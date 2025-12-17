@@ -2290,7 +2290,7 @@ function zaramax_footer_management_page() {
                 
                 <div class="footer-bottom-section">
                     <h2>Footer Bottom Section</h2>
-                    <div style="max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div style="max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 30px;">
                         
                         <!-- Disclaimer Area -->
                         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
@@ -2349,8 +2349,7 @@ function zaramax_footer_management_page() {
     }
     
     @media (max-width: 768px) {
-        .footer-boxes-section > div,
-        .footer-bottom-section > div > div {
+        .footer-boxes-section > div {
             grid-template-columns: 1fr !important;
         }
     }
