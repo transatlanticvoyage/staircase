@@ -59,6 +59,38 @@ body {
     color: #333;
 }
 
+/* Staircase Logo Styles */
+.staircase-logo-link {
+    display: inline-block;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.staircase-logo {
+    height: 40px;
+    width: auto;
+    max-width: 250px;
+    vertical-align: middle;
+    transition: opacity 0.3s ease;
+}
+
+.staircase-logo:hover {
+    opacity: 0.8;
+}
+
+/* WordPress custom logo fallback */
+.custom-logo-link {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.custom-logo {
+    height: 40px;
+    width: auto;
+    max-width: 250px;
+    vertical-align: middle;
+}
+
 /* Navigation */
 .main-navigation {
     display: flex;
@@ -80,6 +112,139 @@ body {
 
 .main-navigation a:hover {
     color: #0073aa;
+}
+
+/* Dropdown Menus */
+.main-navigation .menu-item-has-children {
+    position: relative;
+}
+
+.main-navigation .sub-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    padding: 0.5rem 0;
+}
+
+.main-navigation .menu-item-has-children.dropdown-open .sub-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.main-navigation .sub-menu li {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.main-navigation .sub-menu li:last-child {
+    border-bottom: none;
+}
+
+.main-navigation .sub-menu a {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: #333;
+    font-weight: 400;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.main-navigation .sub-menu a:hover {
+    background-color: #f8f9fa;
+    color: #0073aa;
+}
+
+/* Dropdown Toggle Button */
+.dropdown-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 2px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.dropdown-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-toggle svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.menu-item-has-children.dropdown-open .dropdown-toggle svg {
+    transform: rotate(180deg);
+}
+
+/* Multi-level Dropdowns */
+.main-navigation .sub-menu .menu-item-has-children .sub-menu {
+    top: 0;
+    left: 100%;
+    margin-left: -1px;
+}
+
+/* Dropdown Indicator Styling */
+.dropdown-indicator {
+    margin-left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-indicator svg {
+    width: 0.75rem;
+    height: 0.5rem;
+}
+
+.menu-item-has-children.dropdown-open .dropdown-indicator {
+    transform: rotate(180deg);
+}
+
+/* Header Phone Button */
+.header-phone {
+    margin-left: 1rem;
+}
+
+.header-phone-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: #0073aa;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 500;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.header-phone-button:hover {
+    background-color: #005a87;
+    transform: translateY(-1px);
+}
+
+.phone-icon {
+    flex-shrink: 0;
+}
+
+.phone-number {
+    white-space: nowrap;
 }
 
 /* Mobile Menu Toggle */
@@ -144,6 +309,21 @@ body {
     font-size: 2.5rem;
     margin-bottom: 1rem;
     color: #333;
+}
+
+/* Page Header for Blog and Archive Pages */
+.page-header {
+    margin-bottom: 3rem;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: bold;
 }
 
 .entry-content {
@@ -285,6 +465,66 @@ body {
         padding: 1rem 20px;
     }
     
+    /* Mobile Dropdown Styles */
+    .main-navigation .sub-menu {
+        position: static;
+        background-color: #f8f9fa;
+        box-shadow: none;
+        border-radius: 0;
+        min-width: auto;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        transition: none;
+        padding: 0;
+        display: none;
+    }
+    
+    .main-navigation .menu-item-has-children.dropdown-open .sub-menu {
+        display: block;
+    }
+    
+    .main-navigation .sub-menu a {
+        padding: 0.75rem 40px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .main-navigation .sub-menu .sub-menu a {
+        padding-left: 60px;
+    }
+    
+    .dropdown-toggle {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0;
+    }
+    
+    /* Mobile Header Phone */
+    .header-phone {
+        order: -1;
+        margin: 0 0 1rem 0;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .header-phone-button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .header-inner {
+        flex-wrap: wrap;
+    }
+    
+    /* Mobile Logo Styles */
+    .staircase-logo,
+    .custom-logo {
+        height: 32px;
+        max-width: 180px;
+    }
+    
     /* Hero Section Mobile */
     .hero-content h1 {
         font-size: 2rem;
@@ -296,6 +536,10 @@ body {
     
     /* Content Mobile */
     .entry-title {
+        font-size: 1.8rem;
+    }
+    
+    .page-title {
         font-size: 1.8rem;
     }
     
@@ -333,10 +577,214 @@ body {
     }
 }
 
+/* Zaramax Custom Footer Styles */
+.zaramax-footer {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.zaramax-footer-main {
+    padding: 3rem 0 2rem;
+}
+
+.footer-boxes-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    align-items: start;
+}
+
+.footer-box {
+    padding: 1rem;
+}
+
+/* Box 1 - Logo & Contact */
+.footer-box-1 .footer-logo-img {
+    height: 50px;
+    width: auto;
+    margin-bottom: 1rem;
+}
+
+.footer-box-1 .footer-site-title h3 {
+    margin: 0 0 1rem 0;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.footer-box-1 .footer-blurb p {
+    margin-bottom: 1rem;
+    color: #ecf0f1;
+    line-height: 1.6;
+}
+
+.footer-phone-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+.footer-phone-button:hover {
+    background-color: #2980b9;
+}
+
+/* Boxes 2 & 3 - Custom HTML */
+.footer-box-2,
+.footer-box-3 {
+    color: #ecf0f1;
+}
+
+.footer-box-2 h3,
+.footer-box-2 h4,
+.footer-box-3 h3,
+.footer-box-3 h4 {
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.footer-box-2 ul,
+.footer-box-3 ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-box-2 li,
+.footer-box-3 li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-box-2 a,
+.footer-box-3 a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-box-2 a:hover,
+.footer-box-3 a:hover {
+    color: #5dade2;
+}
+
+/* Box 4 - Google Maps */
+.footer-box-4 .map-heading {
+    margin: 0 0 1rem 0;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.footer-map {
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.footer-map iframe {
+    display: block;
+}
+
+/* Footer Bottom Section */
+.zaramax-footer-bottom {
+    background-color: #1a252f;
+    padding: 2rem 0;
+    border-top: 1px solid #34495e;
+}
+
+.footer-bottom-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    text-align: left;
+}
+
+.footer-disclaimer,
+.footer-legal-links {
+    color: #bdc3c7;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.footer-disclaimer h4,
+.footer-legal-links h4 {
+    color: white;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.footer-disclaimer a,
+.footer-legal-links a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.footer-disclaimer a:hover,
+.footer-legal-links a:hover {
+    color: #5dade2;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1200px) {
+    .footer-boxes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-boxes-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .zaramax-footer-main {
+        padding: 2rem 0 1.5rem;
+    }
+    
+    .footer-bottom-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .footer-bottom-container {
+        padding: 0 15px;
+    }
+    
+    .footer-phone-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .zaramax-footer-main {
+        padding: 1.5rem 0 1rem;
+    }
+    
+    .footer-box {
+        padding: 0.5rem;
+    }
+    
+    .footer-map {
+        height: 150px;
+    }
+}
+
 /* Print Styles */
 @media print {
     .site-header,
     .site-footer,
+    .zaramax-footer,
     .menu-toggle {
         display: none;
     }

@@ -15,14 +15,7 @@ get_header();
         <?php
         if (have_posts()):
             
-            // Check if this is a blog listing page
-            if (is_home() && !is_front_page()):
-                ?>
-                <header class="page-header">
-                    <h1 class="page-title"><?php single_post_title(); ?></h1>
-                </header>
-                <?php
-            endif;
+            // Blog listing page title is now handled by the hero section in header.php
             
             // Start the Loop
             while (have_posts()): the_post();
