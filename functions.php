@@ -370,6 +370,11 @@ function staircase_hero_section($title = '', $subtitle = '', $button_text = '', 
         return;
     }
     
+    if ($hero_type === 'homepage-apple') {
+        staircase_homepage_apple_hero();
+        return;
+    }
+    
     // Default hero for other templates
     if (empty($title)) {
         $title = get_bloginfo('name');
@@ -769,9 +774,318 @@ function staircase_homepage_cherry_hero() {
     <?php
 }
 
+// Homepage Apple hero section
+function staircase_homepage_apple_hero() {
+    $post_id = get_the_ID();
+    
+    // Get Homepage Apple fields - fallback to cherry fields for identical content
+    $apple_heading = get_post_meta($post_id, 'apple_hero_heading', true);
+    if (empty($apple_heading)) {
+        $apple_heading = get_post_meta($post_id, 'cherry_hero_heading', true);
+    }
+    
+    $apple_subheading = get_post_meta($post_id, 'apple_hero_subheading', true);
+    if (empty($apple_subheading)) {
+        $apple_subheading = get_post_meta($post_id, 'cherry_hero_subheading', true);
+    }
+    
+    $apple_button_left_text = get_post_meta($post_id, 'apple_button_left_text', true);
+    if (empty($apple_button_left_text)) {
+        $apple_button_left_text = get_post_meta($post_id, 'cherry_button_left_text', true);
+    }
+    
+    $apple_button_left_url = get_post_meta($post_id, 'apple_button_left_url', true);
+    if (empty($apple_button_left_url)) {
+        $apple_button_left_url = get_post_meta($post_id, 'cherry_button_left_url', true);
+    }
+    
+    $apple_button_right_text = get_post_meta($post_id, 'apple_button_right_text', true);
+    if (empty($apple_button_right_text)) {
+        $apple_button_right_text = get_post_meta($post_id, 'cherry_button_right_text', true);
+    }
+    
+    $apple_button_right_url = get_post_meta($post_id, 'apple_button_right_url', true);
+    if (empty($apple_button_right_url)) {
+        $apple_button_right_url = get_post_meta($post_id, 'cherry_button_right_url', true);
+    }
+    // Get formatted phone number from database (same as header phone button)
+    $apple_phone_number_raw = staircase_get_header_phone();
+    $apple_phone_number_formatted = staircase_get_formatted_phone();
+    
+    // Get zarl card data - shared with cherry template
+    $zarl_card_1_icon = get_post_meta($post_id, 'zarl_card_1_icon', true);
+    $zarl_card_1_title = get_post_meta($post_id, 'zarl_card_1_title', true);
+    $zarl_card_1_description = get_post_meta($post_id, 'zarl_card_1_description', true);
+    
+    $zarl_card_2_icon = get_post_meta($post_id, 'zarl_card_2_icon', true);
+    $zarl_card_2_title = get_post_meta($post_id, 'zarl_card_2_title', true);
+    $zarl_card_2_description = get_post_meta($post_id, 'zarl_card_2_description', true);
+    
+    $zarl_card_3_icon = get_post_meta($post_id, 'zarl_card_3_icon', true);
+    $zarl_card_3_title = get_post_meta($post_id, 'zarl_card_3_title', true);
+    $zarl_card_3_description = get_post_meta($post_id, 'zarl_card_3_description', true);
+    
+    // Default values (same logic as cherry)
+    if (empty($apple_heading)) {
+        $apple_heading = get_the_title();
+    }
+    if (empty($apple_subheading)) {
+        $apple_subheading = get_bloginfo('description');
+    }
+    
+    ?>
+    <section class="hero-section homepage-apple-hero">
+        <div class="container">
+            <div class="apple-hero-content">
+                <h1 class="apple-heading"><?php echo esc_html($apple_heading); ?></h1>
+                <?php if ($apple_subheading): ?>
+                    <p class="apple-subheading"><?php echo esc_html($apple_subheading); ?></p>
+                <?php endif; ?>
+                
+                <?php if ($apple_button_left_text || $apple_button_right_text): ?>
+                    <div class="apple-buttons-container">
+                        <?php if ($apple_button_left_text && $apple_button_left_url): ?>
+                            <a href="<?php echo esc_url($apple_button_left_url); ?>" class="apple-button apple-button-left">
+                                <?php echo esc_html($apple_button_left_text); ?>
+                            </a>
+                        <?php endif; ?>
+                        
+                        <?php if ($apple_button_right_text && $apple_button_right_url): ?>
+                            <a href="<?php echo esc_url($apple_button_right_url); ?>" class="apple-button apple-button-right">
+                                <?php echo esc_html($apple_button_right_text); ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($apple_phone_number_raw): ?>
+                    <div class="apple-phone-container">
+                        <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $apple_phone_number_raw)); ?>" class="apple-phone">
+                            <?php echo esc_html($apple_phone_number_formatted); ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+    
+    <?php 
+    // Show zarl card block if any cards have content
+    $has_zarl_cards = !empty($zarl_card_1_title) || !empty($zarl_card_2_title) || !empty($zarl_card_3_title);
+    if ($has_zarl_cards): 
+    ?>
+    <section class="zarl-card-block">
+        <div class="container">
+            <div class="zarl-cards-grid">
+                <?php if (!empty($zarl_card_1_title)): ?>
+                    <div class="zarl-card">
+                        <?php if (!empty($zarl_card_1_icon)): ?>
+                            <div class="zarl-card-icon">
+                                <img src="<?php echo esc_url($zarl_card_1_icon); ?>" alt="<?php echo esc_attr($zarl_card_1_title); ?>" />
+                            </div>
+                        <?php endif; ?>
+                        <h3 class="zarl-card-title"><?php echo esc_html($zarl_card_1_title); ?></h3>
+                        <?php if (!empty($zarl_card_1_description)): ?>
+                            <p class="zarl-card-description"><?php echo esc_html($zarl_card_1_description); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($zarl_card_2_title)): ?>
+                    <div class="zarl-card">
+                        <?php if (!empty($zarl_card_2_icon)): ?>
+                            <div class="zarl-card-icon">
+                                <img src="<?php echo esc_url($zarl_card_2_icon); ?>" alt="<?php echo esc_attr($zarl_card_2_title); ?>" />
+                            </div>
+                        <?php endif; ?>
+                        <h3 class="zarl-card-title"><?php echo esc_html($zarl_card_2_title); ?></h3>
+                        <?php if (!empty($zarl_card_2_description)): ?>
+                            <p class="zarl-card-description"><?php echo esc_html($zarl_card_2_description); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($zarl_card_3_title)): ?>
+                    <div class="zarl-card">
+                        <?php if (!empty($zarl_card_3_icon)): ?>
+                            <div class="zarl-card-icon">
+                                <img src="<?php echo esc_url($zarl_card_3_icon); ?>" alt="<?php echo esc_attr($zarl_card_3_title); ?>" />
+                            </div>
+                        <?php endif; ?>
+                        <h3 class="zarl-card-title"><?php echo esc_html($zarl_card_3_title); ?></h3>
+                        <?php if (!empty($zarl_card_3_description)): ?>
+                            <p class="zarl-card-description"><?php echo esc_html($zarl_card_3_description); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
+    
+    <style>
+    .homepage-apple-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        padding: 80px 0;
+        position: relative;
+    }
+    
+    .apple-hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .apple-heading {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin: 0 0 20px 0;
+        line-height: 1.1;
+    }
+    
+    .apple-subheading {
+        font-size: 1.4rem;
+        margin: 0 0 40px 0;
+        opacity: 0.9;
+        line-height: 1.4;
+        font-weight: 300;
+    }
+    
+    .apple-buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 0 0 30px 0;
+        flex-wrap: wrap;
+    }
+    
+    .apple-button {
+        display: inline-block;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        min-width: 180px;
+        text-align: center;
+    }
+    
+    .apple-button-left {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid white;
+    }
+    
+    .apple-button-left:hover {
+        background: white;
+        color: #667eea;
+    }
+    
+    .apple-button-right {
+        background: white;
+        color: #667eea;
+        border: 2px solid white;
+    }
+    
+    .apple-button-right:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border-color: white;
+    }
+    
+    .apple-phone-container {
+        margin-top: 20px;
+    }
+    
+    .apple-phone {
+        display: inline-block;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: white;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .apple-phone:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .homepage-apple-hero {
+            padding: 60px 0;
+        }
+        
+        .apple-heading {
+            font-size: 2.5rem;
+        }
+        
+        .apple-subheading {
+            font-size: 1.2rem;
+        }
+        
+        .apple-buttons-container {
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .apple-button {
+            min-width: 250px;
+        }
+        
+        .apple-phone {
+            font-size: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .apple-heading {
+            font-size: 2rem;
+        }
+        
+        .apple-subheading {
+            font-size: 1.1rem;
+        }
+        
+        .apple-phone {
+            font-size: 1.3rem;
+        }
+    }
+    </style>
+    <?php
+}
+
 // Get the template for current page
 function staircase_get_current_template() {
+    global $wpdb;
     $post_id = get_the_ID();
+    
+    // First try to get template from wp_pylons table (imported pages)
+    $pylon_template = $wpdb->get_var($wpdb->prepare(
+        "SELECT staircase_page_template_desired 
+         FROM {$wpdb->prefix}pylons 
+         WHERE rel_wp_post_id = %d 
+         AND staircase_page_template_desired IS NOT NULL 
+         AND staircase_page_template_desired != ''", 
+        $post_id
+    ));
+    
+    if ($pylon_template) {
+        // Normalize the template name to match available templates
+        return staircase_normalize_template_name($pylon_template);
+    }
+    
+    // Fallback to existing logic for manually created pages
     $template = get_post_meta($post_id, 'staircase_page_template', true);
     
     // If no template set or set to default, use theme settings
@@ -787,7 +1101,7 @@ function staircase_should_show_hero() {
     $template = staircase_get_current_template();
     
     // Hero templates
-    return in_array($template, array('hero-full', 'hero-minimal', 'homepage-cherry'));
+    return in_array($template, array('hero-full', 'hero-minimal', 'homepage-cherry', 'homepage-apple'));
 }
 
 // Get hero type for current page
@@ -800,6 +1114,8 @@ function staircase_get_hero_type() {
         return 'minimal';
     } elseif ($template === 'homepage-cherry') {
         return 'homepage-cherry';
+    } elseif ($template === 'homepage-apple') {
+        return 'homepage-apple';
     }
     
     return false;
@@ -853,10 +1169,38 @@ function staircase_get_page_templates() {
         'hero-full' => 'Full Hero Layout',
         'hero-minimal' => 'Minimal Hero Layout',
         'homepage-cherry' => 'Homepage Cherry',
+        'homepage-apple' => 'Homepage Apple',
         'no-hero' => 'Standard Layout',
         'content-only' => 'Content Only',
         'sections-builder' => 'Sections Builder'
     );
+}
+
+// Normalize template name from user input to match available templates
+function staircase_normalize_template_name($user_input) {
+    if (empty($user_input)) {
+        return 'default';
+    }
+    
+    // Get available templates
+    $templates = staircase_get_page_templates();
+    
+    // Normalize user input: lowercase, remove spaces, trim
+    $normalized_input = strtolower(trim(str_replace(' ', '', $user_input)));
+    
+    // Check for exact matches first
+    foreach ($templates as $template_key => $template_label) {
+        $normalized_key = strtolower(str_replace(' ', '', $template_key));
+        $normalized_label = strtolower(str_replace(' ', '', $template_label));
+        
+        // Match against template key or label
+        if ($normalized_input === $normalized_key || $normalized_input === $normalized_label) {
+            return $template_key;
+        }
+    }
+    
+    // If no match found, return default
+    return 'default';
 }
 
 // Page options meta box callback
@@ -1007,6 +1351,96 @@ function staircase_page_options_meta_box_callback($post) {
         </script>
     <?php endif; ?>
     
+    <?php if ($selected_template === 'homepage-apple'): ?>
+        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #ff6b6b;">
+            <h4 style="margin: 0 0 10px 0; color: #ff6b6b;">Homepage Apple Options</h4>
+            
+            <p style="margin-bottom: 8px;">
+                <label for="apple_hero_heading"><strong>Hero Heading:</strong></label><br>
+                <input type="text" id="apple_hero_heading" name="apple_hero_heading" 
+                       value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_hero_heading', true)); ?>" 
+                       style="width: 100%; margin-top: 3px;" 
+                       placeholder="<?php echo esc_attr(get_the_title($post->ID) ?: 'Main Heading'); ?>">
+            </p>
+            
+            <p style="margin-bottom: 8px;">
+                <label for="apple_hero_subheading"><strong>Hero Subheading:</strong></label><br>
+                <input type="text" id="apple_hero_subheading" name="apple_hero_subheading" 
+                       value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_hero_subheading', true)); ?>" 
+                       style="width: 100%; margin-top: 3px;" 
+                       placeholder="Subtitle or tagline">
+            </p>
+            
+            <div style="margin-bottom: 8px;">
+                <strong>Buttons:</strong>
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
+                    <div style="flex: 1;">
+                        <input type="text" id="apple_button_left_text" name="apple_button_left_text" 
+                               value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_button_left_text', true)); ?>" 
+                               style="width: 100%; margin-bottom: 3px;" placeholder="Left Button Text">
+                        <input type="text" id="apple_button_left_url" name="apple_button_left_url" 
+                               value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_button_left_url', true)); ?>" 
+                               style="width: 100%;" placeholder="Left Button URL">
+                    </div>
+                    <div style="flex: 1;">
+                        <input type="text" id="apple_button_right_text" name="apple_button_right_text" 
+                               value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_button_right_text', true)); ?>" 
+                               style="width: 100%; margin-bottom: 3px;" placeholder="Right Button Text">
+                        <input type="text" id="apple_button_right_url" name="apple_button_right_url" 
+                               value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_button_right_url', true)); ?>" 
+                               style="width: 100%;" placeholder="Right Button URL">
+                    </div>
+                </div>
+            </div>
+            
+            <h4 style="margin: 15px 0 5px 0; color: #ff6b6b;">Apple Card Blocks (Zarl)</h4>
+            <p style="font-size: 12px; margin-bottom: 10px; color: #666;">Add up to 3 cards that will display below the hero section.</p>
+            
+            <?php for ($i = 1; $i <= 3; $i++): ?>
+                <div style="margin-bottom: 10px; padding: 8px; background: #f9f9f9; border-radius: 4px;">
+                    <strong>Card <?php echo $i; ?>:</strong>
+                    <p style="margin: 5px 0 3px 0;">
+                        <input type="text" name="zarl_card_<?php echo $i; ?>_title" 
+                               value="<?php echo esc_attr(get_post_meta($post->ID, "zarl_card_{$i}_title", true)); ?>" 
+                               style="width: 100%;" placeholder="Card <?php echo $i; ?> title">
+                    </p>
+                    <p style="margin: 3px 0;">
+                        <input type="url" name="zarl_card_<?php echo $i; ?>_icon" 
+                               value="<?php echo esc_attr(get_post_meta($post->ID, "zarl_card_{$i}_icon", true)); ?>" 
+                               style="width: 100%;" placeholder="Icon URL (optional)">
+                    </p>
+                    <p style="margin: 3px 0 0 0;">
+                        <textarea name="zarl_card_<?php echo $i; ?>_description" 
+                                  style="width: 100%; height: 50px; resize: vertical;" 
+                                  placeholder="Card description text"><?php echo esc_textarea(get_post_meta($post->ID, "zarl_card_{$i}_description", true)); ?></textarea>
+                    </p>
+                </div>
+            <?php endfor; ?>
+            
+            <p style="font-size: 11px; color: #666; margin-top: 10px;">
+                Cards will only display if they have a title. Leave title empty to hide a card.
+            </p>
+        </div>
+        
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const templateSelect = document.getElementById('staircase_page_template');
+            const appleOptions = templateSelect.parentNode.querySelector('[style*="border-top: 2px solid #ff6b6b"]');
+            
+            function toggleAppleOptions() {
+                if (templateSelect.value === 'homepage-apple') {
+                    appleOptions.style.display = 'block';
+                } else {
+                    appleOptions.style.display = 'none';
+                }
+            }
+            
+            templateSelect.addEventListener('change', toggleAppleOptions);
+            toggleAppleOptions(); // Initial state
+        });
+        </script>
+    <?php endif; ?>
+    
     <?php
 }
 
@@ -1060,6 +1494,31 @@ function staircase_save_page_options_meta($post_id) {
     
     if (isset($_POST['cherry_button_right_url'])) {
         update_post_meta($post_id, 'cherry_button_right_url', esc_url_raw($_POST['cherry_button_right_url']));
+    }
+    
+    // Save Homepage Apple fields
+    if (isset($_POST['apple_hero_heading'])) {
+        update_post_meta($post_id, 'apple_hero_heading', sanitize_text_field($_POST['apple_hero_heading']));
+    }
+    
+    if (isset($_POST['apple_hero_subheading'])) {
+        update_post_meta($post_id, 'apple_hero_subheading', sanitize_text_field($_POST['apple_hero_subheading']));
+    }
+    
+    if (isset($_POST['apple_button_left_text'])) {
+        update_post_meta($post_id, 'apple_button_left_text', sanitize_text_field($_POST['apple_button_left_text']));
+    }
+    
+    if (isset($_POST['apple_button_left_url'])) {
+        update_post_meta($post_id, 'apple_button_left_url', esc_url_raw($_POST['apple_button_left_url']));
+    }
+    
+    if (isset($_POST['apple_button_right_text'])) {
+        update_post_meta($post_id, 'apple_button_right_text', sanitize_text_field($_POST['apple_button_right_text']));
+    }
+    
+    if (isset($_POST['apple_button_right_url'])) {
+        update_post_meta($post_id, 'apple_button_right_url', esc_url_raw($_POST['apple_button_right_url']));
     }
     
     // Phone number is now pulled directly from database, no need to save it as post meta
@@ -1376,6 +1835,11 @@ function staircase_templates_page() {
                         'name' => 'Homepage Cherry',
                         'description' => 'Centered hero with heading, subheading, dual buttons, and phone number',
                         'features' => array('Centered Hero', 'Two Buttons', 'Phone Number', 'Page Content')
+                    ),
+                    'homepage-apple' => array(
+                        'name' => 'Homepage Apple',
+                        'description' => 'Centered hero with warm gradient, heading, subheading, dual buttons, and phone number',
+                        'features' => array('Warm Gradient Hero', 'Two Buttons', 'Phone Number', 'Page Content')
                     ),
                     'no-hero' => array(
                         'name' => 'Standard Layout',
@@ -1771,6 +2235,7 @@ function staircase_settings_page() {
                                     <option value="hero-full" <?php selected($default_template, 'hero-full'); ?>>Full Hero Layout</option>
                                     <option value="hero-minimal" <?php selected($default_template, 'hero-minimal'); ?>>Minimal Hero Layout</option>
                                     <option value="homepage-cherry" <?php selected($default_template, 'homepage-cherry'); ?>>Homepage Cherry</option>
+                                    <option value="homepage-apple" <?php selected($default_template, 'homepage-apple'); ?>>Homepage Apple</option>
                                     <option value="no-hero" <?php selected($default_template, 'no-hero'); ?>>Standard Layout</option>
                                     <option value="content-only" <?php selected($default_template, 'content-only'); ?>>Content Only</option>
                                     <option value="sections-builder" <?php selected($default_template, 'sections-builder'); ?>>Sections Builder</option>
