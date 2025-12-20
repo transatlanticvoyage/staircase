@@ -793,6 +793,167 @@ function staircase_homepage_cherry_hero() {
             font-size: 0.9rem;
         }
     }
+    
+    /* Paragon Card Styles - Our Services Section */
+    .paragon-services-section {
+        padding: 80px 0;
+        background: #ffffff;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .paragon-section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 50px 0;
+        line-height: 1.2;
+    }
+    
+    .paragon-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .paragon-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .paragon-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .paragon-card-image {
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .paragon-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .paragon-card:hover .paragon-card-image img {
+        transform: scale(1.05);
+    }
+    
+    .paragon-card-content {
+        padding: 25px 20px;
+    }
+    
+    .paragon-card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 12px 0;
+        line-height: 1.3;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    
+    .paragon-card-description {
+        font-size: 0.95rem;
+        color: #6c757d;
+        line-height: 1.5;
+        margin: 0;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+    
+    /* Responsive Design for Paragon Cards */
+    @media (max-width: 1200px) {
+        .paragon-cards-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .paragon-cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .paragon-section-title {
+            font-size: 2.2rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .paragon-services-section {
+            padding: 60px 0;
+        }
+        
+        .paragon-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .paragon-section-title {
+            font-size: 2rem;
+            margin: 0 0 40px 0;
+        }
+        
+        .paragon-card-image {
+            height: 200px;
+        }
+        
+        .paragon-card-content {
+            padding: 20px 18px;
+        }
+        
+        .paragon-card-title {
+            font-size: 1.1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .paragon-services-section {
+            padding: 50px 0;
+        }
+        
+        .paragon-section-title {
+            font-size: 1.8rem;
+            margin: 0 0 30px 0;
+        }
+        
+        .paragon-card-image {
+            height: 160px;
+        }
+        
+        .paragon-card-content {
+            padding: 18px 15px;
+        }
+        
+        .paragon-card-description {
+            font-size: 0.9rem;
+        }
+    }
     </style>
     <?php
 }
