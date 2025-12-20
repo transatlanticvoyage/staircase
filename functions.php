@@ -403,11 +403,26 @@ function staircase_hero_section($title = '', $subtitle = '', $button_text = '', 
 
 // Homepage Cherry hero section
 function staircase_homepage_cherry_hero() {
+    global $wpdb;
     $post_id = get_the_ID();
     
-    // Get Homepage Cherry specific fields (we'll create these)
-    $cherry_heading = get_post_meta($post_id, 'cherry_hero_heading', true);
-    $cherry_subheading = get_post_meta($post_id, 'cherry_hero_subheading', true);
+    // Get data from wp_posts and wp_pylons tables
+    $cherry_heading = get_the_title(); // wp_posts.post_title
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Get hero subheading from wp_pylons
+    $cherry_subheading = '';
+    if ($pylon_data && !empty($pylon_data['hero_subheading'])) {
+        $cherry_subheading = $pylon_data['hero_subheading'];
+    }
+    
+    // Keep existing button logic for now
     $cherry_button_left_text = get_post_meta($post_id, 'cherry_button_left_text', true);
     $cherry_button_left_url = get_post_meta($post_id, 'cherry_button_left_url', true);
     $cherry_button_right_text = get_post_meta($post_id, 'cherry_button_right_text', true);
@@ -416,23 +431,31 @@ function staircase_homepage_cherry_hero() {
     $cherry_phone_number_raw = staircase_get_header_phone();
     $cherry_phone_number_formatted = staircase_get_formatted_phone();
     
-    // Get zarl card data
+    // Get chenblock card data from wp_pylons
+    $zarl_card_1_title = '';
+    $zarl_card_1_description = '';
+    $zarl_card_2_title = '';
+    $zarl_card_2_description = '';
+    $zarl_card_3_title = '';
+    $zarl_card_3_description = '';
+    
+    if ($pylon_data) {
+        $zarl_card_1_title = !empty($pylon_data['chenblock_card1_title']) ? $pylon_data['chenblock_card1_title'] : '';
+        $zarl_card_1_description = !empty($pylon_data['chenblock_card1_desc']) ? $pylon_data['chenblock_card1_desc'] : '';
+        
+        $zarl_card_2_title = !empty($pylon_data['chenblock_card2_title']) ? $pylon_data['chenblock_card2_title'] : '';
+        $zarl_card_2_description = !empty($pylon_data['chenblock_card2_desc']) ? $pylon_data['chenblock_card2_desc'] : '';
+        
+        $zarl_card_3_title = !empty($pylon_data['chenblock_card3_title']) ? $pylon_data['chenblock_card3_title'] : '';
+        $zarl_card_3_description = !empty($pylon_data['chenblock_card3_desc']) ? $pylon_data['chenblock_card3_desc'] : '';
+    }
+    
+    // Keep icons from post_meta for now (or remove if not needed)
     $zarl_card_1_icon = get_post_meta($post_id, 'zarl_card_1_icon', true);
-    $zarl_card_1_title = get_post_meta($post_id, 'zarl_card_1_title', true);
-    $zarl_card_1_description = get_post_meta($post_id, 'zarl_card_1_description', true);
-    
     $zarl_card_2_icon = get_post_meta($post_id, 'zarl_card_2_icon', true);
-    $zarl_card_2_title = get_post_meta($post_id, 'zarl_card_2_title', true);
-    $zarl_card_2_description = get_post_meta($post_id, 'zarl_card_2_description', true);
-    
     $zarl_card_3_icon = get_post_meta($post_id, 'zarl_card_3_icon', true);
-    $zarl_card_3_title = get_post_meta($post_id, 'zarl_card_3_title', true);
-    $zarl_card_3_description = get_post_meta($post_id, 'zarl_card_3_description', true);
     
     // Default values
-    if (empty($cherry_heading)) {
-        $cherry_heading = get_the_title();
-    }
     if (empty($cherry_subheading)) {
         $cherry_subheading = get_bloginfo('description');
     }

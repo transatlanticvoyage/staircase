@@ -38,21 +38,28 @@
             
             <nav class="main-navigation">
                 <?php
-                wp_nav_menu(array(
-                    'theme_location' => 'primary',
-                    'menu_id'        => 'primary-menu',
-                    'container'      => false,
-                    'depth'          => 3, // Allow up to 3 levels
-                    'walker'         => new Staircase_Walker_Nav_Menu(),
-                    'fallback_cb'    => function() {
-                        echo '<ul id="primary-menu">';
-                        wp_list_pages(array(
-                            'title_li' => '',
-                            'depth'    => 1,
-                        ));
-                        echo '</ul>';
-                    }
-                ));
+                // Check if Silkweaver menu system is enabled
+                if (function_exists('silkweaver_render_menu') && get_option('silkweaver_use_system', true)) {
+                    // Use Silkweaver menu system
+                    echo silkweaver_render_menu();
+                } else {
+                    // Use native WordPress menu system
+                    wp_nav_menu(array(
+                        'theme_location' => 'primary',
+                        'menu_id'        => 'primary-menu',
+                        'container'      => false,
+                        'depth'          => 3, // Allow up to 3 levels
+                        'walker'         => new Staircase_Walker_Nav_Menu(),
+                        'fallback_cb'    => function() {
+                            echo '<ul id="primary-menu">';
+                            wp_list_pages(array(
+                                'title_li' => '',
+                                'depth'    => 1,
+                            ));
+                            echo '</ul>';
+                        }
+                    ));
+                }
                 ?>
             </nav>
             
