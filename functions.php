@@ -406,6 +406,9 @@ function staircase_homepage_cherry_hero() {
     global $wpdb;
     $post_id = get_the_ID();
     
+    // Debug: Add HTML comment to verify function is being called
+    echo "<!-- Homepage Cherry Hero: Post ID = $post_id -->\n";
+    
     // Get data from wp_posts and wp_pylons tables
     $cherry_heading = get_the_title(); // wp_posts.post_title
     
@@ -415,6 +418,15 @@ function staircase_homepage_cherry_hero() {
         "SELECT * FROM {$pylons_table} WHERE rel_wp_post_id = %d",
         $post_id
     ), ARRAY_A);
+    
+    // Debug: Check if pylon data exists
+    if ($pylon_data) {
+        echo "<!-- Pylon data found for post $post_id -->\n";
+        echo "<!-- hero_subheading: " . (!empty($pylon_data['hero_subheading']) ? $pylon_data['hero_subheading'] : 'empty') . " -->\n";
+        echo "<!-- chenblock_card1_title: " . (!empty($pylon_data['chenblock_card1_title']) ? $pylon_data['chenblock_card1_title'] : 'empty') . " -->\n";
+    } else {
+        echo "<!-- No pylon data found for post $post_id -->\n";
+    }
     
     // Get hero subheading from wp_pylons
     $cherry_subheading = '';
@@ -3132,11 +3144,113 @@ function zaramax_render_custom_footer() {
                     
                     <!-- Legal Links Area -->
                     <div class="footer-legal-links">
-                        <?php echo wpautop(wp_kses_post($footer_legal_links)); ?>
+                        <?php 
+                        // Preserve multiple spaces by replacing them with non-breaking spaces
+                        $legal_links_html = wp_kses_post($footer_legal_links);
+                        // Replace multiple spaces with non-breaking spaces
+                        $legal_links_html = preg_replace('/  +/', function($matches) {
+                            return str_repeat('&nbsp;', strlen($matches[0]));
+                        }, $legal_links_html);
+                        echo wpautop($legal_links_html); 
+                        ?>
                     </div>
                 </div>
             </div>
         </div>
     </footer>
+    <?php
+}
+
+// Our Services Section - Paragon Cards
+function staircase_our_services_section() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get service title configuration from current page's pylon data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT our_services_box_title FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Default title or use configured title
+    $services_title = !empty($pylon_data['our_services_box_title']) ? $pylon_data['our_services_box_title'] : 'Our Services';
+    
+    // Get all service pages from pylons table
+    // Order by creation date (primary) and alphabetical by moniker/post_title (secondary)
+    $services = $wpdb->get_results("
+        SELECT 
+            p.ID, 
+            p.post_title, 
+            py.moniker, 
+            py.paragon_description,
+            py.paragon_featured_image_id,
+            py.created_at
+        FROM {$wpdb->posts} p 
+        INNER JOIN {$pylons_table} py ON p.ID = py.rel_wp_post_id 
+        WHERE py.pylon_archetype = 'servicepage' 
+        AND p.post_status = 'publish'
+        AND (py.paragon_description IS NOT NULL AND py.paragon_description != '')
+        ORDER BY py.created_at ASC, 
+                 CASE WHEN py.moniker IS NULL OR py.moniker = '' THEN p.post_title ELSE py.moniker END ASC
+    ");
+    
+    // Don't render section if no services found
+    if (empty($services)) {
+        return;
+    }
+    
+    ?>
+    <section class="paragon-services-section">
+        <div class="container">
+            <h2 class="paragon-section-title"><?php echo esc_html($services_title); ?></h2>
+            <div class="paragon-cards-grid">
+                <?php foreach ($services as $service): ?>
+                    <?php
+                    $service_url = get_permalink($service->ID);
+                    $service_title = !empty($service->moniker) ? $service->moniker : $service->post_title;
+                    
+                    // Get featured image
+                    $image_html = '';
+                    if (!empty($service->paragon_featured_image_id)) {
+                        $image_src = wp_get_attachment_image_src($service->paragon_featured_image_id, 'medium');
+                        if ($image_src) {
+                            $image_html = sprintf(
+                                '<img src="%s" alt="%s" />',
+                                esc_url($image_src[0]),
+                                esc_attr($service_title)
+                            );
+                        }
+                    }
+                    
+                    // Fallback to featured image if no paragon image
+                    if (empty($image_html)) {
+                        $featured_image_id = get_post_thumbnail_id($service->ID);
+                        if ($featured_image_id) {
+                            $image_html = get_the_post_thumbnail($service->ID, 'medium', array(
+                                'alt' => esc_attr($service_title)
+                            ));
+                        }
+                    }
+                    
+                    // Default placeholder if no images found
+                    if (empty($image_html)) {
+                        $image_html = '<div style="width:100%;height:180px;background:#f8f9fa;display:flex;align-items:center;justify-content:center;color:#6c757d;font-size:14px;">No Image Available</div>';
+                    }
+                    ?>
+                    
+                    <a href="<?php echo esc_url($service_url); ?>" class="paragon-card">
+                        <div class="paragon-card-image">
+                            <?php echo $image_html; ?>
+                        </div>
+                        <div class="paragon-card-content">
+                            <h3 class="paragon-card-title"><?php echo esc_html($service_title); ?></h3>
+                            <p class="paragon-card-description"><?php echo esc_html($service->paragon_description); ?></p>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
     <?php
 }

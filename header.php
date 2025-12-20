@@ -89,31 +89,39 @@
 <?php
 // Display hero section if applicable
 if (function_exists('staircase_should_show_hero') && staircase_should_show_hero()) {
-    if (is_front_page()) {
-        // Default hero for homepage/front page
-        $hero_title = get_bloginfo('name');
-        $hero_subtitle = get_bloginfo('description');
-        $hero_button_text = '';
-        $hero_button_url = '';
-    } elseif (is_home() && !is_front_page()) {
-        // Hero for blog listing page
-        $blog_page_id = get_option('page_for_posts');
-        $hero_title = $blog_page_id ? get_the_title($blog_page_id) : 'Blog';
-        $hero_subtitle = '';
-        $hero_button_text = '';
-        $hero_button_url = '';
+    // Check if it's a special template that handles its own hero
+    $current_template = staircase_get_current_template();
+    if (in_array($current_template, array('homepage-cherry', 'homepage-apple'))) {
+        // Let the template-specific function handle all the hero data
+        staircase_hero_section();
     } else {
-        // Get custom hero data for regular pages
-        $hero_title = get_post_meta(get_the_ID(), 'hero_title', true);
-        $hero_subtitle = get_post_meta(get_the_ID(), 'hero_subtitle', true);
-        $hero_button_text = get_post_meta(get_the_ID(), 'hero_button_text', true);
-        $hero_button_url = get_post_meta(get_the_ID(), 'hero_button_url', true);
-        
-        if (empty($hero_title)) {
-            $hero_title = get_the_title();
+        // Standard hero handling
+        if (is_front_page()) {
+            // Default hero for homepage/front page
+            $hero_title = get_bloginfo('name');
+            $hero_subtitle = get_bloginfo('description');
+            $hero_button_text = '';
+            $hero_button_url = '';
+        } elseif (is_home() && !is_front_page()) {
+            // Hero for blog listing page
+            $blog_page_id = get_option('page_for_posts');
+            $hero_title = $blog_page_id ? get_the_title($blog_page_id) : 'Blog';
+            $hero_subtitle = '';
+            $hero_button_text = '';
+            $hero_button_url = '';
+        } else {
+            // Get custom hero data for regular pages
+            $hero_title = get_post_meta(get_the_ID(), 'hero_title', true);
+            $hero_subtitle = get_post_meta(get_the_ID(), 'hero_subtitle', true);
+            $hero_button_text = get_post_meta(get_the_ID(), 'hero_button_text', true);
+            $hero_button_url = get_post_meta(get_the_ID(), 'hero_button_url', true);
+            
+            if (empty($hero_title)) {
+                $hero_title = get_the_title();
+            }
         }
+        
+        staircase_hero_section($hero_title, $hero_subtitle, $hero_button_text, $hero_button_url);
     }
-    
-    staircase_hero_section($hero_title, $hero_subtitle, $hero_button_text, $hero_button_url);
 }
 ?>

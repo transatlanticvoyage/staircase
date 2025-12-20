@@ -729,6 +729,11 @@ body {
     line-height: 1.6;
 }
 
+.footer-legal-links {
+    white-space: pre-wrap;
+    word-spacing: normal;
+}
+
 .footer-disclaimer h4,
 .footer-legal-links h4 {
     color: white;
@@ -790,6 +795,224 @@ body {
     
     .footer-map {
         height: 150px;
+    }
+}
+
+/* Silkweaver Menu Styles - Integrated with Staircase Theme */
+.silkweaver-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.silkweaver-menu li {
+    position: relative;
+    margin-right: 30px;
+}
+
+.silkweaver-menu li:last-child {
+    margin-right: 0;
+}
+
+.silkweaver-menu a {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 500;
+    font-size: 16px;
+    transition: opacity 0.3s ease;
+    display: block;
+    padding: 8px 0;
+}
+
+.silkweaver-menu a:hover {
+    opacity: 0.7;
+}
+
+/* Dropdown Menu Styles */
+.silkweaver-dropdown {
+    position: relative;
+}
+
+.silkweaver-dropdown-toggle::after {
+    content: "▼";
+    font-size: 10px;
+    margin-left: 5px;
+    opacity: 0.7;
+}
+
+/* Parent button styling for dynamic menu items */
+.silkweaver-parent-button {
+    background: none;
+    border: none;
+    color: inherit;
+    font-weight: 500;
+    font-size: 16px;
+    transition: opacity 0.3s ease;
+    padding: 8px 0;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.silkweaver-parent-button:hover {
+    opacity: 0.7;
+}
+
+.silkweaver-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 240px;
+    max-width: 320px;
+    background: white;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    border-radius: 8px;
+    list-style: none;
+    margin: 0;
+    padding: 12px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 1000;
+    border: 1px solid rgba(0,0,0,0.08);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+}
+
+.silkweaver-dropdown:hover .silkweaver-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.silkweaver-dropdown-menu li {
+    margin: 0;
+    width: 100%;
+    display: block;
+}
+
+.silkweaver-dropdown-menu a {
+    padding: 12px 20px;
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f2f4;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
+}
+
+.silkweaver-dropdown-menu li:last-child a {
+    border-bottom: none;
+}
+
+.silkweaver-dropdown-menu a:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #1a252f;
+    padding-left: 24px;
+    opacity: 1;
+    transform: translateX(2px);
+}
+
+/* Enhanced styling for pinned links */
+.silkweaver-dropdown-menu li:first-child a {
+    font-weight: 600;
+    color: #0073aa;
+    border-bottom: 2px solid #e3f2fd;
+}
+
+.silkweaver-dropdown-menu li:first-child a:hover {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #005177;
+}
+
+/* Enhanced mobile responsive design */
+@media (max-width: 768px) {
+    .silkweaver-menu {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    
+    .silkweaver-menu li {
+        margin-right: 0;
+        margin-bottom: 8px;
+        width: 100%;
+    }
+    
+    .silkweaver-dropdown {
+        width: 100%;
+    }
+    
+    .silkweaver-dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        background: #f8f9fa;
+        margin-left: 15px;
+        margin-top: 8px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        padding: 8px 0;
+        min-width: auto;
+        width: calc(100% - 15px);
+    }
+    
+    .silkweaver-dropdown-toggle::after {
+        content: "▼";
+        transition: transform 0.3s ease;
+    }
+    
+    .silkweaver-dropdown:hover .silkweaver-dropdown-toggle::after {
+        transform: rotate(180deg);
+    }
+    
+    .silkweaver-parent-button {
+        width: 100%;
+        text-align: left;
+        padding: 12px 0;
+        font-size: 16px;
+    }
+    
+    .silkweaver-dropdown-menu a {
+        padding: 8px 15px;
+        font-size: 14px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .silkweaver-dropdown-menu li:last-child a {
+        border-bottom: none;
+    }
+}
+
+/* Improved tablet responsive */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .silkweaver-menu {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .silkweaver-menu li {
+        margin-right: 15px;
+    }
+    
+    .silkweaver-dropdown-menu {
+        min-width: 200px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-10px);
+    }
+    
+    .silkweaver-dropdown:hover .silkweaver-dropdown-menu {
+        transform: translateX(-50%) translateY(0);
     }
 }
 

@@ -94,6 +94,14 @@ get_header();
     </div>
 </main>
 
+<?php
+// Add Our Services section for homepage cherry template
+$current_template = staircase_get_current_template();
+if ($current_template === 'homepage-cherry') {
+    staircase_our_services_section();
+}
+?>
+
 <style>
 /* Homepage specific styles */
 .latest-posts {
