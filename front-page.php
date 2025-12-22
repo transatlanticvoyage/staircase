@@ -95,10 +95,34 @@ get_header();
 </main>
 
 <?php
-// Add Our Services section for homepage cherry template
+// Add Our Services section for homepage cherry template when enabled
 $current_template = staircase_get_current_template();
+$post_id = get_the_ID();
+
+// Debug output
+echo "<!-- OSB Debug: Post ID = $post_id, Template = '$current_template' -->\n";
+
 if ($current_template === 'homepage-cherry') {
-    staircase_our_services_section();
+    // Check if OSB is enabled for this page
+    global $wpdb;
+    $pylons_table = $wpdb->prefix . 'pylons';
+    
+    $osb_enabled = $wpdb->get_var($wpdb->prepare(
+        "SELECT osb_is_enabled FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ));
+    
+    echo "<!-- OSB Debug: OSB Enabled = " . ($osb_enabled ? 'YES' : 'NO') . " -->\n";
+    
+    if ($osb_enabled) {
+        echo "<!-- OSB Debug: Rendering Our Services Section -->\n";
+        staircase_our_services_section();
+        echo "<!-- OSB Debug: Our Services Section Rendered -->\n";
+    } else {
+        echo "<!-- OSB Debug: OSB not enabled for this page -->\n";
+    }
+} else {
+    echo "<!-- OSB Debug: Not a homepage-cherry template, OSB will not render -->\n";
 }
 ?>
 

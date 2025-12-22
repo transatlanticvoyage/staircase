@@ -2,9 +2,14 @@
 // Check which footer system to use
 $use_zaramax_footer = get_option('zaramax_use_custom_footer', false);
 
+// Debug: Add HTML comment to show footer system status
+echo "<!-- Footer Debug: use_zaramax_footer = " . ($use_zaramax_footer ? 'true' : 'false') . ", function_exists = " . (function_exists('zaramax_render_custom_footer') ? 'true' : 'false') . " -->\n";
+
 if ($use_zaramax_footer && function_exists('zaramax_render_custom_footer')) {
+    echo "<!-- Using Zaramax Custom Footer -->\n";
     zaramax_render_custom_footer();
 } else {
+    echo "<!-- Using Default WordPress Footer -->\n";
     // Default footer system
     ?>
     <footer class="site-footer">

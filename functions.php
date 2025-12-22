@@ -3145,13 +3145,20 @@ function zaramax_render_custom_footer() {
                     <!-- Legal Links Area -->
                     <div class="footer-legal-links">
                         <?php 
-                        // Preserve multiple spaces by replacing them with non-breaking spaces
-                        $legal_links_html = wp_kses_post($footer_legal_links);
-                        // Replace multiple spaces with non-breaking spaces
-                        $legal_links_html = preg_replace('/  +/', function($matches) {
-                            return str_repeat('&nbsp;', strlen($matches[0]));
-                        }, $legal_links_html);
-                        echo wpautop($legal_links_html); 
+                        // Debug: Show legal links variable status
+                        echo '<!-- Legal Links Debug: footer_legal_links = "' . esc_attr($footer_legal_links) . '", length = ' . strlen($footer_legal_links) . ' -->';
+                        
+                        if (!empty($footer_legal_links)) {
+                            // Preserve multiple spaces by replacing them with non-breaking spaces
+                            $legal_links_html = wp_kses_post($footer_legal_links);
+                            // Simple replacement of multiple spaces with non-breaking spaces
+                            $legal_links_html = str_replace('    ', '&nbsp;&nbsp;&nbsp;&nbsp;', $legal_links_html); // 4 spaces
+                            $legal_links_html = str_replace('   ', '&nbsp;&nbsp;&nbsp;', $legal_links_html); // 3 spaces  
+                            $legal_links_html = str_replace('  ', '&nbsp;&nbsp;', $legal_links_html); // 2 spaces
+                            echo wpautop($legal_links_html); 
+                        } else {
+                            echo '<!-- No legal links content -->';
+                        }
                         ?>
                     </div>
                 </div>
@@ -3166,41 +3173,144 @@ function staircase_our_services_section() {
     global $wpdb;
     $post_id = get_the_ID();
     
-    // Get service title configuration from current page's pylon data
+    // Get OSB configuration from current page's pylon data
     $pylons_table = $wpdb->prefix . 'pylons';
     $pylon_data = $wpdb->get_row($wpdb->prepare(
-        "SELECT our_services_box_title FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        "SELECT osb_box_title, osb_services_per_row, osb_max_services_display FROM {$pylons_table} WHERE rel_wp_post_id = %d",
         $post_id
     ), ARRAY_A);
     
-    // Default title or use configured title
-    $services_title = !empty($pylon_data['our_services_box_title']) ? $pylon_data['our_services_box_title'] : 'Our Services';
+    // Debug: Check table names and existence
+    echo "<!-- Our Services Debug: Using pylons table = '{$pylons_table}' -->\n";
+    echo "<!-- Our Services Debug: Using posts table = '{$wpdb->posts}' -->\n";
     
-    // Get all service pages from pylons table
-    // Order by creation date (primary) and alphabetical by moniker/post_title (secondary)
-    $services = $wpdb->get_results("
+    // Get configuration values with defaults
+    $services_title = !empty($pylon_data['osb_box_title']) ? $pylon_data['osb_box_title'] : 'Our Services';
+    $services_per_row = !empty($pylon_data['osb_services_per_row']) ? (int)$pylon_data['osb_services_per_row'] : 4;
+    $max_services = !empty($pylon_data['osb_max_services_display']) ? (int)$pylon_data['osb_max_services_display'] : 0;
+    
+    // Debug: First check how many service pages exist without description requirement
+    $debug_services = $wpdb->get_results("
         SELECT 
             p.ID, 
             p.post_title, 
             py.moniker, 
             py.paragon_description,
-            py.paragon_featured_image_id,
-            py.created_at
+            py.pylon_archetype
         FROM {$wpdb->posts} p 
         INNER JOIN {$pylons_table} py ON p.ID = py.rel_wp_post_id 
         WHERE py.pylon_archetype = 'servicepage' 
         AND p.post_status = 'publish'
-        AND (py.paragon_description IS NOT NULL AND py.paragon_description != '')
-        ORDER BY py.created_at ASC, 
-                 CASE WHEN py.moniker IS NULL OR py.moniker = '' THEN p.post_title ELSE py.moniker END ASC
     ");
+    
+    // Debug output
+    echo "<!-- Our Services Debug: Found " . count($debug_services) . " total service pages -->\n";
+    foreach ($debug_services as $service) {
+        echo "<!-- Service: ID=" . $service->ID . ", title='" . esc_attr($service->post_title) . "', moniker='" . esc_attr($service->moniker) . "', description='" . esc_attr($service->paragon_description) . "' -->\n";
+    }
+    
+    // Get service pages from pylons table with optional limit
+    // Order by creation date (primary) and alphabetical by moniker/post_title (secondary)
+    $limit_clause = $max_services > 0 ? "LIMIT " . $max_services : "";
+    // Debug: Use EXACT same query as working dioptra (without post_status filter first)
+    $services_test = $wpdb->get_results("
+        SELECT py.*, p.post_title, p.post_status 
+        FROM {$pylons_table} py 
+        LEFT JOIN {$wpdb->posts} p ON p.ID = py.rel_wp_post_id 
+        WHERE py.pylon_archetype = 'servicepage'
+    ", ARRAY_A);
+    
+    echo "<!-- Our Services Debug: Exact dioptra query found " . count($services_test) . " records -->\n";
+    
+    // Now filter for published only
+    $published_services = array_filter($services_test, function($row) {
+        return $row['post_status'] === 'publish';
+    });
+    
+    echo "<!-- Our Services Debug: Published services after filter = " . count($published_services) . " -->\n";
+    
+    // Convert to proper format for rendering
+    $services = array();
+    foreach ($published_services as $row) {
+        $service = (object) array(
+            'ID' => $row['rel_wp_post_id'],
+            'post_title' => $row['post_title'],
+            'moniker' => $row['moniker'],
+            'paragon_description' => $row['paragon_description'],
+            'paragon_featured_image_id' => $row['paragon_featured_image_id'],
+            'created_at' => $row['created_at']
+        );
+        $services[] = $service;
+    }
+    
+    // Apply limit
+    if ($max_services > 0 && count($services) > $max_services) {
+        $services = array_slice($services, 0, $max_services);
+    }
+    
+    // Debug: Show first few service results if any found
+    if (!empty($services)) {
+        $sample = array_slice($services, 0, 3);
+        foreach ($sample as $i => $svc) {
+            echo "<!-- Our Services Debug: Service $i = ID:{$svc->ID}, Title:'" . esc_attr($svc->post_title) . "', Status: (checking...) -->\n";
+        }
+    }
+    
+    echo "<!-- Our Services Debug: After filtering, showing " . count($services) . " service pages -->\n";
+    echo "<!-- Our Services Debug: Max services limit = $max_services -->\n";
+    echo "<!-- Our Services Debug: Limit clause = '$limit_clause' -->\n";
+    
+    // Debug: Show the actual SQL query being executed  
+    $debug_query = "SELECT p.ID, p.post_title, py.moniker, py.paragon_description, py.paragon_featured_image_id, py.created_at 
+                   FROM {$pylons_table} py 
+                   LEFT JOIN {$wpdb->posts} p ON p.ID = py.rel_wp_post_id 
+                   WHERE py.pylon_archetype = 'servicepage' 
+                   AND p.post_status = 'publish' 
+                   ORDER BY py.created_at ASC, 
+                            CASE WHEN py.moniker IS NULL OR py.moniker = '' THEN p.post_title ELSE py.moniker END ASC 
+                   {$limit_clause}";
+    echo "<!-- Our Services Debug: SQL Query = " . esc_html(str_replace(["\n", "\t", "  "], [" ", " ", " "], $debug_query)) . " -->\n";
+    
+    // Debug: Test if the issue is with the INNER JOIN
+    $posts_check = $wpdb->get_results("SELECT ID, post_title, post_status FROM {$wpdb->posts} WHERE post_status = 'publish' AND ID IN (1705, 1706, 1709, 1658, 1739, 1740, 1753)");
+    echo "<!-- Our Services Debug: Published posts check found " . count($posts_check) . " posts -->\n";
+    
+    $pylons_check = $wpdb->get_results("SELECT rel_wp_post_id, pylon_archetype FROM {$pylons_table} WHERE pylon_archetype = 'servicepage' AND rel_wp_post_id IN (1705, 1706, 1709, 1658, 1739, 1740, 1753)");
+    echo "<!-- Our Services Debug: Pylons servicepage check found " . count($pylons_check) . " records -->\n";
     
     // Don't render section if no services found
     if (empty($services)) {
+        echo "<!-- Our Services: No services found after filtering -->\n";
         return;
     }
     
     ?>
+    <!-- Dynamic OSB Grid Style -->
+    <style>
+        .paragon-cards-grid {
+            grid-template-columns: repeat(<?php echo esc_attr($services_per_row); ?>, 1fr) !important;
+        }
+        
+        /* Responsive overrides for smaller screens */
+        @media (max-width: 1200px) {
+            .paragon-cards-grid {
+                grid-template-columns: repeat(<?php echo min(3, $services_per_row); ?>, 1fr) !important;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .paragon-cards-grid {
+                grid-template-columns: repeat(<?php echo min(2, $services_per_row); ?>, 1fr) !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .paragon-cards-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+    
     <section class="paragon-services-section">
         <div class="container">
             <h2 class="paragon-section-title"><?php echo esc_html($services_title); ?></h2>
