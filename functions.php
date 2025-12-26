@@ -2841,7 +2841,10 @@ function zaramax_footer_management_page() {
         // TEMPORARY: Save footer blurb to WordPress options for testing
         // TODO: Remove this when proper database column is created
         if (isset($_POST['footer_blurb'])) {
-            update_option('zaramax_temp_footer_blurb', sanitize_textarea_field($_POST['footer_blurb']));
+            // Use wp_unslash to remove magic quotes, then trim whitespace
+            // This preserves shortcodes without adding unwanted backslashes
+            $footer_blurb = trim(wp_unslash($_POST['footer_blurb']));
+            update_option('zaramax_temp_footer_blurb', $footer_blurb);
         }
         
         // Save other footer settings
@@ -3082,7 +3085,7 @@ function zaramax_render_custom_footer() {
                         
                         <?php if (!empty($footer_blurb)): ?>
                             <div class="footer-blurb">
-                                <p><?php echo nl2br(esc_html($footer_blurb)); ?></p>
+                                <p><?php echo do_shortcode(nl2br($footer_blurb)); ?></p>
                             </div>
                         <?php endif; ?>
                         
@@ -3364,3 +3367,11 @@ function staircase_our_services_section() {
     </section>
     <?php
 }
+
+add_filter('ai1wm_exclude_content_from_export', function($exclude_filters) {
+
+  $exclude_filters[] = 'debug.log';
+
+  return $exclude_filters;
+
+});
