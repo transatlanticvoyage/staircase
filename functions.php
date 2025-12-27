@@ -363,54 +363,62 @@ class Staircase_Walker_Nav_Menu extends Walker_Nav_Menu {
 
 // Custom hero section function
 function staircase_hero_section($title = '', $subtitle = '', $button_text = '', $button_url = '') {
-    $hero_type = staircase_get_hero_type();
+    $template = staircase_get_current_template();
     
-    if ($hero_type === 'homepage-cherry') {
-        staircase_homepage_cherry_hero();
-        return;
+    switch ($template) {
+        case 'homepage-cherry':
+            staircase_homepage_cherry_hero();
+            break;
+        case 'homepage-apple':
+            staircase_homepage_apple_hero();
+            break;
+        default:
+            // Default hero for content-only and other templates
+            if (empty($title)) {
+                $title = get_bloginfo('name');
+            }
+            if (empty($subtitle)) {
+                $subtitle = get_bloginfo('description');
+            }
+            ?>
+            <section class="hero-section">
+                <div class="container">
+                    <div class="hero-content">
+                        <h1><?php echo esc_html($title); ?></h1>
+                        <?php if ($subtitle): ?>
+                            <p><?php echo esc_html($subtitle); ?></p>
+                        <?php endif; ?>
+                        <?php if ($button_text && $button_url): ?>
+                            <a href="<?php echo esc_url($button_url); ?>" class="hero-button">
+                                <?php echo esc_html($button_text); ?>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </section>
+            <?php
+            break;
     }
-    
-    if ($hero_type === 'homepage-apple') {
-        staircase_homepage_apple_hero();
-        return;
-    }
-    
-    // Default hero for other templates
-    if (empty($title)) {
-        $title = get_bloginfo('name');
-    }
-    if (empty($subtitle)) {
-        $subtitle = get_bloginfo('description');
-    }
-    ?>
-    <section class="hero-section">
-        <div class="container">
-            <div class="hero-content">
-                <h1><?php echo esc_html($title); ?></h1>
-                <?php if ($subtitle): ?>
-                    <p><?php echo esc_html($subtitle); ?></p>
-                <?php endif; ?>
-                <?php if ($button_text && $button_url): ?>
-                    <a href="<?php echo esc_url($button_url); ?>" class="hero-button">
-                        <?php echo esc_html($button_text); ?>
-                    </a>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-    <?php
 }
 
 // Homepage Cherry hero section
 function staircase_homepage_cherry_hero() {
     global $wpdb;
-    $post_id = get_the_ID();
+    
+    // Check if this is the blog page
+    if (is_home() && !is_front_page()) {
+        $blog_page_id = get_option('page_for_posts');
+        $post_id = $blog_page_id ?: get_the_ID();
+        $cherry_heading = $blog_page_id ? get_the_title($blog_page_id) : 'Blog';
+    } else {
+        $post_id = get_the_ID();
+        $cherry_heading = get_the_title(); // wp_posts.post_title
+    }
     
     // Debug: Add HTML comment to verify function is being called
     echo "<!-- Homepage Cherry Hero: Post ID = $post_id -->\n";
     
     // Get data from wp_posts and wp_pylons tables
-    $cherry_heading = get_the_title(); // wp_posts.post_title
     
     // Get wp_pylons data
     $pylons_table = $wpdb->prefix . 'pylons';
@@ -434,14 +442,21 @@ function staircase_homepage_cherry_hero() {
         $cherry_subheading = $pylon_data['hero_subheading'];
     }
     
-    // Keep existing button logic for now
-    $cherry_button_left_text = get_post_meta($post_id, 'cherry_button_left_text', true);
-    $cherry_button_left_url = get_post_meta($post_id, 'cherry_button_left_url', true);
-    $cherry_button_right_text = get_post_meta($post_id, 'cherry_button_right_text', true);
-    $cherry_button_right_url = get_post_meta($post_id, 'cherry_button_right_url', true);
-    // Get formatted phone number from database (same as header phone button)
-    $cherry_phone_number_raw = staircase_get_header_phone();
-    $cherry_phone_number_formatted = staircase_get_formatted_phone();
+    // Always show buttons with default text
+    $cherry_button_left_text = get_post_meta($post_id, 'cherry_button_left_text', true) ?: 'Get Your Estimate';
+    $cherry_button_left_url = get_post_meta($post_id, 'cherry_button_left_url', true) ?: '';
+    $cherry_button_right_text = get_post_meta($post_id, 'cherry_button_right_text', true) ?: 'Call Us Now';
+    $cherry_button_right_url = get_post_meta($post_id, 'cherry_button_right_url', true) ?: '';
+    
+    // Get phone number from wp_zen_sitespren.driggs_phone_1
+    global $wpdb;
+    $cherry_phone_number_raw = $wpdb->get_var("SELECT driggs_phone_1 FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+    $cherry_phone_number_formatted = $cherry_phone_number_raw ? staircase_format_phone_number($cherry_phone_number_raw) : '';
+    
+    // Set right button as call link if no custom URL is set
+    if (empty($cherry_button_right_url) && !empty($cherry_phone_number_raw)) {
+        $cherry_button_right_url = 'tel:' . preg_replace('/[^0-9]/', '', $cherry_phone_number_raw);
+    }
     
     // Get chenblock card data from wp_pylons
     $zarl_card_1_title = '';
@@ -480,24 +495,30 @@ function staircase_homepage_cherry_hero() {
                     <p class="cherry-subheading"><?php echo esc_html($cherry_subheading); ?></p>
                 <?php endif; ?>
                 
-                <?php if ($cherry_button_left_text || $cherry_button_right_text): ?>
-                    <div class="cherry-buttons-container">
-                        <?php if ($cherry_button_left_text && $cherry_button_left_url): ?>
-                            <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="cherry-button cherry-button-left">
-                                <?php echo esc_html($cherry_button_left_text); ?>
-                            </a>
-                        <?php endif; ?>
-                        
-                        <?php if ($cherry_button_right_text && $cherry_button_right_url): ?>
-                            <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="cherry-button cherry-button-right">
-                                <?php echo esc_html($cherry_button_right_text); ?>
-                            </a>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
+                <div class="cherry-buttons-container">
+                    <?php if ($cherry_button_left_url): ?>
+                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="cherry-button cherry-button-left">
+                            <?php echo esc_html($cherry_button_left_text); ?>
+                        </a>
+                    <?php else: ?>
+                        <span class="cherry-button cherry-button-left cherry-button-disabled">
+                            <?php echo esc_html($cherry_button_left_text); ?>
+                        </span>
+                    <?php endif; ?>
+                    
+                    <?php if ($cherry_button_right_url): ?>
+                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="cherry-button cherry-button-right">
+                            <?php echo esc_html($cherry_button_right_text); ?>
+                        </a>
+                    <?php else: ?>
+                        <span class="cherry-button cherry-button-right cherry-button-disabled">
+                            <?php echo esc_html($cherry_button_right_text); ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
                 
                 <?php if ($cherry_phone_number_raw): ?>
-                    <div class="cherry-phone-container">
+                    <div class="cherry-phone-container" style="text-align: center; margin-top: 15px;">
                         <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $cherry_phone_number_raw)); ?>" class="cherry-phone">
                             <?php echo esc_html($cherry_phone_number_formatted); ?>
                         </a>
@@ -632,6 +653,12 @@ function staircase_homepage_cherry_hero() {
         background: rgba(255, 255, 255, 0.2);
         color: white;
         border-color: white;
+    }
+    
+    .cherry-button-disabled {
+        opacity: 0.6;
+        cursor: default;
+        pointer-events: none;
     }
     
     .cherry-phone-container {
@@ -981,29 +1008,12 @@ function staircase_homepage_apple_hero() {
     }
     
     $apple_subheading = get_post_meta($post_id, 'apple_hero_subheading', true);
-    if (empty($apple_subheading)) {
-        $apple_subheading = get_post_meta($post_id, 'cherry_hero_subheading', true);
-    }
     
-    $apple_button_left_text = get_post_meta($post_id, 'apple_button_left_text', true);
-    if (empty($apple_button_left_text)) {
-        $apple_button_left_text = get_post_meta($post_id, 'cherry_button_left_text', true);
-    }
-    
-    $apple_button_left_url = get_post_meta($post_id, 'apple_button_left_url', true);
-    if (empty($apple_button_left_url)) {
-        $apple_button_left_url = get_post_meta($post_id, 'cherry_button_left_url', true);
-    }
-    
-    $apple_button_right_text = get_post_meta($post_id, 'apple_button_right_text', true);
-    if (empty($apple_button_right_text)) {
-        $apple_button_right_text = get_post_meta($post_id, 'cherry_button_right_text', true);
-    }
-    
-    $apple_button_right_url = get_post_meta($post_id, 'apple_button_right_url', true);
-    if (empty($apple_button_right_url)) {
-        $apple_button_right_url = get_post_meta($post_id, 'cherry_button_right_url', true);
-    }
+    // Buttons now use defaults
+    $apple_button_left_text = 'Get Your Estimate';
+    $apple_button_left_url = '';
+    $apple_button_right_text = 'Call Us Now';
+    $apple_button_right_url = '';
     // Get formatted phone number from database (same as header phone button)
     $apple_phone_number_raw = staircase_get_header_phone();
     $apple_phone_number_formatted = staircase_get_formatted_phone();
@@ -1038,21 +1048,34 @@ function staircase_homepage_apple_hero() {
                     <p class="apple-subheading"><?php echo esc_html($apple_subheading); ?></p>
                 <?php endif; ?>
                 
-                <?php if ($apple_button_left_text || $apple_button_right_text): ?>
-                    <div class="apple-buttons-container">
-                        <?php if ($apple_button_left_text && $apple_button_left_url): ?>
-                            <a href="<?php echo esc_url($apple_button_left_url); ?>" class="apple-button apple-button-left">
-                                <?php echo esc_html($apple_button_left_text); ?>
-                            </a>
-                        <?php endif; ?>
-                        
-                        <?php if ($apple_button_right_text && $apple_button_right_url): ?>
-                            <a href="<?php echo esc_url($apple_button_right_url); ?>" class="apple-button apple-button-right">
-                                <?php echo esc_html($apple_button_right_text); ?>
-                            </a>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
+                <div class="apple-buttons-container">
+                    <?php if ($apple_button_left_url): ?>
+                        <a href="<?php echo esc_url($apple_button_left_url); ?>" class="apple-button apple-button-left">
+                            <?php echo esc_html($apple_button_left_text); ?>
+                        </a>
+                    <?php else: ?>
+                        <span class="apple-button apple-button-left apple-button-disabled">
+                            <?php echo esc_html($apple_button_left_text); ?>
+                        </span>
+                    <?php endif; ?>
+                    
+                    <?php 
+                    // Set right button as call link if no custom URL
+                    if (empty($apple_button_right_url) && !empty($apple_phone_number_raw)) {
+                        $apple_button_right_url = 'tel:' . preg_replace('/[^0-9]/', '', $apple_phone_number_raw);
+                    }
+                    ?>
+                    
+                    <?php if ($apple_button_right_url): ?>
+                        <a href="<?php echo esc_url($apple_button_right_url); ?>" class="apple-button apple-button-right">
+                            <?php echo esc_html($apple_button_right_text); ?>
+                        </a>
+                    <?php else: ?>
+                        <span class="apple-button apple-button-right apple-button-disabled">
+                            <?php echo esc_html($apple_button_right_text); ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
                 
                 <?php if ($apple_phone_number_raw): ?>
                     <div class="apple-phone-container">
@@ -1266,7 +1289,7 @@ function staircase_get_current_template() {
     global $wpdb;
     $post_id = get_the_ID();
     
-    // First try to get template from wp_pylons table (imported pages)
+    // Get template from wp_pylons table only
     $pylon_template = $wpdb->get_var($wpdb->prepare(
         "SELECT staircase_page_template_desired 
          FROM {$wpdb->prefix}pylons 
@@ -1281,15 +1304,8 @@ function staircase_get_current_template() {
         return staircase_normalize_template_name($pylon_template);
     }
     
-    // Fallback to existing logic for manually created pages
-    $template = get_post_meta($post_id, 'staircase_page_template', true);
-    
-    // If no template set or set to default, use theme settings
-    if (empty($template) || $template === 'default') {
-        $template = get_option('staircase_default_template', 'hero-full');
-    }
-    
-    return $template;
+    // If no pylon template found, return homepage-cherry as default
+    return 'homepage-cherry';
 }
 
 // Custom function to check if hero should be displayed based on template
@@ -1361,33 +1377,28 @@ add_action('add_meta_boxes', 'staircase_add_meta_boxes');
 // Get available page templates
 function staircase_get_page_templates() {
     return array(
-        'default' => 'Default (use theme settings)',
-        'hero-full' => 'Full Hero Layout',
-        'hero-minimal' => 'Minimal Hero Layout',
-        'homepage-cherry' => 'Homepage Cherry',
+        'homepage-cherry' => 'Homepage Cherry (default)',
         'homepage-apple' => 'Homepage Apple',
-        'no-hero' => 'Standard Layout',
-        'content-only' => 'Content Only',
-        'sections-builder' => 'Sections Builder'
+        'content-only' => 'Content Only'
     );
 }
 
 // Normalize template name from user input to match available templates
 function staircase_normalize_template_name($user_input) {
     if (empty($user_input)) {
-        return 'default';
+        return 'homepage-cherry';
     }
     
     // Get available templates
     $templates = staircase_get_page_templates();
     
-    // Normalize user input: lowercase, remove spaces, trim
-    $normalized_input = strtolower(trim(str_replace(' ', '', $user_input)));
+    // Normalize user input: lowercase, remove spaces/hyphens/underscores, trim
+    $normalized_input = strtolower(trim(str_replace([' ', '-', '_'], '', $user_input)));
     
-    // Check for exact matches first
+    // Check for matches treating spaces, hyphens, and underscores as equivalent
     foreach ($templates as $template_key => $template_label) {
-        $normalized_key = strtolower(str_replace(' ', '', $template_key));
-        $normalized_label = strtolower(str_replace(' ', '', $template_label));
+        $normalized_key = strtolower(str_replace([' ', '-', '_'], '', $template_key));
+        $normalized_label = strtolower(str_replace([' ', '-', '_'], '', $template_label));
         
         // Match against template key or label
         if ($normalized_input === $normalized_key || $normalized_input === $normalized_label) {
@@ -1395,16 +1406,25 @@ function staircase_normalize_template_name($user_input) {
         }
     }
     
-    // If no match found, return default
-    return 'default';
+    // If no match found, return homepage-cherry as default
+    return 'homepage-cherry';
 }
 
 // Page options meta box callback
 function staircase_page_options_meta_box_callback($post) {
+    global $wpdb;
     wp_nonce_field('staircase_page_options_meta_box', 'staircase_page_options_meta_box_nonce');
     
     $selected_template = get_post_meta($post->ID, 'staircase_page_template', true);
     $templates = staircase_get_page_templates();
+    
+    // Get current value from wp_pylons table
+    $pylon_template = $wpdb->get_var($wpdb->prepare(
+        "SELECT staircase_page_template_desired 
+         FROM {$wpdb->prefix}pylons 
+         WHERE rel_wp_post_id = %d", 
+        $post->ID
+    ));
     
     // Get default template from theme settings
     $default_template = get_option('staircase_default_template', 'hero-full');
@@ -1418,6 +1438,14 @@ function staircase_page_options_meta_box_callback($post) {
                 </option>
             <?php endforeach; ?>
         </select>
+    </p>
+    
+    <p style="margin-top: 15px;">
+        <label for="staircase_pylon_raw_template" style="display: block; word-wrap: break-word; overflow-wrap: break-word;"><strong>Raw value of db column:<br>wp_pylons.staircase_page_template_desired</strong></label><br>
+        <input type="text" id="staircase_pylon_raw_template" name="staircase_pylon_raw_template" 
+               value="<?php echo esc_attr($pylon_template ?: ''); ?>" 
+               style="width: 100%; margin-top: 5px; font-family: monospace; background-color: #f9f9f9;" 
+               placeholder="Select from dropdown to populate">
     </p>
     
     <?php if ($selected_template === '' || $selected_template === 'default'): ?>
@@ -1459,35 +1487,8 @@ function staircase_page_options_meta_box_callback($post) {
                        placeholder="Subtitle or tagline">
             </p>
             
-            <div style="margin-bottom: 8px;">
-                <strong>Buttons:</strong>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <div style="flex: 1;">
-                        <input type="text" id="cherry_button_left_text" name="cherry_button_left_text" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, 'cherry_button_left_text', true)); ?>" 
-                               style="width: 100%; margin-bottom: 3px; font-size: 11px;" 
-                               placeholder="Left Button Text">
-                        <input type="url" id="cherry_button_left_url" name="cherry_button_left_url" 
-                               value="<?php echo esc_url(get_post_meta($post->ID, 'cherry_button_left_url', true)); ?>" 
-                               style="width: 100%; font-size: 11px;" 
-                               placeholder="Left Button URL">
-                    </div>
-                    <div style="flex: 1;">
-                        <input type="text" id="cherry_button_right_text" name="cherry_button_right_text" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, 'cherry_button_right_text', true)); ?>" 
-                               style="width: 100%; margin-bottom: 3px; font-size: 11px;" 
-                               placeholder="Right Button Text">
-                        <input type="url" id="cherry_button_right_url" name="cherry_button_right_url" 
-                               value="<?php echo esc_url(get_post_meta($post->ID, 'cherry_button_right_url', true)); ?>" 
-                               style="width: 100%; font-size: 11px;" 
-                               placeholder="Right Button URL">
-                    </div>
-                </div>
-            </div>
-            
             <p style="font-size: 11px; color: #666; margin-top: 10px;">
-                <strong>Note:</strong> Phone number is automatically pulled from the database (same as header phone button).<br>
-                Leave button fields empty to hide those elements.
+                <strong>Note:</strong> Hero buttons are automatically configured with default text and phone number from the database.
             </p>
         </div>
         
@@ -1528,23 +1529,6 @@ function staircase_page_options_meta_box_callback($post) {
             </p>
         </div>
         
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const templateSelect = document.getElementById('staircase_page_template');
-            const cherryOptions = templateSelect.parentNode.querySelector('[style*="border-top: 2px solid #0073aa"]');
-            
-            function toggleCherryOptions() {
-                if (templateSelect.value === 'homepage-cherry') {
-                    cherryOptions.style.display = 'block';
-                } else {
-                    cherryOptions.style.display = 'none';
-                }
-            }
-            
-            templateSelect.addEventListener('change', toggleCherryOptions);
-            toggleCherryOptions(); // Initial state
-        });
-        </script>
     <?php endif; ?>
     
     <?php if ($selected_template === 'homepage-apple'): ?>
@@ -1567,27 +1551,9 @@ function staircase_page_options_meta_box_callback($post) {
                        placeholder="Subtitle or tagline">
             </p>
             
-            <div style="margin-bottom: 8px;">
-                <strong>Buttons:</strong>
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <div style="flex: 1;">
-                        <input type="text" id="apple_button_left_text" name="apple_button_left_text" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_button_left_text', true)); ?>" 
-                               style="width: 100%; margin-bottom: 3px;" placeholder="Left Button Text">
-                        <input type="text" id="apple_button_left_url" name="apple_button_left_url" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_button_left_url', true)); ?>" 
-                               style="width: 100%;" placeholder="Left Button URL">
-                    </div>
-                    <div style="flex: 1;">
-                        <input type="text" id="apple_button_right_text" name="apple_button_right_text" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_button_right_text', true)); ?>" 
-                               style="width: 100%; margin-bottom: 3px;" placeholder="Right Button Text">
-                        <input type="text" id="apple_button_right_url" name="apple_button_right_url" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_button_right_url', true)); ?>" 
-                               style="width: 100%;" placeholder="Right Button URL">
-                    </div>
-                </div>
-            </div>
+            <p style="font-size: 11px; color: #666; margin-top: 10px;">
+                <strong>Note:</strong> Hero buttons are automatically configured.
+            </p>
             
             <h4 style="margin: 15px 0 5px 0; color: #ff6b6b;">Apple Card Blocks (Zarl)</h4>
             <p style="font-size: 12px; margin-bottom: 10px; color: #666;">Add up to 3 cards that will display below the hero section.</p>
@@ -1618,24 +1584,30 @@ function staircase_page_options_meta_box_callback($post) {
             </p>
         </div>
         
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const templateSelect = document.getElementById('staircase_page_template');
-            const appleOptions = templateSelect.parentNode.querySelector('[style*="border-top: 2px solid #ff6b6b"]');
-            
-            function toggleAppleOptions() {
-                if (templateSelect.value === 'homepage-apple') {
-                    appleOptions.style.display = 'block';
-                } else {
-                    appleOptions.style.display = 'none';
-                }
-            }
-            
-            templateSelect.addEventListener('change', toggleAppleOptions);
-            toggleAppleOptions(); // Initial state
-        });
-        </script>
     <?php endif; ?>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const templateSelect = document.getElementById('staircase_page_template');
+        const pylonRawInput = document.getElementById('staircase_pylon_raw_template');
+        
+        // Template value mappings to raw format
+        const templateMappings = {
+            'homepage-cherry': 'homepage_cherry',
+            'homepage-apple': 'homepage_apple',
+            'content-only': 'content_only'
+        };
+        
+        function updateRawValue() {
+            const selectedValue = templateSelect.value;
+            const rawValue = templateMappings[selectedValue] || selectedValue;
+            pylonRawInput.value = rawValue;
+        }
+        
+        templateSelect.addEventListener('change', updateRawValue);
+        updateRawValue(); // Set initial value
+    });
+    </script>
     
     <?php
 }
@@ -1661,10 +1633,38 @@ function staircase_save_page_options_meta($post_id) {
         return;
     }
     
-    // Save template selection
-    if (isset($_POST['staircase_page_template'])) {
-        $template = sanitize_text_field($_POST['staircase_page_template']);
-        update_post_meta($post_id, 'staircase_page_template', $template);
+    // Save template selection to wp_pylons table
+    if (isset($_POST['staircase_pylon_raw_template'])) {
+        global $wpdb;
+        $raw_template = sanitize_text_field($_POST['staircase_pylon_raw_template']);
+        
+        // Check if pylon record exists for this post
+        $pylon_exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT pylon_id FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+            $post_id
+        ));
+        
+        if ($pylon_exists) {
+            // Update existing record
+            $wpdb->update(
+                $wpdb->prefix . 'pylons',
+                array('staircase_page_template_desired' => $raw_template),
+                array('rel_wp_post_id' => $post_id),
+                array('%s'),
+                array('%d')
+            );
+        } else {
+            // Create new pylon record
+            $wpdb->insert(
+                $wpdb->prefix . 'pylons',
+                array(
+                    'rel_wp_post_id' => $post_id,
+                    'staircase_page_template_desired' => $raw_template,
+                    'created_at' => current_time('mysql')
+                ),
+                array('%d', '%s', '%s')
+            );
+        }
     }
     
     // Save Homepage Cherry fields

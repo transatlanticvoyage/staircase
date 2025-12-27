@@ -506,6 +506,140 @@ body {
     .main-navigation .sub-menu .sub-menu a {
         padding-left: 60px;
     }
+}
+
+/* Blog Page Card Styles (Victoria Blog Box Style) */
+.blog-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.blog-post-card {
+    width: 100%;
+    height: 300px;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    text-align: left;
+}
+
+.blog-post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.12);
+}
+
+.blog-post-card .post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.blog-post-card .post-date {
+    font-weight: 500;
+}
+
+.blog-post-card .post-author {
+    font-style: italic;
+}
+
+.blog-post-card .post-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 0 15px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-post-card .post-title a {
+    color: #2c3e50;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.blog-post-card .post-title a:hover {
+    color: #275fd2;
+}
+
+.blog-post-card .post-excerpt {
+    font-size: 15px;
+    color: #6c757d;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.blog-post-card .read-more-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: auto;
+    transition: color 0.3s ease;
+}
+
+.blog-post-card .read-more-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* Mobile optimization for blog cards */
+@media (max-width: 1024px) {
+    .blog-posts-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+        padding: 0 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-posts-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 0 15px;
+    }
+    
+    .blog-post-card {
+        height: auto;
+        min-height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-posts-grid {
+        padding: 0 10px;
+        gap: 15px;
+    }
+    
+    .blog-post-card {
+        padding: 15px;
+        min-height: 220px;
+    }
+    
+    .blog-post-card .post-title {
+        font-size: 16px;
+    }
+    
+    .blog-post-card .post-excerpt {
+        font-size: 14px;
+    }
     
     .dropdown-toggle {
         position: absolute;
@@ -522,6 +656,7 @@ body {
         width: 100%;
         text-align: center;
     }
+}
     
     .header-phone-button {
         width: 100%;
