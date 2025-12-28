@@ -1151,6 +1151,160 @@ body {
     }
 }
 
+/* Serena FAQ Box Styles */
+.serena-faq-box {
+    width: 100%;
+    background-color: #ffffff;
+    border-top: 2px solid #cccccc;
+    padding: 60px 0;
+}
+
+.serena-faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.serena-faq-title {
+    font-size: 30px;
+    font-weight: bold;
+    color: #000000;
+    margin: 0 0 15px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.serena-faq-subtitle {
+    font-size: 18px;
+    font-weight: normal;
+    color: #666666;
+    margin: 0 0 40px 0;
+    line-height: 1.4;
+}
+
+.serena-faq-accordion {
+    text-align: left;
+    max-width: 100%;
+}
+
+.serena-faq-item {
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.serena-faq-question {
+    width: 100%;
+    background-color: #f8f9fa;
+    border: none;
+    padding: 20px 25px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #333333;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.serena-faq-question:hover {
+    background-color: #e9ecef;
+}
+
+.serena-faq-question.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.serena-faq-icon {
+    font-size: 20px;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+.serena-faq-answer {
+    display: none;
+    padding: 25px;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+}
+
+.serena-faq-answer p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555555;
+}
+
+/* Mobile optimization for Serena FAQ Box */
+@media (max-width: 768px) {
+    .serena-faq-box {
+        padding: 40px 0;
+    }
+    
+    .serena-faq-container {
+        padding: 0 15px;
+    }
+    
+    .serena-faq-title {
+        font-size: 26px;
+        margin-bottom: 12px;
+    }
+    
+    .serena-faq-subtitle {
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+    
+    .serena-faq-question {
+        padding: 18px 20px;
+        font-size: 15px;
+    }
+    
+    .serena-faq-answer {
+        padding: 20px;
+    }
+    
+    .serena-faq-answer p {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .serena-faq-box {
+        padding: 30px 0;
+    }
+    
+    .serena-faq-container {
+        padding: 0 10px;
+    }
+    
+    .serena-faq-title {
+        font-size: 24px;
+    }
+    
+    .serena-faq-subtitle {
+        font-size: 15px;
+    }
+    
+    .serena-faq-question {
+        padding: 15px 18px;
+        font-size: 14px;
+    }
+    
+    .serena-faq-answer {
+        padding: 18px;
+    }
+    
+    .serena-faq-icon {
+        font-size: 18px;
+    }
+}
+
 /* Nile Map Box Styles */
 .nile-map-box {
     width: 100%;

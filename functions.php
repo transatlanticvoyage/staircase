@@ -47,6 +47,9 @@ function staircase_enqueue_assets() {
         filemtime(get_template_directory() . '/style.css')
     );
     
+    // Enqueue Dashicons for frontend use (for service icons)
+    wp_enqueue_style('dashicons');
+    
     // Enqueue navigation script for mobile menu
     wp_enqueue_script(
         'staircase-navigation',
@@ -2502,13 +2505,14 @@ function zaramax_footer_management_page() {
         }
         
         // Save other footer settings
-        update_option('zaramax_footer_box2_content', wp_kses_post($_POST['footer_box2_content']));
-        update_option('zaramax_footer_box3_content', wp_kses_post($_POST['footer_box3_content']));
+        // Use wp_unslash to preserve shortcodes without adding backslashes
+        update_option('zaramax_footer_box2_content', wp_unslash($_POST['footer_box2_content']));
+        update_option('zaramax_footer_box3_content', wp_unslash($_POST['footer_box3_content']));
         update_option('zaramax_footer_map_heading', sanitize_text_field($_POST['footer_map_heading']));
         // Use wp_unslash to preserve shortcodes without adding backslashes
         update_option('zaramax_footer_map_location', wp_unslash($_POST['footer_map_location']));
-        update_option('zaramax_footer_disclaimer', wp_kses_post($_POST['footer_disclaimer']));
-        update_option('zaramax_footer_legal_links', wp_kses_post($_POST['footer_legal_links']));
+        update_option('zaramax_footer_disclaimer', wp_unslash($_POST['footer_disclaimer']));
+        update_option('zaramax_footer_legal_links', wp_unslash($_POST['footer_legal_links']));
         
         echo '<div class="notice notice-success"><p>Footer settings saved successfully!</p></div>';
     }
@@ -2758,12 +2762,12 @@ function zaramax_render_custom_footer() {
                     
                     <!-- Box 2: Custom HTML -->
                     <div class="footer-box footer-box-2">
-                        <?php echo wpautop(wp_kses_post($footer_box2_content)); ?>
+                        <?php echo wpautop(do_shortcode($footer_box2_content)); ?>
                     </div>
                     
                     <!-- Box 3: Custom HTML -->
                     <div class="footer-box footer-box-3">
-                        <?php echo wpautop(wp_kses_post($footer_box3_content)); ?>
+                        <?php echo wpautop(do_shortcode($footer_box3_content)); ?>
                     </div>
                     
                     <!-- Box 4: Google Maps -->
@@ -2797,7 +2801,7 @@ function zaramax_render_custom_footer() {
                 <div class="footer-bottom-grid">
                     <!-- Disclaimer Area -->
                     <div class="footer-disclaimer">
-                        <?php echo wpautop(wp_kses_post($footer_disclaimer)); ?>
+                        <?php echo wpautop(do_shortcode($footer_disclaimer)); ?>
                     </div>
                     
                     <!-- Legal Links Area -->
@@ -2807,8 +2811,8 @@ function zaramax_render_custom_footer() {
                         echo '<!-- Legal Links Debug: footer_legal_links = "' . esc_attr($footer_legal_links) . '", length = ' . strlen($footer_legal_links) . ' -->';
                         
                         if (!empty($footer_legal_links)) {
-                            // Preserve multiple spaces by replacing them with non-breaking spaces
-                            $legal_links_html = wp_kses_post($footer_legal_links);
+                            // Process shortcodes and preserve multiple spaces
+                            $legal_links_html = do_shortcode($footer_legal_links);
                             // Simple replacement of multiple spaces with non-breaking spaces
                             $legal_links_html = str_replace('    ', '&nbsp;&nbsp;&nbsp;&nbsp;', $legal_links_html); // 4 spaces
                             $legal_links_html = str_replace('   ', '&nbsp;&nbsp;&nbsp;', $legal_links_html); // 3 spaces  
@@ -3003,7 +3007,9 @@ function staircase_our_services_section() {
                     
                     // Default placeholder if no images found
                     if (empty($image_html)) {
-                        $image_html = '<div style="width:100%;height:180px;background:#f8f9fa;display:flex;align-items:center;justify-content:center;color:#6c757d;font-size:14px;">No Image Available</div>';
+                        $image_html = '<div style="width:100%;height:180px;background:#f8f9fa;display:flex;align-items:center;justify-content:center;color:#6c757d;">
+                            <span class="dashicons dashicons-admin-tools" style="font-size:48px;"></span>
+                        </div>';
                     }
                     ?>
                     
@@ -3041,6 +3047,72 @@ function staircase_render_cherry_template_boxes() {
     // Only show on Cherry template pages
     if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
         ?>
+        <!-- Serena FAQ Box Section -->
+        <section class="serena-faq-box">
+            <div class="serena-faq-container">
+                <h2 class="serena-faq-title">FAQ</h2>
+                <p class="serena-faq-subtitle">Frequently Asked Questions</p>
+                
+                <div class="serena-faq-accordion">
+                    <div class="serena-faq-item">
+                        <button class="serena-faq-question" onclick="toggleFAQ(this)">
+                            What are silverfish and why are they in my home?
+                            <span class="serena-faq-icon">+</span>
+                        </button>
+                        <div class="serena-faq-answer">
+                            <p>Silverfish are small, wingless insects with a silvery appearance and fish-like movement. They're attracted to moisture and feed on starchy materials like paper, clothing, and food crumbs. They often enter homes seeking humid environments like bathrooms, basements, and kitchens.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="serena-faq-item">
+                        <button class="serena-faq-question" onclick="toggleFAQ(this)">
+                            How do I know if I have a silverfish infestation?
+                            <span class="serena-faq-icon">+</span>
+                        </button>
+                        <div class="serena-faq-answer">
+                            <p>Signs of silverfish include yellow stains on clothing or paper, small holes in fabrics, shed skins, and actual sightings of the insects, especially at night. You may also find their feces, which appear as small black pepper-like specks.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="serena-faq-item">
+                        <button class="serena-faq-question" onclick="toggleFAQ(this)">
+                            What's included in your silverfish control service?
+                            <span class="serena-faq-icon">+</span>
+                        </button>
+                        <div class="serena-faq-answer">
+                            <p>Our comprehensive silverfish control includes a thorough inspection, targeted treatment of affected areas, moisture reduction recommendations, sealing of entry points, and follow-up visits to ensure complete elimination. We also provide prevention tips to keep them from returning.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+            function toggleFAQ(button) {
+                const answer = button.nextElementSibling;
+                const icon = button.querySelector('.serena-faq-icon');
+                const isOpen = answer.style.display === 'block';
+                
+                // Close all other FAQ items
+                document.querySelectorAll('.serena-faq-answer').forEach(item => {
+                    item.style.display = 'none';
+                });
+                document.querySelectorAll('.serena-faq-icon').forEach(item => {
+                    item.textContent = '+';
+                });
+                document.querySelectorAll('.serena-faq-question').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Toggle current item
+                if (!isOpen) {
+                    answer.style.display = 'block';
+                    icon.textContent = '-';
+                    button.classList.add('active');
+                }
+            }
+            </script>
+        </section>
+        
         <!-- Nile Map Box Section -->
         <section class="nile-map-box">
             <?php
