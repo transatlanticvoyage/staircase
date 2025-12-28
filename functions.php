@@ -366,11 +366,9 @@ function staircase_hero_section($title = '', $subtitle = '', $button_text = '', 
     $template = staircase_get_current_template();
     
     switch ($template) {
-        case 'homepage-cherry':
-            staircase_homepage_cherry_hero();
-            break;
-        case 'homepage-apple':
-            staircase_homepage_apple_hero();
+        case 'cherry':
+        case 'homepage-cherry': // Legacy compatibility
+            staircase_cherry_hero();
             break;
         default:
             // Default hero for content-only and other templates
@@ -401,8 +399,8 @@ function staircase_hero_section($title = '', $subtitle = '', $button_text = '', 
     }
 }
 
-// Homepage Cherry hero section
-function staircase_homepage_cherry_hero() {
+// Cherry hero section
+function staircase_cherry_hero() {
     global $wpdb;
     
     // Check if this is the blog page
@@ -416,7 +414,7 @@ function staircase_homepage_cherry_hero() {
     }
     
     // Debug: Add HTML comment to verify function is being called
-    echo "<!-- Homepage Cherry Hero: Post ID = $post_id -->\n";
+    echo "<!-- Cherry Hero: Post ID = $post_id -->\n";
     
     // Get data from wp_posts and wp_pylons tables
     
@@ -482,12 +480,23 @@ function staircase_homepage_cherry_hero() {
     $zarl_card_2_icon = get_post_meta($post_id, 'zarl_card_2_icon', true);
     $zarl_card_3_icon = get_post_meta($post_id, 'zarl_card_3_icon', true);
     
+    // Get paragon featured image for hero background
+    $paragon_image_id = '';
+    $paragon_image_url = '';
+    if ($pylon_data && !empty($pylon_data['paragon_featured_image_id'])) {
+        $paragon_image_id = $pylon_data['paragon_featured_image_id'];
+        $paragon_image_url = wp_get_attachment_image_url($paragon_image_id, 'full');
+        echo "<!-- Background Image: $paragon_image_url (ID: $paragon_image_id) -->\n";
+    } else {
+        echo "<!-- Background Image: None set -->\n";
+    }
+    
     // Default values
     if (empty($cherry_subheading)) {
         $cherry_subheading = get_bloginfo('description');
     }
     ?>
-    <section class="hero-section homepage-cherry-hero">
+    <section class="hero-section cherry-hero">
         <div class="container">
             <div class="cherry-hero-content">
                 <h1 class="cherry-heading"><?php echo esc_html($cherry_heading); ?></h1>
@@ -583,8 +592,15 @@ function staircase_homepage_cherry_hero() {
     <?php endif; ?>
     
     <style>
-    .homepage-cherry-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .cherry-hero {
+        <?php if (!empty($paragon_image_url)): ?>
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<?php echo esc_url($paragon_image_url); ?>');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        <?php else: ?>
+        background: #53565b;
+        <?php endif; ?>
         color: white;
         text-align: center;
         padding: 80px 0;
@@ -633,30 +649,30 @@ function staircase_homepage_cherry_hero() {
     }
     
     .cherry-button-left {
-        background: rgba(255, 255, 255, 0.2);
+        background: #3f72d7;
         color: white;
-        border: 2px solid white;
+        border: 2px solid #3f72d7;
     }
     
     .cherry-button-left:hover {
-        background: white;
-        color: #667eea;
+        background: #2d5cbf;
+        color: white;
+        border-color: #2d5cbf;
     }
     
     .cherry-button-right {
-        background: white;
-        color: #667eea;
-        border: 2px solid white;
+        background: #3f72d7;
+        color: white;
+        border: 2px solid #3f72d7;
     }
     
     .cherry-button-right:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: #2d5cbf;
         color: white;
-        border-color: white;
+        border-color: #2d5cbf;
     }
     
     .cherry-button-disabled {
-        opacity: 0.6;
         cursor: default;
         pointer-events: none;
     }
@@ -686,7 +702,7 @@ function staircase_homepage_cherry_hero() {
     
     /* Responsive Design */
     @media (max-width: 768px) {
-        .homepage-cherry-hero {
+        .cherry-hero {
             padding: 60px 0;
         }
         
@@ -833,6 +849,7 @@ function staircase_homepage_cherry_hero() {
         }
     }
     
+    /* Paragon Card Styles - Our Services Section */
     /* Paragon Card Styles - Our Services Section */
     .paragon-services-section {
         padding: 80px 0;
@@ -997,292 +1014,6 @@ function staircase_homepage_cherry_hero() {
     <?php
 }
 
-// Homepage Apple hero section
-function staircase_homepage_apple_hero() {
-    $post_id = get_the_ID();
-    
-    // Get Homepage Apple fields - fallback to cherry fields for identical content
-    $apple_heading = get_post_meta($post_id, 'apple_hero_heading', true);
-    if (empty($apple_heading)) {
-        $apple_heading = get_post_meta($post_id, 'cherry_hero_heading', true);
-    }
-    
-    $apple_subheading = get_post_meta($post_id, 'apple_hero_subheading', true);
-    
-    // Buttons now use defaults
-    $apple_button_left_text = 'Get Your Estimate';
-    $apple_button_left_url = '';
-    $apple_button_right_text = 'Call Us Now';
-    $apple_button_right_url = '';
-    // Get formatted phone number from database (same as header phone button)
-    $apple_phone_number_raw = staircase_get_header_phone();
-    $apple_phone_number_formatted = staircase_get_formatted_phone();
-    
-    // Get zarl card data - shared with cherry template
-    $zarl_card_1_icon = get_post_meta($post_id, 'zarl_card_1_icon', true);
-    $zarl_card_1_title = get_post_meta($post_id, 'zarl_card_1_title', true);
-    $zarl_card_1_description = get_post_meta($post_id, 'zarl_card_1_description', true);
-    
-    $zarl_card_2_icon = get_post_meta($post_id, 'zarl_card_2_icon', true);
-    $zarl_card_2_title = get_post_meta($post_id, 'zarl_card_2_title', true);
-    $zarl_card_2_description = get_post_meta($post_id, 'zarl_card_2_description', true);
-    
-    $zarl_card_3_icon = get_post_meta($post_id, 'zarl_card_3_icon', true);
-    $zarl_card_3_title = get_post_meta($post_id, 'zarl_card_3_title', true);
-    $zarl_card_3_description = get_post_meta($post_id, 'zarl_card_3_description', true);
-    
-    // Default values (same logic as cherry)
-    if (empty($apple_heading)) {
-        $apple_heading = get_the_title();
-    }
-    if (empty($apple_subheading)) {
-        $apple_subheading = get_bloginfo('description');
-    }
-    
-    ?>
-    <section class="hero-section homepage-apple-hero">
-        <div class="container">
-            <div class="apple-hero-content">
-                <h1 class="apple-heading"><?php echo esc_html($apple_heading); ?></h1>
-                <?php if ($apple_subheading): ?>
-                    <p class="apple-subheading"><?php echo esc_html($apple_subheading); ?></p>
-                <?php endif; ?>
-                
-                <div class="apple-buttons-container">
-                    <?php if ($apple_button_left_url): ?>
-                        <a href="<?php echo esc_url($apple_button_left_url); ?>" class="apple-button apple-button-left">
-                            <?php echo esc_html($apple_button_left_text); ?>
-                        </a>
-                    <?php else: ?>
-                        <span class="apple-button apple-button-left apple-button-disabled">
-                            <?php echo esc_html($apple_button_left_text); ?>
-                        </span>
-                    <?php endif; ?>
-                    
-                    <?php 
-                    // Set right button as call link if no custom URL
-                    if (empty($apple_button_right_url) && !empty($apple_phone_number_raw)) {
-                        $apple_button_right_url = 'tel:' . preg_replace('/[^0-9]/', '', $apple_phone_number_raw);
-                    }
-                    ?>
-                    
-                    <?php if ($apple_button_right_url): ?>
-                        <a href="<?php echo esc_url($apple_button_right_url); ?>" class="apple-button apple-button-right">
-                            <?php echo esc_html($apple_button_right_text); ?>
-                        </a>
-                    <?php else: ?>
-                        <span class="apple-button apple-button-right apple-button-disabled">
-                            <?php echo esc_html($apple_button_right_text); ?>
-                        </span>
-                    <?php endif; ?>
-                </div>
-                
-                <?php if ($apple_phone_number_raw): ?>
-                    <div class="apple-phone-container">
-                        <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $apple_phone_number_raw)); ?>" class="apple-phone">
-                            <?php echo esc_html($apple_phone_number_formatted); ?>
-                        </a>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-    
-    <?php 
-    // Show zarl card block if any cards have content
-    $has_zarl_cards = !empty($zarl_card_1_title) || !empty($zarl_card_2_title) || !empty($zarl_card_3_title);
-    if ($has_zarl_cards): 
-    ?>
-    <section class="zarl-card-block">
-        <div class="container">
-            <div class="zarl-cards-grid">
-                <?php if (!empty($zarl_card_1_title)): ?>
-                    <div class="zarl-card">
-                        <?php if (!empty($zarl_card_1_icon)): ?>
-                            <div class="zarl-card-icon">
-                                <img src="<?php echo esc_url($zarl_card_1_icon); ?>" alt="<?php echo esc_attr($zarl_card_1_title); ?>" />
-                            </div>
-                        <?php endif; ?>
-                        <h3 class="zarl-card-title"><?php echo esc_html($zarl_card_1_title); ?></h3>
-                        <?php if (!empty($zarl_card_1_description)): ?>
-                            <p class="zarl-card-description"><?php echo esc_html($zarl_card_1_description); ?></p>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($zarl_card_2_title)): ?>
-                    <div class="zarl-card">
-                        <?php if (!empty($zarl_card_2_icon)): ?>
-                            <div class="zarl-card-icon">
-                                <img src="<?php echo esc_url($zarl_card_2_icon); ?>" alt="<?php echo esc_attr($zarl_card_2_title); ?>" />
-                            </div>
-                        <?php endif; ?>
-                        <h3 class="zarl-card-title"><?php echo esc_html($zarl_card_2_title); ?></h3>
-                        <?php if (!empty($zarl_card_2_description)): ?>
-                            <p class="zarl-card-description"><?php echo esc_html($zarl_card_2_description); ?></p>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($zarl_card_3_title)): ?>
-                    <div class="zarl-card">
-                        <?php if (!empty($zarl_card_3_icon)): ?>
-                            <div class="zarl-card-icon">
-                                <img src="<?php echo esc_url($zarl_card_3_icon); ?>" alt="<?php echo esc_attr($zarl_card_3_title); ?>" />
-                            </div>
-                        <?php endif; ?>
-                        <h3 class="zarl-card-title"><?php echo esc_html($zarl_card_3_title); ?></h3>
-                        <?php if (!empty($zarl_card_3_description)): ?>
-                            <p class="zarl-card-description"><?php echo esc_html($zarl_card_3_description); ?></p>
-                        <?php endif; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-    <?php endif; ?>
-    
-    <style>
-    .homepage-apple-hero {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        text-align: center;
-        padding: 80px 0;
-        position: relative;
-    }
-    
-    .apple-hero-content {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
-    
-    .apple-heading {
-        font-size: 3.5rem;
-        font-weight: 700;
-        margin: 0 0 20px 0;
-        line-height: 1.1;
-    }
-    
-    .apple-subheading {
-        font-size: 1.4rem;
-        margin: 0 0 40px 0;
-        opacity: 0.9;
-        line-height: 1.4;
-        font-weight: 300;
-    }
-    
-    .apple-buttons-container {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin: 0 0 30px 0;
-        flex-wrap: wrap;
-    }
-    
-    .apple-button {
-        display: inline-block;
-        padding: 15px 30px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        text-decoration: none;
-        border-radius: 50px;
-        transition: all 0.3s ease;
-        min-width: 180px;
-        text-align: center;
-    }
-    
-    .apple-button-left {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border: 2px solid white;
-    }
-    
-    .apple-button-left:hover {
-        background: white;
-        color: #667eea;
-    }
-    
-    .apple-button-right {
-        background: white;
-        color: #667eea;
-        border: 2px solid white;
-    }
-    
-    .apple-button-right:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        border-color: white;
-    }
-    
-    .apple-phone-container {
-        margin-top: 20px;
-    }
-    
-    .apple-phone {
-        display: inline-block;
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: white;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
-    }
-    
-    .apple-phone:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-2px);
-    }
-    
-    /* Responsive Design */
-    @media (max-width: 768px) {
-        .homepage-apple-hero {
-            padding: 60px 0;
-        }
-        
-        .apple-heading {
-            font-size: 2.5rem;
-        }
-        
-        .apple-subheading {
-            font-size: 1.2rem;
-        }
-        
-        .apple-buttons-container {
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .apple-button {
-            min-width: 250px;
-        }
-        
-        .apple-phone {
-            font-size: 1.5rem;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .apple-heading {
-            font-size: 2rem;
-        }
-        
-        .apple-subheading {
-            font-size: 1.1rem;
-        }
-        
-        .apple-phone {
-            font-size: 1.3rem;
-        }
-    }
-    </style>
-    <?php
-}
 
 // Get the template for current page
 function staircase_get_current_template() {
@@ -1304,16 +1035,16 @@ function staircase_get_current_template() {
         return staircase_normalize_template_name($pylon_template);
     }
     
-    // If no pylon template found, return homepage-cherry as default
-    return 'homepage-cherry';
+    // If no pylon template found, return cherry as default
+    return 'cherry';
 }
 
 // Custom function to check if hero should be displayed based on template
 function staircase_should_show_hero() {
     $template = staircase_get_current_template();
     
-    // Hero templates
-    return in_array($template, array('hero-full', 'hero-minimal', 'homepage-cherry', 'homepage-apple'));
+    // Hero templates (includes legacy compatibility)
+    return in_array($template, array('hero-full', 'hero-minimal', 'cherry', 'homepage-cherry'));
 }
 
 // Get hero type for current page
@@ -1324,10 +1055,8 @@ function staircase_get_hero_type() {
         return 'full';
     } elseif ($template === 'hero-minimal') {
         return 'minimal';
-    } elseif ($template === 'homepage-cherry') {
-        return 'homepage-cherry';
-    } elseif ($template === 'homepage-apple') {
-        return 'homepage-apple';
+    } elseif ($template === 'cherry' || $template === 'homepage-cherry') {
+        return 'cherry';
     }
     
     return false;
@@ -1377,8 +1106,7 @@ add_action('add_meta_boxes', 'staircase_add_meta_boxes');
 // Get available page templates
 function staircase_get_page_templates() {
     return array(
-        'homepage-cherry' => 'Homepage Cherry (default)',
-        'homepage-apple' => 'Homepage Apple',
+        'cherry' => 'Cherry (default)', 
         'content-only' => 'Content Only'
     );
 }
@@ -1386,7 +1114,20 @@ function staircase_get_page_templates() {
 // Normalize template name from user input to match available templates
 function staircase_normalize_template_name($user_input) {
     if (empty($user_input)) {
-        return 'homepage-cherry';
+        return 'cherry';
+    }
+    
+    // Legacy compatibility mapping
+    $legacy_mappings = [
+        'homepage-cherry' => 'cherry',
+        'homepagecherry' => 'cherry', 
+        'Homepage Cherry' => 'cherry',
+        'Homepage Cherry (default)' => 'cherry'
+    ];
+    
+    // Check for direct legacy match first
+    if (isset($legacy_mappings[$user_input])) {
+        return $legacy_mappings[$user_input];
     }
     
     // Get available templates
@@ -1406,8 +1147,8 @@ function staircase_normalize_template_name($user_input) {
         }
     }
     
-    // If no match found, return homepage-cherry as default
-    return 'homepage-cherry';
+    // If no match found, return cherry as default
+    return 'cherry';
 }
 
 // Page options meta box callback
@@ -1460,16 +1201,16 @@ function staircase_page_options_meta_box_callback($post) {
             <strong>Template Guide:</strong><br>
             • <strong>Full Hero:</strong> Large hero with background<br>
             • <strong>Minimal Hero:</strong> Compact title section<br>
-            • <strong>Homepage Cherry:</strong> Hero with buttons & phone<br>
+            • <strong>Cherry:</strong> Hero with buttons & phone<br>
             • <strong>Standard:</strong> Traditional page layout<br>
             • <strong>Content Only:</strong> Just page content<br>
             • <strong>Sections Builder:</strong> Custom sections
         </p>
     </div>
     
-    <?php if ($selected_template === 'homepage-cherry'): ?>
+    <?php if ($selected_template === 'cherry' || $selected_template === 'homepage-cherry'): ?>
         <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #0073aa;">
-            <h4 style="margin: 0 0 10px 0; color: #0073aa;">Homepage Cherry Options</h4>
+            <h4 style="margin: 0 0 10px 0; color: #0073aa;">Cherry Options</h4>
             
             <p style="margin-bottom: 8px;">
                 <label for="cherry_hero_heading"><strong>Hero Heading:</strong></label><br>
@@ -1531,60 +1272,6 @@ function staircase_page_options_meta_box_callback($post) {
         
     <?php endif; ?>
     
-    <?php if ($selected_template === 'homepage-apple'): ?>
-        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #ff6b6b;">
-            <h4 style="margin: 0 0 10px 0; color: #ff6b6b;">Homepage Apple Options</h4>
-            
-            <p style="margin-bottom: 8px;">
-                <label for="apple_hero_heading"><strong>Hero Heading:</strong></label><br>
-                <input type="text" id="apple_hero_heading" name="apple_hero_heading" 
-                       value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_hero_heading', true)); ?>" 
-                       style="width: 100%; margin-top: 3px;" 
-                       placeholder="<?php echo esc_attr(get_the_title($post->ID) ?: 'Main Heading'); ?>">
-            </p>
-            
-            <p style="margin-bottom: 8px;">
-                <label for="apple_hero_subheading"><strong>Hero Subheading:</strong></label><br>
-                <input type="text" id="apple_hero_subheading" name="apple_hero_subheading" 
-                       value="<?php echo esc_attr(get_post_meta($post->ID, 'apple_hero_subheading', true)); ?>" 
-                       style="width: 100%; margin-top: 3px;" 
-                       placeholder="Subtitle or tagline">
-            </p>
-            
-            <p style="font-size: 11px; color: #666; margin-top: 10px;">
-                <strong>Note:</strong> Hero buttons are automatically configured.
-            </p>
-            
-            <h4 style="margin: 15px 0 5px 0; color: #ff6b6b;">Apple Card Blocks (Zarl)</h4>
-            <p style="font-size: 12px; margin-bottom: 10px; color: #666;">Add up to 3 cards that will display below the hero section.</p>
-            
-            <?php for ($i = 1; $i <= 3; $i++): ?>
-                <div style="margin-bottom: 10px; padding: 8px; background: #f9f9f9; border-radius: 4px;">
-                    <strong>Card <?php echo $i; ?>:</strong>
-                    <p style="margin: 5px 0 3px 0;">
-                        <input type="text" name="zarl_card_<?php echo $i; ?>_title" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, "zarl_card_{$i}_title", true)); ?>" 
-                               style="width: 100%;" placeholder="Card <?php echo $i; ?> title">
-                    </p>
-                    <p style="margin: 3px 0;">
-                        <input type="url" name="zarl_card_<?php echo $i; ?>_icon" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, "zarl_card_{$i}_icon", true)); ?>" 
-                               style="width: 100%;" placeholder="Icon URL (optional)">
-                    </p>
-                    <p style="margin: 3px 0 0 0;">
-                        <textarea name="zarl_card_<?php echo $i; ?>_description" 
-                                  style="width: 100%; height: 50px; resize: vertical;" 
-                                  placeholder="Card description text"><?php echo esc_textarea(get_post_meta($post->ID, "zarl_card_{$i}_description", true)); ?></textarea>
-                    </p>
-                </div>
-            <?php endfor; ?>
-            
-            <p style="font-size: 11px; color: #666; margin-top: 10px;">
-                Cards will only display if they have a title. Leave title empty to hide a card.
-            </p>
-        </div>
-        
-    <?php endif; ?>
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1593,8 +1280,7 @@ function staircase_page_options_meta_box_callback($post) {
         
         // Template value mappings to raw format
         const templateMappings = {
-            'homepage-cherry': 'homepage_cherry',
-            'homepage-apple': 'homepage_apple',
+            'homepage-cherry': 'cherry',
             'content-only': 'content_only'
         };
         
@@ -1667,7 +1353,7 @@ function staircase_save_page_options_meta($post_id) {
         }
     }
     
-    // Save Homepage Cherry fields
+    // Save Cherry fields
     if (isset($_POST['cherry_hero_heading'])) {
         update_post_meta($post_id, 'cherry_hero_heading', sanitize_text_field($_POST['cherry_hero_heading']));
     }
@@ -1692,32 +1378,6 @@ function staircase_save_page_options_meta($post_id) {
         update_post_meta($post_id, 'cherry_button_right_url', esc_url_raw($_POST['cherry_button_right_url']));
     }
     
-    // Save Homepage Apple fields
-    if (isset($_POST['apple_hero_heading'])) {
-        update_post_meta($post_id, 'apple_hero_heading', sanitize_text_field($_POST['apple_hero_heading']));
-    }
-    
-    if (isset($_POST['apple_hero_subheading'])) {
-        update_post_meta($post_id, 'apple_hero_subheading', sanitize_text_field($_POST['apple_hero_subheading']));
-    }
-    
-    if (isset($_POST['apple_button_left_text'])) {
-        update_post_meta($post_id, 'apple_button_left_text', sanitize_text_field($_POST['apple_button_left_text']));
-    }
-    
-    if (isset($_POST['apple_button_left_url'])) {
-        update_post_meta($post_id, 'apple_button_left_url', esc_url_raw($_POST['apple_button_left_url']));
-    }
-    
-    if (isset($_POST['apple_button_right_text'])) {
-        update_post_meta($post_id, 'apple_button_right_text', sanitize_text_field($_POST['apple_button_right_text']));
-    }
-    
-    if (isset($_POST['apple_button_right_url'])) {
-        update_post_meta($post_id, 'apple_button_right_url', esc_url_raw($_POST['apple_button_right_url']));
-    }
-    
-    // Phone number is now pulled directly from database, no need to save it as post meta
     
     // Save Zarl Card fields
     for ($i = 1; $i <= 3; $i++) {
@@ -2028,14 +1688,9 @@ function staircase_templates_page() {
                         'features' => array('Minimal Hero', 'Page Content', 'Clean Design')
                     ),
                     'homepage-cherry' => array(
-                        'name' => 'Homepage Cherry',
+                        'name' => 'Cherry',
                         'description' => 'Centered hero with heading, subheading, dual buttons, and phone number',
                         'features' => array('Centered Hero', 'Two Buttons', 'Phone Number', 'Page Content')
-                    ),
-                    'homepage-apple' => array(
-                        'name' => 'Homepage Apple',
-                        'description' => 'Centered hero with warm gradient, heading, subheading, dual buttons, and phone number',
-                        'features' => array('Warm Gradient Hero', 'Two Buttons', 'Phone Number', 'Page Content')
                     ),
                     'no-hero' => array(
                         'name' => 'Standard Layout',
@@ -2430,8 +2085,7 @@ function staircase_settings_page() {
                                 <select name="default_template">
                                     <option value="hero-full" <?php selected($default_template, 'hero-full'); ?>>Full Hero Layout</option>
                                     <option value="hero-minimal" <?php selected($default_template, 'hero-minimal'); ?>>Minimal Hero Layout</option>
-                                    <option value="homepage-cherry" <?php selected($default_template, 'homepage-cherry'); ?>>Homepage Cherry</option>
-                                    <option value="homepage-apple" <?php selected($default_template, 'homepage-apple'); ?>>Homepage Apple</option>
+                                    <option value="homepage-cherry" <?php selected($default_template, 'homepage-cherry'); ?>>Cherry</option>
                                     <option value="no-hero" <?php selected($default_template, 'no-hero'); ?>>Standard Layout</option>
                                     <option value="content-only" <?php selected($default_template, 'content-only'); ?>>Content Only</option>
                                     <option value="sections-builder" <?php selected($default_template, 'sections-builder'); ?>>Sections Builder</option>
@@ -2851,7 +2505,8 @@ function zaramax_footer_management_page() {
         update_option('zaramax_footer_box2_content', wp_kses_post($_POST['footer_box2_content']));
         update_option('zaramax_footer_box3_content', wp_kses_post($_POST['footer_box3_content']));
         update_option('zaramax_footer_map_heading', sanitize_text_field($_POST['footer_map_heading']));
-        update_option('zaramax_footer_map_location', sanitize_text_field($_POST['footer_map_location']));
+        // Use wp_unslash to preserve shortcodes without adding backslashes
+        update_option('zaramax_footer_map_location', wp_unslash($_POST['footer_map_location']));
         update_option('zaramax_footer_disclaimer', wp_kses_post($_POST['footer_disclaimer']));
         update_option('zaramax_footer_legal_links', wp_kses_post($_POST['footer_legal_links']));
         
@@ -3120,7 +2775,7 @@ function zaramax_render_custom_footer() {
                         <?php if (!empty($footer_map_location)): ?>
                             <div class="footer-map">
                                 <iframe 
-                                    src="https://www.google.com/maps?q=<?php echo urlencode($footer_map_location); ?>&output=embed"
+                                    src="https://www.google.com/maps?q=<?php echo urlencode(wp_strip_all_tags(do_shortcode($footer_map_location))); ?>&output=embed"
                                     width="100%" 
                                     height="200" 
                                     style="border:0;" 
@@ -3375,3 +3030,174 @@ add_filter('ai1wm_exclude_content_from_export', function($exclude_filters) {
   return $exclude_filters;
 
 });
+
+/**
+ * Render Nile and Victoria boxes for Cherry template pages
+ * Single source of truth for these template sections
+ */
+function staircase_render_cherry_template_boxes() {
+    $current_template = staircase_get_current_template();
+    
+    // Only show on Cherry template pages
+    if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
+        ?>
+        <!-- Nile Map Box Section -->
+        <section class="nile-map-box">
+            <?php
+            // Get current post ID
+            $current_post_id = get_the_ID();
+            global $wpdb;
+            
+            // Check if this page has a locationpage archetype in wp_pylons
+            $pylon_data = $wpdb->get_row($wpdb->prepare(
+                "SELECT pylon_archetype, locpage_gmaps_string FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+                $current_post_id
+            ), ARRAY_A);
+            
+            $location_string = '';
+            
+            // If this is a locationpage, use the locpage_gmaps_string
+            if ($pylon_data && $pylon_data['pylon_archetype'] === 'locationpage' && !empty($pylon_data['locpage_gmaps_string'])) {
+                $location_string = trim($pylon_data['locpage_gmaps_string']);
+            } else {
+                // Default behavior: Get location data from wp_zen_sitespren table
+                $city = $wpdb->get_var("SELECT driggs_city FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+                $state_full = $wpdb->get_var("SELECT driggs_state_full FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+                $state_code = $wpdb->get_var("SELECT driggs_state_code FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+                $country = $wpdb->get_var("SELECT driggs_country FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+                
+                // Use state_full if available, otherwise fallback to state_code
+                $state = !empty($state_full) ? $state_full : $state_code;
+                
+                // Build location string with proper comma handling
+                $location_parts = array();
+                if (!empty($city)) {
+                    $location_parts[] = trim($city);
+                }
+                if (!empty($state)) {
+                    $location_parts[] = trim($state);
+                }
+                if (!empty($country)) {
+                    $location_parts[] = trim($country);
+                }
+                
+                $location_string = implode(', ', $location_parts);
+            }
+            
+            $fallback_location = 'Dallas, TX'; // Fallback if no location data
+            $final_location = !empty($location_string) ? $location_string : $fallback_location;
+            
+            // URL encode the location for the Google Maps embed
+            $encoded_location = urlencode($final_location);
+            ?>
+            <div class="map-header">
+                <h3>Find us on the map (nile map box)</h3>
+            </div>
+            <div class="map-embed-container">
+                <iframe 
+                    src="https://www.google.com/maps?q=<?php echo $encoded_location; ?>&output=embed"
+                    width="100%" 
+                    height="275" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Our Location - <?php echo esc_attr($final_location); ?>">
+                </iframe>
+            </div>
+        </section>
+        
+        <!-- Kristina CTA Box Section -->
+        <section class="kristina-cta-box">
+            <div class="kristina-cta-container">
+                <h2 class="kristina-cta-heading">Get Your Free Estimate Today</h2>
+                <p class="kristina-cta-subtext">Contact us today for professional service and free estimates</p>
+                
+                <?php
+                // Get phone number using existing hero logic
+                global $wpdb;
+                $kristina_phone_number_raw = $wpdb->get_var("SELECT driggs_phone_1 FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+                $kristina_phone_number_formatted = $kristina_phone_number_raw ? staircase_format_phone_number($kristina_phone_number_raw) : '';
+                
+                // Clean phone number for tel: link (same as hero logic)
+                $clean_phone = preg_replace('/[^0-9+]/', '', $kristina_phone_number_raw);
+                ?>
+                
+                <?php if (!empty($kristina_phone_number_raw)): ?>
+                    <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="kristina-cta-button">
+                        Call Now
+                    </a>
+                <?php else: ?>
+                    <a href="tel:555-0123" class="kristina-cta-button">
+                        Call Now
+                    </a>
+                <?php endif; ?>
+            </div>
+        </section>
+        
+        <!-- Victoria Blog Box Section -->
+        <section class="victoria-blog-box">
+            <div class="blog-box-container">
+                <h2>Top Tips (victoria blog box)</h2>
+                <p class="blog-box-subtitle">Key insights from our team</p>
+                
+                <div class="blog-posts-grid">
+                    <?php
+                    // Get the 3 most recent blog posts
+                    $recent_posts = new WP_Query(array(
+                        'post_type' => 'post',
+                        'posts_per_page' => 3,
+                        'post_status' => 'publish',
+                        'orderby' => 'date',
+                        'order' => 'DESC'
+                    ));
+                    
+                    if ($recent_posts->have_posts()) :
+                        while ($recent_posts->have_posts()) : $recent_posts->the_post();
+                            $author_id = get_the_author_meta('ID');
+                            $author_name = get_the_author();
+                            $post_date = get_the_date('M j, Y');
+                            $post_title = get_the_title();
+                            $post_excerpt = has_excerpt() ? get_the_excerpt() : wp_trim_words(get_the_content(), 20, '...');
+                            $post_link = get_permalink();
+                            ?>
+                            <div class="blog-post-card">
+                                <div class="post-meta">
+                                    <span class="post-date"><?php echo esc_html($post_date); ?></span>
+                                    <span class="post-author">By <?php echo esc_html($author_name); ?></span>
+                                </div>
+                                <h3 class="post-title">
+                                    <a href="<?php echo esc_url($post_link); ?>"><?php echo esc_html($post_title); ?></a>
+                                </h3>
+                                <div class="post-excerpt"><?php echo esc_html($post_excerpt); ?></div>
+                                <a href="<?php echo esc_url($post_link); ?>" class="read-more-link">Read More</a>
+                            </div>
+                            <?php
+                        endwhile;
+                        wp_reset_postdata();
+                    else :
+                        // Fallback if no posts exist
+                        ?>
+                        <div class="no-posts-message">
+                            <p>No blog posts available yet. Check back soon!</p>
+                        </div>
+                        <?php
+                    endif;
+                    ?>
+                </div>
+                
+                <?php 
+                // Get the blog page URL
+                $blog_page_id = get_option('page_for_posts');
+                if ($blog_page_id) :
+                    $blog_page_url = get_permalink($blog_page_id);
+                ?>
+                    <div class="blog-button-container">
+                        <a href="<?php echo esc_url($blog_page_url); ?>" class="go-to-blog-btn">Go To Blog</a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </section>
+        <?php
+    }
+}

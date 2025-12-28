@@ -72,4 +72,7 @@ get_header();
 </main>
 
 <?php
+// Render Cherry template boxes (Nile and Victoria) if applicable
+staircase_render_cherry_template_boxes();
+
 get_footer();

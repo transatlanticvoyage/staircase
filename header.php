@@ -92,7 +92,7 @@ if (function_exists('staircase_should_show_hero') && staircase_should_show_hero(
     $current_template = staircase_get_current_template();
     
     // Templates handle their own hero data
-    if ($current_template === 'homepage-cherry' || $current_template === 'homepage-apple') {
+    if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
         staircase_hero_section();
     } else {
         // Standard hero for content-only and other pages
