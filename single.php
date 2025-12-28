@@ -8,10 +8,25 @@
 get_header();
 ?>
 
-<main class="site-content">
-    <div class="container">
-        <?php
-        while (have_posts()): the_post();
+<?php
+// Check if this is a bilberry template page
+$current_template = staircase_get_current_template();
+
+if ($current_template === 'bilberry') {
+    // Use bilberry template rendering
+    while (have_posts()): the_post();
+        staircase_bilberry_template();
+    endwhile;
+} else {
+    // Render Chen cards for cherry template right after hero
+    if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
+        staircase_render_chen_cards_box();
+    }
+    ?>
+    <main class="site-content">
+        <div class="container">
+            <?php
+            while (have_posts()): the_post();
             ?>
             <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                 <header class="entry-header">
@@ -104,6 +119,9 @@ get_header();
         ?>
     </div>
 </main>
+<?php
+} // End bilberry template conditional
+?>
 
 <style>
 /* Single post specific styles */
@@ -218,7 +236,9 @@ get_header();
 </style>
 
 <?php
-// Render Cherry template boxes (Nile and Victoria) if applicable
-staircase_render_cherry_template_boxes();
+// Render Cherry template boxes (Nile and Victoria) if applicable (not for bilberry)
+if ($current_template !== 'bilberry') {
+    staircase_render_cherry_template_boxes();
+}
 
 get_footer();

@@ -8,12 +8,29 @@
 get_header();
 ?>
 
-<main class="site-content">
-    <div class="container">
-        <?php
-        // If this is a static page
-        if (have_posts()):
-            while (have_posts()): the_post();
+<?php
+// Check if this is a bilberry template page
+$current_template = staircase_get_current_template();
+
+if ($current_template === 'bilberry') {
+    // Use bilberry template rendering
+    if (have_posts()):
+        while (have_posts()): the_post();
+            staircase_bilberry_template();
+        endwhile;
+    endif;
+} else {
+    // Render Chen cards for cherry template right after hero
+    if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
+        staircase_render_chen_cards_box();
+    }
+    ?>
+    <main class="site-content">
+        <div class="container">
+            <?php
+            // If this is a static page
+            if (have_posts()):
+                while (have_posts()): the_post();
                 ?>
                 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                     <?php if (!is_front_page()): // Only show title if not set as front page ?>
@@ -91,8 +108,11 @@ get_header();
             <?php
         endif;
         ?>
-    </div>
-</main>
+        </div>
+    </main>
+    <?php
+} // End bilberry template conditional
+?>
 
 <?php
 // Add Our Services section for cherry template when enabled
@@ -102,7 +122,7 @@ $post_id = get_the_ID();
 // Debug output
 echo "<!-- OSB Debug: Post ID = $post_id, Template = '$current_template' -->\n";
 
-if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
+if (($current_template === 'cherry' || $current_template === 'homepage-cherry') && $current_template !== 'bilberry') {
     // Check if OSB is enabled for this page
     global $wpdb;
     $pylons_table = $wpdb->prefix . 'pylons';
@@ -125,8 +145,10 @@ if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
     echo "<!-- OSB Debug: Not a cherry template, OSB will not render -->\n";
 }
 
-// Render Cherry template boxes (Nile and Victoria) if applicable
-staircase_render_cherry_template_boxes();
+// Render Cherry template boxes (Nile and Victoria) if applicable (not for bilberry)
+if ($current_template !== 'bilberry') {
+    staircase_render_cherry_template_boxes();
+}
 ?>
 
 <style>

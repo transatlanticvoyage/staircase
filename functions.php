@@ -371,7 +371,7 @@ function staircase_hero_section($title = '', $subtitle = '', $button_text = '', 
     switch ($template) {
         case 'cherry':
         case 'homepage-cherry': // Legacy compatibility
-            staircase_cherry_hero();
+            staircase_render_batman_hero_box();
             break;
         default:
             // Default hero for content-only and other templates
@@ -853,7 +853,6 @@ function staircase_cherry_hero() {
     }
     
     /* Paragon Card Styles - Our Services Section */
-    /* Paragon Card Styles - Our Services Section */
     .paragon-services-section {
         padding: 80px 0;
         background: #ffffff;
@@ -1017,6 +1016,73 @@ function staircase_cherry_hero() {
     <?php
 }
 
+// Bilberry Template - Bare bones content display
+function staircase_bilberry_template() {
+    ?>
+    <article class="bilberry-article">
+        <header class="bilberry-header">
+            <h1 class="bilberry-title"><?php the_title(); ?></h1>
+        </header>
+        
+        <div class="bilberry-content">
+            <?php the_content(); ?>
+        </div>
+    </article>
+    
+    <style>
+    .bilberry-article {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: #333;
+    }
+    
+    .bilberry-header {
+        margin-bottom: 2rem;
+    }
+    
+    .bilberry-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0;
+        color: #222;
+        line-height: 1.2;
+    }
+    
+    .bilberry-content {
+        font-size: 1.1rem;
+        color: #444;
+    }
+    
+    .bilberry-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .bilberry-content h2, .bilberry-content h3, .bilberry-content h4 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #222;
+    }
+    
+    .bilberry-content ul, .bilberry-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+        .bilberry-article {
+            padding: 1rem;
+        }
+        
+        .bilberry-title {
+            font-size: 2rem;
+        }
+    }
+    </style>
+    <?php
+}
 
 // Get the template for current page
 function staircase_get_current_template() {
@@ -1071,6 +1137,175 @@ function staircase_content_width() {
 }
 add_action('after_setup_theme', 'staircase_content_width', 0);
 
+// Add OSB Box Paragon styles to wp_head
+function staircase_osb_box_paragon_styles() {
+    ?>
+    <style>
+    /* Paragon Card Styles - Our Services Section */
+    .paragon-services-section {
+        padding: 80px 0;
+        background: #ffffff;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .paragon-section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0 0 50px 0;
+        line-height: 1.2;
+    }
+    
+    .paragon-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .paragon-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #f0f0f0;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .paragon-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .paragon-card-image {
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .paragon-card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .paragon-card:hover .paragon-card-image img {
+        transform: scale(1.05);
+    }
+    
+    .paragon-card-content {
+        padding: 25px 20px;
+    }
+    
+    .paragon-card-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0 0 12px 0;
+        line-height: 1.3;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    
+    .paragon-card-description {
+        font-size: 0.95rem;
+        color: #6c757d;
+        line-height: 1.5;
+        margin: 0;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+    }
+    
+    /* Responsive Design for Paragon Cards */
+    @media (max-width: 1200px) {
+        .paragon-cards-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+    }
+    
+    @media (max-width: 992px) {
+        .paragon-cards-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+        
+        .paragon-section-title {
+            font-size: 2.2rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .paragon-services-section {
+            padding: 60px 0;
+        }
+        
+        .paragon-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .paragon-section-title {
+            font-size: 2rem;
+            margin: 0 0 40px 0;
+        }
+        
+        .paragon-card-image {
+            height: 200px;
+        }
+        
+        .paragon-card-content {
+            padding: 20px 18px;
+        }
+        
+        .paragon-card-title {
+            font-size: 1.1rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .paragon-services-section {
+            padding: 50px 0;
+        }
+        
+        .paragon-section-title {
+            font-size: 1.8rem;
+            margin: 0 0 30px 0;
+        }
+        
+        .paragon-card-image {
+            height: 160px;
+        }
+        
+        .paragon-card-content {
+            padding: 18px 15px;
+        }
+        
+        .paragon-card-description {
+            font-size: 0.9rem;
+        }
+    }
+    </style>
+    <?php
+}
+add_action('wp_head', 'staircase_osb_box_paragon_styles');
+
 // Custom excerpt length
 function staircase_excerpt_length($length) {
     return 30;
@@ -1110,7 +1345,10 @@ add_action('add_meta_boxes', 'staircase_add_meta_boxes');
 function staircase_get_page_templates() {
     return array(
         'cherry' => 'Cherry (default)', 
-        'content-only' => 'Content Only'
+        'content-only' => 'Content Only',
+        'bilberry' => 'bilberry (bare bones)',
+        'sarsaparilla' => 'sarsaparilla',
+        'gooseberry' => 'gooseberry'
     );
 }
 
@@ -1174,7 +1412,7 @@ function staircase_page_options_meta_box_callback($post) {
     $default_template = get_option('staircase_default_template', 'hero-full');
     ?>
     <p>
-        <label for="staircase_page_template"><strong>Page Template:</strong></label><br>
+        <label for="staircase_page_template"><strong>page-template-dropdown:</strong></label><br>
         <select id="staircase_page_template" name="staircase_page_template" style="width: 100%; margin-top: 5px;">
             <?php foreach ($templates as $value => $label): ?>
                 <option value="<?php echo esc_attr($value); ?>" <?php selected($selected_template, $value); ?>>
@@ -3038,6 +3276,702 @@ add_filter('ai1wm_exclude_content_from_export', function($exclude_filters) {
 });
 
 /**
+ * Render Batman Hero Box Section
+ */
+function staircase_render_batman_hero_box() {
+    global $wpdb;
+    
+    // Check if this is the blog page
+    if (is_home() && !is_front_page()) {
+        $blog_page_id = get_option('page_for_posts');
+        $post_id = $blog_page_id ?: get_the_ID();
+        $cherry_heading = $blog_page_id ? get_the_title($blog_page_id) : 'Blog';
+    } else {
+        $post_id = get_the_ID();
+        $cherry_heading = get_the_title(); // wp_posts.post_title
+    }
+    
+    // Debug: Add HTML comment to verify function is being called
+    echo "<!-- Batman Hero: Post ID = $post_id -->\n";
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Debug: Check if pylon data exists
+    if ($pylon_data) {
+        echo "<!-- Pylon data found for post $post_id -->\n";
+        echo "<!-- hero_subheading: " . (!empty($pylon_data['hero_subheading']) ? $pylon_data['hero_subheading'] : 'empty') . " -->\n";
+    } else {
+        echo "<!-- No pylon data found for post $post_id -->\n";
+    }
+    
+    // Get hero subheading from wp_pylons
+    $cherry_subheading = '';
+    if ($pylon_data && !empty($pylon_data['hero_subheading'])) {
+        $cherry_subheading = $pylon_data['hero_subheading'];
+    }
+    
+    // Always show buttons with default text
+    $cherry_button_left_text = get_post_meta($post_id, 'cherry_button_left_text', true) ?: 'Get Your Estimate';
+    $cherry_button_left_url = get_post_meta($post_id, 'cherry_button_left_url', true) ?: '';
+    $cherry_button_right_text = get_post_meta($post_id, 'cherry_button_right_text', true) ?: 'Call Us Now';
+    $cherry_button_right_url = get_post_meta($post_id, 'cherry_button_right_url', true) ?: '';
+    
+    // Get phone number from wp_zen_sitespren.driggs_phone_1
+    $cherry_phone_number_raw = $wpdb->get_var("SELECT driggs_phone_1 FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+    $cherry_phone_number_formatted = $cherry_phone_number_raw ? staircase_format_phone_number($cherry_phone_number_raw) : '';
+    
+    // Set right button as call link if no custom URL is set
+    if (empty($cherry_button_right_url) && !empty($cherry_phone_number_raw)) {
+        $cherry_button_right_url = 'tel:' . preg_replace('/[^0-9]/', '', $cherry_phone_number_raw);
+    }
+    
+    // Get paragon featured image for hero background
+    $paragon_image_id = '';
+    $paragon_image_url = '';
+    if ($pylon_data && !empty($pylon_data['paragon_featured_image_id'])) {
+        $paragon_image_id = $pylon_data['paragon_featured_image_id'];
+        $paragon_image_url = wp_get_attachment_image_url($paragon_image_id, 'full');
+        echo "<!-- Background Image: $paragon_image_url (ID: $paragon_image_id) -->\n";
+    } else {
+        echo "<!-- Background Image: None set -->\n";
+    }
+    
+    // Default values
+    if (empty($cherry_subheading)) {
+        $cherry_subheading = get_bloginfo('description');
+    }
+    ?>
+    <section class="hero-section cherry-hero">
+        <div class="container">
+            <div class="cherry-hero-content">
+                <h1 class="cherry-heading"><?php echo esc_html($cherry_heading); ?></h1>
+                <?php if ($cherry_subheading): ?>
+                    <p class="cherry-subheading"><?php echo esc_html($cherry_subheading); ?></p>
+                <?php endif; ?>
+                
+                <div class="cherry-buttons-container">
+                    <?php if ($cherry_button_left_url): ?>
+                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="cherry-button cherry-button-left">
+                            <?php echo esc_html($cherry_button_left_text); ?>
+                        </a>
+                    <?php else: ?>
+                        <span class="cherry-button cherry-button-left cherry-button-disabled">
+                            <?php echo esc_html($cherry_button_left_text); ?>
+                        </span>
+                    <?php endif; ?>
+                    
+                    <?php if ($cherry_button_right_url): ?>
+                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="cherry-button cherry-button-right">
+                            <?php echo esc_html($cherry_button_right_text); ?>
+                        </a>
+                    <?php else: ?>
+                        <span class="cherry-button cherry-button-right cherry-button-disabled">
+                            <?php echo esc_html($cherry_button_right_text); ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
+                
+                <?php if ($cherry_phone_number_raw): ?>
+                    <div class="cherry-phone-container" style="text-align: center; margin-top: 15px;">
+                        <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $cherry_phone_number_raw)); ?>" class="cherry-phone">
+                            <?php echo esc_html($cherry_phone_number_formatted); ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+    .cherry-hero {
+        <?php if (!empty($paragon_image_url)): ?>
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<?php echo esc_url($paragon_image_url); ?>');
+        background-size: cover;
+        background-position: center center;
+        background-repeat: no-repeat;
+        <?php else: ?>
+        background: #53565b;
+        <?php endif; ?>
+        color: white;
+        text-align: center;
+        padding: 80px 0;
+        position: relative;
+    }
+    
+    .cherry-hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    
+    .cherry-heading {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin: 0 0 20px 0;
+        line-height: 1.1;
+    }
+    
+    .cherry-subheading {
+        font-size: 1.4rem;
+        margin: 0 0 40px 0;
+        opacity: 0.9;
+        line-height: 1.4;
+        font-weight: 300;
+    }
+    
+    .cherry-buttons-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 0 0 30px 0;
+        flex-wrap: wrap;
+    }
+    
+    .cherry-button {
+        display: inline-block;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        min-width: 180px;
+        text-align: center;
+    }
+    
+    .cherry-button-left {
+        background: #3f72d7;
+        color: white;
+        border: 2px solid #3f72d7;
+    }
+    
+    .cherry-button-left:hover {
+        background: #2d5cbf;
+        color: white;
+        border-color: #2d5cbf;
+    }
+    
+    .cherry-button-right {
+        background: #3f72d7;
+        color: white;
+        border: 2px solid #3f72d7;
+    }
+    
+    .cherry-button-right:hover {
+        background: #2d5cbf;
+        color: white;
+        border-color: #2d5cbf;
+    }
+    
+    .cherry-button-disabled {
+        cursor: default;
+        opacity: 0.6;
+        background: #666;
+        border-color: #666;
+    }
+    
+    .cherry-phone-container {
+        margin-top: 20px;
+    }
+    
+    .cherry-phone {
+        color: white;
+        font-size: 1.3rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 2px solid white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .cherry-phone:hover {
+        background: white;
+        color: #333;
+    }
+    
+    @media (max-width: 1200px) {
+        .cherry-hero {
+            padding: 60px 0;
+        }
+        
+        .cherry-heading {
+            font-size: 3rem;
+        }
+        
+        .cherry-subheading {
+            font-size: 1.2rem;
+        }
+        
+        .cherry-buttons-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .cherry-button {
+            width: 220px;
+        }
+        
+        .cherry-phone {
+            font-size: 1.1rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .cherry-heading {
+            font-size: 2.5rem;
+        }
+        
+        .cherry-subheading {
+            font-size: 1.1rem;
+        }
+        
+        .cherry-phone {
+            font-size: 1rem;
+        }
+    }
+    </style>
+    <?php
+}
+
+/**
+ * Render Chen Cards Box Section
+ */
+function staircase_render_chen_cards_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Get chenblock card data from wp_pylons
+    $chen_card_1_title = '';
+    $chen_card_1_description = '';
+    $chen_card_2_title = '';
+    $chen_card_2_description = '';
+    $chen_card_3_title = '';
+    $chen_card_3_description = '';
+    
+    if ($pylon_data) {
+        $chen_card_1_title = !empty($pylon_data['chenblock_card1_title']) ? $pylon_data['chenblock_card1_title'] : '';
+        $chen_card_1_description = !empty($pylon_data['chenblock_card1_desc']) ? $pylon_data['chenblock_card1_desc'] : '';
+        
+        $chen_card_2_title = !empty($pylon_data['chenblock_card2_title']) ? $pylon_data['chenblock_card2_title'] : '';
+        $chen_card_2_description = !empty($pylon_data['chenblock_card2_desc']) ? $pylon_data['chenblock_card2_desc'] : '';
+        
+        $chen_card_3_title = !empty($pylon_data['chenblock_card3_title']) ? $pylon_data['chenblock_card3_title'] : '';
+        $chen_card_3_description = !empty($pylon_data['chenblock_card3_desc']) ? $pylon_data['chenblock_card3_desc'] : '';
+    }
+    
+    // Show chen card block if any cards have content
+    $has_chen_cards = !empty($chen_card_1_title) || !empty($chen_card_2_title) || !empty($chen_card_3_title);
+    if ($has_chen_cards): 
+    ?>
+    <section class="chen-card-block">
+        <div class="container">
+            <div class="chen-cards-grid">
+                <?php if (!empty($chen_card_1_title)): ?>
+                    <div class="chen-card">
+                        <h3 class="chen-card-title"><?php echo esc_html($chen_card_1_title); ?></h3>
+                        <?php if (!empty($chen_card_1_description)): ?>
+                            <p class="chen-card-description"><?php echo esc_html($chen_card_1_description); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($chen_card_2_title)): ?>
+                    <div class="chen-card">
+                        <h3 class="chen-card-title"><?php echo esc_html($chen_card_2_title); ?></h3>
+                        <?php if (!empty($chen_card_2_description)): ?>
+                            <p class="chen-card-description"><?php echo esc_html($chen_card_2_description); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (!empty($chen_card_3_title)): ?>
+                    <div class="chen-card">
+                        <h3 class="chen-card-title"><?php echo esc_html($chen_card_3_title); ?></h3>
+                        <?php if (!empty($chen_card_3_description)): ?>
+                            <p class="chen-card-description"><?php echo esc_html($chen_card_3_description); ?></p>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+    .chen-card-block {
+        padding: 60px 0;
+        background: #f9f9f9;
+    }
+    
+    .chen-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .chen-card {
+        background: white;
+        border-radius: 12px;
+        padding: 40px 30px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+    
+    .chen-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .chen-card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0 0 15px 0;
+        color: #333;
+        line-height: 1.3;
+    }
+    
+    .chen-card-description {
+        font-size: 1rem;
+        line-height: 1.6;
+        color: #666;
+        margin: 0;
+    }
+    
+    @media (max-width: 1200px) {
+        .chen-cards-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .chen-card {
+            padding: 30px 25px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .chen-card-block {
+            padding: 40px 0;
+        }
+        
+        .chen-cards-grid {
+            grid-template-columns: 1fr;
+            gap: 25px;
+            padding: 0 20px;
+        }
+        
+        .chen-card {
+            padding: 25px 20px;
+        }
+        
+        .chen-card-title {
+            font-size: 1.3rem;
+        }
+        
+        .chen-card-description {
+            font-size: 0.9rem;
+        }
+    }
+    </style>
+    <?php
+    endif;
+}
+
+/**
+ * Render Serena FAQ Box Section
+ */
+function staircase_render_serena_faq_box() {
+    $current_post_id = get_the_ID();
+    global $wpdb;
+    
+    // Get FAQ data from wp_pylons table for current post (using correct column names with _box suffix)
+    $faq_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT serena_faq_box_q1, serena_faq_box_a1, serena_faq_box_q2, serena_faq_box_a2, 
+                serena_faq_box_q3, serena_faq_box_a3, serena_faq_box_q4, serena_faq_box_a4,
+                serena_faq_box_q5, serena_faq_box_a5, serena_faq_box_q6, serena_faq_box_a6,
+                serena_faq_box_q7, serena_faq_box_a7, serena_faq_box_q8, serena_faq_box_a8,
+                serena_faq_box_q9, serena_faq_box_a9, serena_faq_box_q10, serena_faq_box_a10
+         FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+        $current_post_id
+    ), ARRAY_A);
+    
+    // DEBUG: Show FAQ data retrieval (remove after testing)
+    echo "<!-- DEBUG: FAQ Data Retrieved: " . print_r($faq_data, true) . " -->\n";
+    
+    // Check if any FAQ content exists
+    $has_faq_content = false;
+    if ($faq_data) {
+        // Check all FAQ question and answer fields for content (using correct column names)
+        for ($i = 1; $i <= 10; $i++) {
+            $question = $faq_data["serena_faq_box_q{$i}"] ?? '';
+            $answer = $faq_data["serena_faq_box_a{$i}"] ?? '';
+            
+            // DEBUG: Show each FAQ field check
+            if (!empty(trim($question)) || !empty(trim($answer))) {
+                echo "<!-- DEBUG: Found FAQ content in q{$i}/a{$i}: Q='{$question}', A='{$answer}' -->\n";
+                $has_faq_content = true;
+                break;
+            }
+        }
+    }
+    
+    // DEBUG: Show final decision
+    echo "<!-- DEBUG: Has FAQ content: " . ($has_faq_content ? 'YES' : 'NO') . " -->\n";
+    
+    // Only render the FAQ box if content exists
+    if ($has_faq_content) {
+    ?>
+    <!-- Serena FAQ Box Section -->
+    <section class="serena-faq-box">
+        <div class="serena-faq-container">
+            <h2 class="serena-faq-title"><span class="serena-faq-star">★</span> FAQ</h2>
+            <p class="serena-faq-subtitle">Frequently Asked Questions</p>
+            
+            <div class="serena-faq-accordion">
+                <?php
+                // Loop through FAQ data and display non-empty items (using correct column names)
+                for ($i = 1; $i <= 10; $i++) {
+                    $question = $faq_data["serena_faq_box_q{$i}"] ?? '';
+                    $answer = $faq_data["serena_faq_box_a{$i}"] ?? '';
+                    
+                    // Only display if both question and answer have content
+                    if (!empty(trim($question)) && !empty(trim($answer))) {
+                ?>
+                    <div class="serena-faq-item">
+                        <button class="serena-faq-question" onclick="toggleFAQ(this)">
+                            <?php echo esc_html(trim($question)); ?>
+                            <span class="serena-faq-icon">+</span>
+                        </button>
+                        <div class="serena-faq-answer">
+                            <p><?php echo wp_kses_post(wpautop(trim($answer))); ?></p>
+                        </div>
+                    </div>
+                <?php
+                    }
+                }
+                ?>
+            </div>
+        </div>
+        
+        <script>
+        function toggleFAQ(button) {
+            const answer = button.nextElementSibling;
+            const icon = button.querySelector('.serena-faq-icon');
+            const isOpen = answer.style.display === 'block';
+            
+            // Close all other FAQ items
+            document.querySelectorAll('.serena-faq-answer').forEach(item => {
+                item.style.display = 'none';
+            });
+            document.querySelectorAll('.serena-faq-icon').forEach(item => {
+                item.textContent = '+';
+            });
+            document.querySelectorAll('.serena-faq-question').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Toggle current item
+            if (!isOpen) {
+                answer.style.display = 'block';
+                icon.textContent = '-';
+                button.classList.add('active');
+            }
+        }
+        </script>
+    </section>
+    <?php
+    } // End if ($has_faq_content)
+}
+
+/**
+ * Render Nile Map Box Section
+ */
+function staircase_render_nile_map_box() {
+    $current_post_id = get_the_ID();
+    global $wpdb;
+    
+    // Check if this page has a locationpage archetype in wp_pylons
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT pylon_archetype, locpage_gmaps_string FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+        $current_post_id
+    ), ARRAY_A);
+    
+    $location_string = '';
+    
+    // If this is a locationpage, use the locpage_gmaps_string
+    if ($pylon_data && $pylon_data['pylon_archetype'] === 'locationpage' && !empty($pylon_data['locpage_gmaps_string'])) {
+        $location_string = trim($pylon_data['locpage_gmaps_string']);
+    } else {
+        // Default behavior: Get location data from wp_zen_sitespren table
+        $city = $wpdb->get_var("SELECT driggs_city FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+        $state_full = $wpdb->get_var("SELECT driggs_state_full FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+        $state_code = $wpdb->get_var("SELECT driggs_state_code FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+        $country = $wpdb->get_var("SELECT driggs_country FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+        
+        // Use state_full if available, otherwise fallback to state_code
+        $state = !empty($state_full) ? $state_full : $state_code;
+        
+        // Build location string with proper comma handling
+        $location_parts = array();
+        if (!empty($city)) {
+            $location_parts[] = trim($city);
+        }
+        if (!empty($state)) {
+            $location_parts[] = trim($state);
+        }
+        if (!empty($country)) {
+            $location_parts[] = trim($country);
+        }
+        
+        $location_string = implode(', ', $location_parts);
+    }
+    
+    $fallback_location = 'Dallas, TX'; // Fallback if no location data
+    $final_location = !empty($location_string) ? $location_string : $fallback_location;
+    
+    // URL encode the location for the Google Maps embed
+    $encoded_location = urlencode($final_location);
+    ?>
+    <!-- Nile Map Box Section -->
+    <section class="nile-map-box">
+        <div class="map-header">
+            <h3><span class="nile-map-pin">📍</span> On the map</h3>
+        </div>
+        <div class="map-embed-container">
+            <iframe 
+                src="https://www.google.com/maps?q=<?php echo $encoded_location; ?>&output=embed"
+                width="100%" 
+                height="275" 
+                style="border:0;" 
+                allowfullscreen="" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Our Location - <?php echo esc_attr($final_location); ?>">
+            </iframe>
+        </div>
+    </section>
+    <?php
+}
+
+/**
+ * Render Kristina CTA Box Section
+ */
+function staircase_render_kristina_cta_box() {
+    global $wpdb;
+    $kristina_phone_number_raw = $wpdb->get_var("SELECT driggs_phone_1 FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+    $kristina_phone_number_formatted = $kristina_phone_number_raw ? staircase_format_phone_number($kristina_phone_number_raw) : '';
+    
+    // Clean phone number for tel: link (same as hero logic)
+    $clean_phone = preg_replace('/[^0-9+]/', '', $kristina_phone_number_raw);
+    ?>
+    <!-- Kristina CTA Box Section -->
+    <section class="kristina-cta-box">
+        <div class="kristina-cta-container">
+            <h2 class="kristina-cta-heading">Get Your Free Estimate Today</h2>
+            <p class="kristina-cta-subtext">Contact us today for professional service and free estimates</p>
+            
+            <?php if (!empty($kristina_phone_number_raw)): ?>
+                <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="kristina-cta-button">
+                    Call Now
+                </a>
+            <?php else: ?>
+                <a href="tel:555-0123" class="kristina-cta-button">
+                    Call Now
+                </a>
+            <?php endif; ?>
+        </div>
+    </section>
+    <?php
+}
+
+/**
+ * Render Victoria Blog Box Section
+ */
+function staircase_render_victoria_blog_box() {
+    ?>
+    <!-- Victoria Blog Box Section -->
+    <section class="victoria-blog-box">
+        <div class="blog-box-container">
+            <h2>Recent Posts</h2>
+            <p class="blog-box-subtitle">Key insights from our team</p>
+            
+            <div class="blog-posts-grid">
+                <?php
+                // Get the 3 most recent blog posts
+                $recent_posts = new WP_Query(array(
+                    'post_type' => 'post',
+                    'posts_per_page' => 3,
+                    'post_status' => 'publish',
+                    'orderby' => 'date',
+                    'order' => 'DESC'
+                ));
+                
+                if ($recent_posts->have_posts()) :
+                    while ($recent_posts->have_posts()) : $recent_posts->the_post();
+                        $author_id = get_the_author_meta('ID');
+                        $author_name = get_the_author();
+                        $post_date = get_the_date('M j, Y');
+                        $post_title = get_the_title();
+                        $post_excerpt = has_excerpt() ? get_the_excerpt() : wp_trim_words(get_the_content(), 20, '...');
+                        $post_link = get_permalink();
+                        ?>
+                        <div class="blog-post-card">
+                            <div class="post-meta">
+                                <span class="post-date"><?php echo esc_html($post_date); ?></span>
+                                <span class="post-author">By <?php echo esc_html($author_name); ?></span>
+                            </div>
+                            <h3 class="post-title">
+                                <a href="<?php echo esc_url($post_link); ?>"><?php echo esc_html($post_title); ?></a>
+                            </h3>
+                            <div class="post-excerpt"><?php echo esc_html($post_excerpt); ?></div>
+                            <a href="<?php echo esc_url($post_link); ?>" class="read-more-link">Read More</a>
+                        </div>
+                        <?php
+                    endwhile;
+                    wp_reset_postdata();
+                else :
+                    // Fallback if no posts exist
+                    ?>
+                    <div class="no-posts-message">
+                        <p>No blog posts available yet. Check back soon!</p>
+                    </div>
+                    <?php
+                endif;
+                ?>
+            </div>
+            
+            <?php 
+            // Get the blog page URL
+            $blog_page_id = get_option('page_for_posts');
+            if ($blog_page_id) :
+                $blog_page_url = get_permalink($blog_page_id);
+            ?>
+                <div class="blog-button-container">
+                    <a href="<?php echo esc_url($blog_page_url); ?>" class="go-to-blog-btn">Go To Blog</a>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
+    <?php
+}
+
+/**
  * Render Nile and Victoria boxes for Cherry template pages
  * Single source of truth for these template sections
  */
@@ -3050,265 +3984,10 @@ function staircase_render_cherry_template_boxes() {
     
     // Only show on Cherry template pages
     if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
-        // Get current post ID and check for FAQ content in wp_pylons
-        global $wpdb;
-        
-        // Get FAQ data from wp_pylons table for current post (using correct column names with _box suffix)
-        $faq_data = $wpdb->get_row($wpdb->prepare(
-            "SELECT serena_faq_box_q1, serena_faq_box_a1, serena_faq_box_q2, serena_faq_box_a2, 
-                    serena_faq_box_q3, serena_faq_box_a3, serena_faq_box_q4, serena_faq_box_a4,
-                    serena_faq_box_q5, serena_faq_box_a5, serena_faq_box_q6, serena_faq_box_a6,
-                    serena_faq_box_q7, serena_faq_box_a7, serena_faq_box_q8, serena_faq_box_a8,
-                    serena_faq_box_q9, serena_faq_box_a9, serena_faq_box_q10, serena_faq_box_a10
-             FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
-            $current_post_id
-        ), ARRAY_A);
-        
-        // DEBUG: Show FAQ data retrieval (remove after testing)
-        echo "<!-- DEBUG: FAQ Data Retrieved: " . print_r($faq_data, true) . " -->\n";
-        
-        // Check if any FAQ content exists
-        $has_faq_content = false;
-        if ($faq_data) {
-            // Check all FAQ question and answer fields for content (using correct column names)
-            for ($i = 1; $i <= 10; $i++) {
-                $question = $faq_data["serena_faq_box_q{$i}"] ?? '';
-                $answer = $faq_data["serena_faq_box_a{$i}"] ?? '';
-                
-                // DEBUG: Show each FAQ field check
-                if (!empty(trim($question)) || !empty(trim($answer))) {
-                    echo "<!-- DEBUG: Found FAQ content in q{$i}/a{$i}: Q='{$question}', A='{$answer}' -->\n";
-                    $has_faq_content = true;
-                    break;
-                }
-            }
-        }
-        
-        // DEBUG: Show final decision
-        echo "<!-- DEBUG: Has FAQ content: " . ($has_faq_content ? 'YES' : 'NO') . " -->\n";
-        
-        // Only render the FAQ box if content exists
-        if ($has_faq_content) {
-        ?>
-        <!-- Serena FAQ Box Section -->
-        <section class="serena-faq-box">
-            <div class="serena-faq-container">
-                <h2 class="serena-faq-title"><span class="serena-faq-star">★</span> FAQ</h2>
-                <p class="serena-faq-subtitle">Frequently Asked Questions</p>
-                
-                <div class="serena-faq-accordion">
-                    <?php
-                    // Loop through FAQ data and display non-empty items (using correct column names)
-                    for ($i = 1; $i <= 10; $i++) {
-                        $question = $faq_data["serena_faq_box_q{$i}"] ?? '';
-                        $answer = $faq_data["serena_faq_box_a{$i}"] ?? '';
-                        
-                        // Only display if both question and answer have content
-                        if (!empty(trim($question)) && !empty(trim($answer))) {
-                    ?>
-                        <div class="serena-faq-item">
-                            <button class="serena-faq-question" onclick="toggleFAQ(this)">
-                                <?php echo esc_html(trim($question)); ?>
-                                <span class="serena-faq-icon">+</span>
-                            </button>
-                            <div class="serena-faq-answer">
-                                <p><?php echo wp_kses_post(wpautop(trim($answer))); ?></p>
-                            </div>
-                        </div>
-                    <?php
-                        }
-                    }
-                    ?>
-                </div>
-            </div>
-            
-            <script>
-            function toggleFAQ(button) {
-                const answer = button.nextElementSibling;
-                const icon = button.querySelector('.serena-faq-icon');
-                const isOpen = answer.style.display === 'block';
-                
-                // Close all other FAQ items
-                document.querySelectorAll('.serena-faq-answer').forEach(item => {
-                    item.style.display = 'none';
-                });
-                document.querySelectorAll('.serena-faq-icon').forEach(item => {
-                    item.textContent = '+';
-                });
-                document.querySelectorAll('.serena-faq-question').forEach(item => {
-                    item.classList.remove('active');
-                });
-                
-                // Toggle current item
-                if (!isOpen) {
-                    answer.style.display = 'block';
-                    icon.textContent = '-';
-                    button.classList.add('active');
-                }
-            }
-            </script>
-        </section>
-        <?php
-        } // End if ($has_faq_content)
-        ?>
-        
-        <!-- Nile Map Box Section -->
-        <section class="nile-map-box">
-            <?php
-            // Get current post ID
-            $current_post_id = get_the_ID();
-            global $wpdb;
-            
-            // Check if this page has a locationpage archetype in wp_pylons
-            $pylon_data = $wpdb->get_row($wpdb->prepare(
-                "SELECT pylon_archetype, locpage_gmaps_string FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
-                $current_post_id
-            ), ARRAY_A);
-            
-            $location_string = '';
-            
-            // If this is a locationpage, use the locpage_gmaps_string
-            if ($pylon_data && $pylon_data['pylon_archetype'] === 'locationpage' && !empty($pylon_data['locpage_gmaps_string'])) {
-                $location_string = trim($pylon_data['locpage_gmaps_string']);
-            } else {
-                // Default behavior: Get location data from wp_zen_sitespren table
-                $city = $wpdb->get_var("SELECT driggs_city FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
-                $state_full = $wpdb->get_var("SELECT driggs_state_full FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
-                $state_code = $wpdb->get_var("SELECT driggs_state_code FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
-                $country = $wpdb->get_var("SELECT driggs_country FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
-                
-                // Use state_full if available, otherwise fallback to state_code
-                $state = !empty($state_full) ? $state_full : $state_code;
-                
-                // Build location string with proper comma handling
-                $location_parts = array();
-                if (!empty($city)) {
-                    $location_parts[] = trim($city);
-                }
-                if (!empty($state)) {
-                    $location_parts[] = trim($state);
-                }
-                if (!empty($country)) {
-                    $location_parts[] = trim($country);
-                }
-                
-                $location_string = implode(', ', $location_parts);
-            }
-            
-            $fallback_location = 'Dallas, TX'; // Fallback if no location data
-            $final_location = !empty($location_string) ? $location_string : $fallback_location;
-            
-            // URL encode the location for the Google Maps embed
-            $encoded_location = urlencode($final_location);
-            ?>
-            <div class="map-header">
-                <h3><span class="nile-map-pin">📍</span> On the map</h3>
-            </div>
-            <div class="map-embed-container">
-                <iframe 
-                    src="https://www.google.com/maps?q=<?php echo $encoded_location; ?>&output=embed"
-                    width="100%" 
-                    height="275" 
-                    style="border:0;" 
-                    allowfullscreen="" 
-                    loading="lazy" 
-                    referrerpolicy="no-referrer-when-downgrade"
-                    title="Our Location - <?php echo esc_attr($final_location); ?>">
-                </iframe>
-            </div>
-        </section>
-        
-        <!-- Kristina CTA Box Section -->
-        <section class="kristina-cta-box">
-            <div class="kristina-cta-container">
-                <h2 class="kristina-cta-heading">Get Your Free Estimate Today</h2>
-                <p class="kristina-cta-subtext">Contact us today for professional service and free estimates</p>
-                
-                <?php
-                // Get phone number using existing hero logic
-                global $wpdb;
-                $kristina_phone_number_raw = $wpdb->get_var("SELECT driggs_phone_1 FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
-                $kristina_phone_number_formatted = $kristina_phone_number_raw ? staircase_format_phone_number($kristina_phone_number_raw) : '';
-                
-                // Clean phone number for tel: link (same as hero logic)
-                $clean_phone = preg_replace('/[^0-9+]/', '', $kristina_phone_number_raw);
-                ?>
-                
-                <?php if (!empty($kristina_phone_number_raw)): ?>
-                    <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="kristina-cta-button">
-                        Call Now
-                    </a>
-                <?php else: ?>
-                    <a href="tel:555-0123" class="kristina-cta-button">
-                        Call Now
-                    </a>
-                <?php endif; ?>
-            </div>
-        </section>
-        
-        <!-- Victoria Blog Box Section -->
-        <section class="victoria-blog-box">
-            <div class="blog-box-container">
-                <h2>Recent Posts</h2>
-                <p class="blog-box-subtitle">Key insights from our team</p>
-                
-                <div class="blog-posts-grid">
-                    <?php
-                    // Get the 3 most recent blog posts
-                    $recent_posts = new WP_Query(array(
-                        'post_type' => 'post',
-                        'posts_per_page' => 3,
-                        'post_status' => 'publish',
-                        'orderby' => 'date',
-                        'order' => 'DESC'
-                    ));
-                    
-                    if ($recent_posts->have_posts()) :
-                        while ($recent_posts->have_posts()) : $recent_posts->the_post();
-                            $author_id = get_the_author_meta('ID');
-                            $author_name = get_the_author();
-                            $post_date = get_the_date('M j, Y');
-                            $post_title = get_the_title();
-                            $post_excerpt = has_excerpt() ? get_the_excerpt() : wp_trim_words(get_the_content(), 20, '...');
-                            $post_link = get_permalink();
-                            ?>
-                            <div class="blog-post-card">
-                                <div class="post-meta">
-                                    <span class="post-date"><?php echo esc_html($post_date); ?></span>
-                                    <span class="post-author">By <?php echo esc_html($author_name); ?></span>
-                                </div>
-                                <h3 class="post-title">
-                                    <a href="<?php echo esc_url($post_link); ?>"><?php echo esc_html($post_title); ?></a>
-                                </h3>
-                                <div class="post-excerpt"><?php echo esc_html($post_excerpt); ?></div>
-                                <a href="<?php echo esc_url($post_link); ?>" class="read-more-link">Read More</a>
-                            </div>
-                            <?php
-                        endwhile;
-                        wp_reset_postdata();
-                    else :
-                        // Fallback if no posts exist
-                        ?>
-                        <div class="no-posts-message">
-                            <p>No blog posts available yet. Check back soon!</p>
-                        </div>
-                        <?php
-                    endif;
-                    ?>
-                </div>
-                
-                <?php 
-                // Get the blog page URL
-                $blog_page_id = get_option('page_for_posts');
-                if ($blog_page_id) :
-                    $blog_page_url = get_permalink($blog_page_id);
-                ?>
-                    <div class="blog-button-container">
-                        <a href="<?php echo esc_url($blog_page_url); ?>" class="go-to-blog-btn">Go To Blog</a>
-                    </div>
-                <?php endif; ?>
-            </div>
-        </section>
-        <?php
+        // Render all individual component boxes
+        staircase_render_serena_faq_box();
+        staircase_render_nile_map_box();
+        staircase_render_kristina_cta_box();
+        staircase_render_victoria_blog_box();
     }
 }
