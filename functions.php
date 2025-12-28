@@ -3043,46 +3043,82 @@ add_filter('ai1wm_exclude_content_from_export', function($exclude_filters) {
  */
 function staircase_render_cherry_template_boxes() {
     $current_template = staircase_get_current_template();
+    $current_post_id = get_the_ID();
+    
+    // DEBUG: Add debug output (remove after testing)
+    echo "<!-- DEBUG: Current template: {$current_template}, Post ID: {$current_post_id} -->\n";
     
     // Only show on Cherry template pages
     if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
+        // Get current post ID and check for FAQ content in wp_pylons
+        global $wpdb;
+        
+        // Get FAQ data from wp_pylons table for current post (using correct column names with _box suffix)
+        $faq_data = $wpdb->get_row($wpdb->prepare(
+            "SELECT serena_faq_box_q1, serena_faq_box_a1, serena_faq_box_q2, serena_faq_box_a2, 
+                    serena_faq_box_q3, serena_faq_box_a3, serena_faq_box_q4, serena_faq_box_a4,
+                    serena_faq_box_q5, serena_faq_box_a5, serena_faq_box_q6, serena_faq_box_a6,
+                    serena_faq_box_q7, serena_faq_box_a7, serena_faq_box_q8, serena_faq_box_a8,
+                    serena_faq_box_q9, serena_faq_box_a9, serena_faq_box_q10, serena_faq_box_a10
+             FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+            $current_post_id
+        ), ARRAY_A);
+        
+        // DEBUG: Show FAQ data retrieval (remove after testing)
+        echo "<!-- DEBUG: FAQ Data Retrieved: " . print_r($faq_data, true) . " -->\n";
+        
+        // Check if any FAQ content exists
+        $has_faq_content = false;
+        if ($faq_data) {
+            // Check all FAQ question and answer fields for content (using correct column names)
+            for ($i = 1; $i <= 10; $i++) {
+                $question = $faq_data["serena_faq_box_q{$i}"] ?? '';
+                $answer = $faq_data["serena_faq_box_a{$i}"] ?? '';
+                
+                // DEBUG: Show each FAQ field check
+                if (!empty(trim($question)) || !empty(trim($answer))) {
+                    echo "<!-- DEBUG: Found FAQ content in q{$i}/a{$i}: Q='{$question}', A='{$answer}' -->\n";
+                    $has_faq_content = true;
+                    break;
+                }
+            }
+        }
+        
+        // DEBUG: Show final decision
+        echo "<!-- DEBUG: Has FAQ content: " . ($has_faq_content ? 'YES' : 'NO') . " -->\n";
+        
+        // Only render the FAQ box if content exists
+        if ($has_faq_content) {
         ?>
         <!-- Serena FAQ Box Section -->
         <section class="serena-faq-box">
             <div class="serena-faq-container">
-                <h2 class="serena-faq-title">FAQ</h2>
+                <h2 class="serena-faq-title"><span class="serena-faq-star">★</span> FAQ</h2>
                 <p class="serena-faq-subtitle">Frequently Asked Questions</p>
                 
                 <div class="serena-faq-accordion">
-                    <div class="serena-faq-item">
-                        <button class="serena-faq-question" onclick="toggleFAQ(this)">
-                            What are silverfish and why are they in my home?
-                            <span class="serena-faq-icon">+</span>
-                        </button>
-                        <div class="serena-faq-answer">
-                            <p>Silverfish are small, wingless insects with a silvery appearance and fish-like movement. They're attracted to moisture and feed on starchy materials like paper, clothing, and food crumbs. They often enter homes seeking humid environments like bathrooms, basements, and kitchens.</p>
+                    <?php
+                    // Loop through FAQ data and display non-empty items (using correct column names)
+                    for ($i = 1; $i <= 10; $i++) {
+                        $question = $faq_data["serena_faq_box_q{$i}"] ?? '';
+                        $answer = $faq_data["serena_faq_box_a{$i}"] ?? '';
+                        
+                        // Only display if both question and answer have content
+                        if (!empty(trim($question)) && !empty(trim($answer))) {
+                    ?>
+                        <div class="serena-faq-item">
+                            <button class="serena-faq-question" onclick="toggleFAQ(this)">
+                                <?php echo esc_html(trim($question)); ?>
+                                <span class="serena-faq-icon">+</span>
+                            </button>
+                            <div class="serena-faq-answer">
+                                <p><?php echo wp_kses_post(wpautop(trim($answer))); ?></p>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="serena-faq-item">
-                        <button class="serena-faq-question" onclick="toggleFAQ(this)">
-                            How do I know if I have a silverfish infestation?
-                            <span class="serena-faq-icon">+</span>
-                        </button>
-                        <div class="serena-faq-answer">
-                            <p>Signs of silverfish include yellow stains on clothing or paper, small holes in fabrics, shed skins, and actual sightings of the insects, especially at night. You may also find their feces, which appear as small black pepper-like specks.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="serena-faq-item">
-                        <button class="serena-faq-question" onclick="toggleFAQ(this)">
-                            What's included in your silverfish control service?
-                            <span class="serena-faq-icon">+</span>
-                        </button>
-                        <div class="serena-faq-answer">
-                            <p>Our comprehensive silverfish control includes a thorough inspection, targeted treatment of affected areas, moisture reduction recommendations, sealing of entry points, and follow-up visits to ensure complete elimination. We also provide prevention tips to keep them from returning.</p>
-                        </div>
-                    </div>
+                    <?php
+                        }
+                    }
+                    ?>
                 </div>
             </div>
             
@@ -3112,6 +3148,9 @@ function staircase_render_cherry_template_boxes() {
             }
             </script>
         </section>
+        <?php
+        } // End if ($has_faq_content)
+        ?>
         
         <!-- Nile Map Box Section -->
         <section class="nile-map-box">
@@ -3163,7 +3202,7 @@ function staircase_render_cherry_template_boxes() {
             $encoded_location = urlencode($final_location);
             ?>
             <div class="map-header">
-                <h3>Find us on the map (nile map box)</h3>
+                <h3><span class="nile-map-pin">📍</span> On the map</h3>
             </div>
             <div class="map-embed-container">
                 <iframe 
@@ -3210,7 +3249,7 @@ function staircase_render_cherry_template_boxes() {
         <!-- Victoria Blog Box Section -->
         <section class="victoria-blog-box">
             <div class="blog-box-container">
-                <h2>Top Tips (victoria blog box)</h2>
+                <h2>Recent Posts</h2>
                 <p class="blog-box-subtitle">Key insights from our team</p>
                 
                 <div class="blog-posts-grid">

@@ -1174,6 +1174,12 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+.serena-faq-star {
+    color: #800000;
+    margin-right: 8px;
+    font-size: 28px;
+}
+
 .serena-faq-subtitle {
     font-size: 18px;
     font-weight: normal;
@@ -1327,6 +1333,12 @@ body {
     font-weight: bold;
     color: #2c3e50;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.nile-map-pin {
+    color: #e74c3c;
+    margin-right: 8px;
+    font-size: 18px;
 }
 
 .nile-map-box .map-embed-container {
