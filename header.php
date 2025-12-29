@@ -88,13 +88,13 @@
 
 <?php
 // Display hero section if applicable
+// Note: Cherry templates handle their own hero rendering internally
 if (function_exists('staircase_should_show_hero') && staircase_should_show_hero()) {
     $current_template = staircase_get_current_template();
     
-    // Templates handle their own hero data
-    if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
-        staircase_hero_section();
-    } else {
+    // Only show hero for non-cherry templates
+    // Cherry templates render hero as part of their template structure
+    if ($current_template !== 'cherry' && $current_template !== 'homepage-cherry') {
         // Standard hero for content-only and other pages
         // Check if this is the blog page (not front page)
         if (is_home() && !is_front_page()) {

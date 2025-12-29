@@ -4,123 +4,34 @@
  *
  * @package Staircase
  */
+// Test comment for VSCode trigger - single.php
 
 get_header();
 ?>
 
 <?php
-// Check if this is a bilberry template page
 $current_template = staircase_get_current_template();
 
-if ($current_template === 'bilberry') {
-    // Use bilberry template rendering
+// Cherry templates need full width rendering, others use container
+if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
+    // Cherry template renders without container constraint for full width sections
     while (have_posts()): the_post();
-        staircase_bilberry_template();
+        staircase_render_template();
     endwhile;
 } else {
-    // Render Chen cards for cherry template right after hero
-    if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
-        staircase_render_chen_cards_box();
-    }
+    // Other templates use standard container layout
     ?>
     <main class="site-content">
         <div class="container">
             <?php
             while (have_posts()): the_post();
+                staircase_render_template();
+            endwhile;
             ?>
-            <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-                <header class="entry-header">
-                    <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
-                    
-                    <div class="entry-meta">
-                        <span class="posted-on">
-                            <time datetime="<?php echo esc_attr(get_the_date('c')); ?>">
-                                <?php echo get_the_date(); ?>
-                            </time>
-                        </span>
-                        <span class="byline">
-                            by <a href="<?php echo esc_url(get_author_posts_url(get_the_author_meta('ID'))); ?>">
-                                <?php the_author(); ?>
-                            </a>
-                        </span>
-                        <?php if (get_comments_number()): ?>
-                            <span class="comments-link">
-                                <?php comments_popup_link('No Comments', '1 Comment', '% Comments'); ?>
-                            </span>
-                        <?php endif; ?>
-                    </div>
-                </header>
-                
-                <?php if (has_post_thumbnail()): ?>
-                    <div class="post-thumbnail">
-                        <?php the_post_thumbnail('large'); ?>
-                    </div>
-                <?php endif; ?>
-                
-                <div class="entry-content">
-                    <?php
-                    the_content();
-                    
-                    wp_link_pages(array(
-                        'before' => '<div class="page-links">Pages: ',
-                        'after'  => '</div>',
-                    ));
-                    ?>
-                </div>
-                
-                <footer class="entry-footer">
-                    <div class="entry-categories">
-                        <span class="cat-label">Categories:</span>
-                        <?php the_category(', '); ?>
-                    </div>
-                    
-                    <?php if (has_tag()): ?>
-                        <div class="entry-tags">
-                            <span class="tag-label">Tags:</span>
-                            <?php the_tags('', ', '); ?>
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if (get_edit_post_link()): ?>
-                        <?php
-                        edit_post_link(
-                            sprintf(
-                                wp_kses(
-                                    __('Edit <span class="screen-reader-text">%s</span>', 'staircase'),
-                                    array(
-                                        'span' => array(
-                                            'class' => array(),
-                                        ),
-                                    )
-                                ),
-                                wp_kses_post(get_the_title())
-                            ),
-                            '<span class="edit-link">',
-                            '</span>'
-                        );
-                        ?>
-                    <?php endif; ?>
-                </footer>
-            </article>
-            
-            <?php
-            // Post navigation
-            the_post_navigation(array(
-                'prev_text' => '<span class="nav-subtitle">Previous:</span> <span class="nav-title">%title</span>',
-                'next_text' => '<span class="nav-subtitle">Next:</span> <span class="nav-title">%title</span>',
-            ));
-            
-            // If comments are open or we have at least one comment, load up the comment template
-            if (comments_open() || get_comments_number()):
-                comments_template();
-            endif;
-            
-        endwhile;
-        ?>
-    </div>
-</main>
-<?php
-} // End bilberry template conditional
+        </div>
+    </main>
+    <?php
+}
 ?>
 
 <style>
@@ -236,9 +147,4 @@ if ($current_template === 'bilberry') {
 </style>
 
 <?php
-// Render Cherry template boxes (Nile and Victoria) if applicable (not for bilberry)
-if ($current_template !== 'bilberry') {
-    staircase_render_cherry_template_boxes();
-}
-
 get_footer();

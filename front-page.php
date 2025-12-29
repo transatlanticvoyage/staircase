@@ -4,26 +4,24 @@
  *
  * @package Staircase
  */
+// Test comment for VSCode trigger - front-page.php
 
 get_header();
 ?>
 
 <?php
-// Check if this is a bilberry template page
 $current_template = staircase_get_current_template();
 
-if ($current_template === 'bilberry') {
-    // Use bilberry template rendering
+// Cherry templates need full width rendering, others use container
+if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
+    // Cherry template renders without container constraint for full width sections
     if (have_posts()):
         while (have_posts()): the_post();
-            staircase_bilberry_template();
+            staircase_render_template();
         endwhile;
     endif;
 } else {
-    // Render Chen cards for cherry template right after hero
-    if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
-        staircase_render_chen_cards_box();
-    }
+    // Other templates use standard container layout
     ?>
     <main class="site-content">
         <div class="container">
@@ -31,123 +29,68 @@ if ($current_template === 'bilberry') {
             // If this is a static page
             if (have_posts()):
                 while (have_posts()): the_post();
+                    // Use centralized template rendering system
+                    staircase_render_template();
+                endwhile;
+                
+            // If this is set to show latest posts
+            elseif (is_home()):
                 ?>
-                <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-                    <?php if (!is_front_page()): // Only show title if not set as front page ?>
-                        <header class="entry-header">
-                            <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
-                        </header>
-                    <?php endif; ?>
-                    
-                    <div class="entry-content">
+                <div class="latest-posts">
+                    <h2>Latest Posts</h2>
+                    <div class="posts-grid">
                         <?php
-                        the_content();
-                        
-                        wp_link_pages(array(
-                            'before' => '<div class="page-links">Pages: ',
-                            'after'  => '</div>',
+                        $recent_posts = new WP_Query(array(
+                            'posts_per_page' => 6,
+                            'post_status'    => 'publish',
                         ));
+                        
+                        if ($recent_posts->have_posts()):
+                            while ($recent_posts->have_posts()): $recent_posts->the_post();
+                                ?>
+                                <article class="post-card">
+                                    <?php if (has_post_thumbnail()): ?>
+                                        <div class="post-card-thumbnail">
+                                            <a href="<?php the_permalink(); ?>">
+                                                <?php the_post_thumbnail('medium'); ?>
+                                            </a>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <div class="post-card-content">
+                                        <h3 class="post-card-title">
+                                            <a href="<?php the_permalink(); ?>">
+                                                <?php the_title(); ?>
+                                            </a>
+                                        </h3>
+                                        <div class="post-card-meta">
+                                            <?php echo get_the_date(); ?>
+                                        </div>
+                                        <div class="post-card-excerpt">
+                                            <?php the_excerpt(); ?>
+                                        </div>
+                                        <a href="<?php the_permalink(); ?>" class="post-card-link">
+                                            Read More &rarr;
+                                        </a>
+                                    </div>
+                                </article>
+                                <?php
+                            endwhile;
+                            wp_reset_postdata();
+                        else:
+                            ?>
+                            <p>No posts found.</p>
+                            <?php
+                        endif;
                         ?>
                     </div>
-                </article>
-                <?php
-            endwhile;
-            
-        // If this is set to show latest posts
-        elseif (is_home()):
-            ?>
-            <div class="latest-posts">
-                <h2>Latest Posts</h2>
-                <div class="posts-grid">
-                    <?php
-                    $recent_posts = new WP_Query(array(
-                        'posts_per_page' => 6,
-                        'post_status'    => 'publish',
-                    ));
-                    
-                    if ($recent_posts->have_posts()):
-                        while ($recent_posts->have_posts()): $recent_posts->the_post();
-                            ?>
-                            <article class="post-card">
-                                <?php if (has_post_thumbnail()): ?>
-                                    <div class="post-card-thumbnail">
-                                        <a href="<?php the_permalink(); ?>">
-                                            <?php the_post_thumbnail('medium'); ?>
-                                        </a>
-                                    </div>
-                                <?php endif; ?>
-                                
-                                <div class="post-card-content">
-                                    <h3 class="post-card-title">
-                                        <a href="<?php the_permalink(); ?>">
-                                            <?php the_title(); ?>
-                                        </a>
-                                    </h3>
-                                    <div class="post-card-meta">
-                                        <?php echo get_the_date(); ?>
-                                    </div>
-                                    <div class="post-card-excerpt">
-                                        <?php the_excerpt(); ?>
-                                    </div>
-                                    <a href="<?php the_permalink(); ?>" class="post-card-link">
-                                        Read More &rarr;
-                                    </a>
-                                </div>
-                            </article>
-                            <?php
-                        endwhile;
-                        wp_reset_postdata();
-                    else:
-                        ?>
-                        <p>No posts found.</p>
-                        <?php
-                    endif;
-                    ?>
                 </div>
-            </div>
-            <?php
-        endif;
-        ?>
+                <?php
+            endif;
+            ?>
         </div>
     </main>
     <?php
-} // End bilberry template conditional
-?>
-
-<?php
-// Add Our Services section for cherry template when enabled
-$current_template = staircase_get_current_template();
-$post_id = get_the_ID();
-
-// Debug output
-echo "<!-- OSB Debug: Post ID = $post_id, Template = '$current_template' -->\n";
-
-if (($current_template === 'cherry' || $current_template === 'homepage-cherry') && $current_template !== 'bilberry') {
-    // Check if OSB is enabled for this page
-    global $wpdb;
-    $pylons_table = $wpdb->prefix . 'pylons';
-    
-    $osb_enabled = $wpdb->get_var($wpdb->prepare(
-        "SELECT osb_is_enabled FROM {$pylons_table} WHERE rel_wp_post_id = %d",
-        $post_id
-    ));
-    
-    echo "<!-- OSB Debug: OSB Enabled = " . ($osb_enabled ? 'YES' : 'NO') . " -->\n";
-    
-    if ($osb_enabled) {
-        echo "<!-- OSB Debug: Rendering Our Services Section -->\n";
-        staircase_our_services_section();
-        echo "<!-- OSB Debug: Our Services Section Rendered -->\n";
-    } else {
-        echo "<!-- OSB Debug: OSB not enabled for this page -->\n";
-    }
-} else {
-    echo "<!-- OSB Debug: Not a cherry template, OSB will not render -->\n";
-}
-
-// Render Cherry template boxes (Nile and Victoria) if applicable (not for bilberry)
-if ($current_template !== 'bilberry') {
-    staircase_render_cherry_template_boxes();
 }
 ?>
 

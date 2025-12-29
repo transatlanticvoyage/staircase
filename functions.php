@@ -4,6 +4,7 @@
  * 
  * @package Staircase
  */
+// Test comment for VSCode trigger - functions.php
 
 // Theme Setup
 function staircase_theme_setup() {
@@ -509,21 +510,21 @@ function staircase_cherry_hero() {
                 
                 <div class="cherry-buttons-container">
                     <?php if ($cherry_button_left_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="cherry-button cherry-button-left">
+                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="batman-hero-button batman-hero-button-left">
                             <?php echo esc_html($cherry_button_left_text); ?>
                         </a>
                     <?php else: ?>
-                        <span class="cherry-button cherry-button-left cherry-button-disabled">
+                        <span class="batman-hero-button batman-hero-button-left batman-hero-button-disabled">
                             <?php echo esc_html($cherry_button_left_text); ?>
                         </span>
                     <?php endif; ?>
                     
                     <?php if ($cherry_button_right_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="cherry-button cherry-button-right">
+                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right">
                             <?php echo esc_html($cherry_button_right_text); ?>
                         </a>
                     <?php else: ?>
-                        <span class="cherry-button cherry-button-right cherry-button-disabled">
+                        <span class="batman-hero-button batman-hero-button-right batman-hero-button-disabled">
                             <?php echo esc_html($cherry_button_right_text); ?>
                         </span>
                     <?php endif; ?>
@@ -675,7 +676,7 @@ function staircase_cherry_hero() {
         border-color: #2d5cbf;
     }
     
-    .cherry-button-disabled {
+    .batman-hero-button-disabled {
         cursor: default;
         pointer-events: none;
     }
@@ -1082,6 +1083,186 @@ function staircase_bilberry_template() {
     }
     </style>
     <?php
+}
+
+/**
+ * Centralized Template Rendering System
+ * Single source of truth for all template rendering
+ */
+function staircase_render_template() {
+    $current_template = staircase_get_current_template();
+    
+    // Route to appropriate template based on current selection
+    switch($current_template) {
+        case 'bilberry':
+            staircase_render_bilberry_template();
+            break;
+            
+        case 'sarsaparilla':
+            staircase_render_sarsaparilla_template();
+            break;
+            
+        case 'gooseberry':
+            staircase_render_gooseberry_template();
+            break;
+            
+        case 'cherry':
+        case 'homepage-cherry':
+            staircase_render_cherry_full_template();
+            break;
+            
+        case 'content-only':
+        default:
+            staircase_render_default_template();
+            break;
+    }
+}
+
+/**
+ * Render Bilberry Template
+ */
+function staircase_render_bilberry_template() {
+    staircase_bilberry_template();
+}
+
+/**
+ * Render Sarsaparilla Template
+ * TODO: Implement sarsaparilla template
+ */
+function staircase_render_sarsaparilla_template() {
+    // For now, use default template
+    staircase_render_default_template();
+}
+
+/**
+ * Render Gooseberry Template
+ * TODO: Implement gooseberry template
+ */
+function staircase_render_gooseberry_template() {
+    // For now, use default template
+    staircase_render_default_template();
+}
+
+/**
+ * Render Plain Post Content (containerized)
+ */
+function staircase_render_plain_post_content() {
+    ?>
+    <main class="site-content">
+        <div class="container">
+            <?php staircase_render_default_template(); ?>
+        </div>
+    </main>
+    <?php
+}
+
+/**
+ * Render Cherry Full Template
+ */
+function staircase_render_cherry_full_template() {
+    // Cherry template includes batman hero box first
+    staircase_render_batman_hero_box();
+    
+    // Cherry template includes chen cards before content
+    staircase_render_chen_cards_box();
+    
+    // Render main content in container
+    staircase_render_plain_post_content();
+    
+    // Cherry template includes OSB box
+    staircase_render_osb_box();
+    
+    // Cherry template includes all the boxes at the end
+    staircase_render_serena_faq_box();
+    staircase_render_nile_map_box();
+    staircase_render_kristina_cta_box();
+    staircase_render_victoria_blog_box();
+}
+
+/**
+ * Render Default Template (content-only and fallback)
+ */
+function staircase_render_default_template() {
+    $post_type = get_post_type();
+    ?>
+    <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+        <?php 
+        // Show title if hero is not displayed
+        if (!staircase_should_show_hero()): 
+        ?>
+            <header class="entry-header">
+                <?php the_title('<h1 class="entry-title">', '</h1>'); ?>
+                
+                <?php 
+                // Add post meta for single posts
+                if ($post_type === 'post' && is_single()): 
+                ?>
+                    <div class="entry-meta">
+                        <span class="posted-on">
+                            <time datetime="<?php echo esc_attr(get_the_date('c')); ?>">
+                                <?php echo get_the_date(); ?>
+                            </time>
+                        </span>
+                        <span class="byline">
+                            by <a href="<?php echo esc_url(get_author_posts_url(get_the_author_meta('ID'))); ?>">
+                                <?php the_author(); ?>
+                            </a>
+                        </span>
+                        <?php if (get_comments_number()): ?>
+                            <span class="comments-link">
+                                <?php comments_popup_link('No comments', '1 comment', '% comments'); ?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </header>
+        <?php endif; ?>
+        
+        <?php if (has_post_thumbnail() && !is_front_page()): ?>
+            <div class="post-thumbnail">
+                <?php the_post_thumbnail('large'); ?>
+            </div>
+        <?php endif; ?>
+        
+        <div class="entry-content">
+            <?php
+            the_content();
+            
+            wp_link_pages(array(
+                'before' => '<div class="page-links">Pages: ',
+                'after'  => '</div>',
+            ));
+            ?>
+        </div>
+        
+        <?php if (get_edit_post_link()): ?>
+            <footer class="entry-footer">
+                <?php
+                edit_post_link(
+                    sprintf(
+                        wp_kses(
+                            __('Edit <span class="screen-reader-text">%s</span>', 'staircase'),
+                            array(
+                                'span' => array(
+                                    'class' => array(),
+                                ),
+                            )
+                        ),
+                        wp_kses_post(get_the_title())
+                    ),
+                    '<span class="edit-link">',
+                    '</span>'
+                );
+                ?>
+            </footer>
+        <?php endif; ?>
+    </article>
+    
+    <?php
+    // Add comments for single posts
+    if (is_singular() && (comments_open() || get_comments_number())):
+        comments_template();
+    endif;
 }
 
 // Get the template for current page
@@ -1541,22 +1722,31 @@ function staircase_page_options_meta_box_callback($post) {
 
 // Save page options meta box data
 function staircase_save_page_options_meta($post_id) {
+    // DEBUG: Log function entry
+    error_log("===== STAIRCASE SAVE META ENTERED =====");
+    error_log("Post ID: " . $post_id);
+    error_log("POST data keys: " . implode(', ', array_keys($_POST)));
+    
     // Check nonce
     if (!isset($_POST['staircase_page_options_meta_box_nonce'])) {
+        error_log("STAIRCASE SAVE: No nonce found - exiting");
         return;
     }
     
     if (!wp_verify_nonce($_POST['staircase_page_options_meta_box_nonce'], 'staircase_page_options_meta_box')) {
+        error_log("STAIRCASE SAVE: Nonce verification failed - exiting");
         return;
     }
     
     // Check autosave
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        error_log("STAIRCASE SAVE: Autosave detected - exiting");
         return;
     }
     
     // Check permissions
     if (!current_user_can('edit_post', $post_id)) {
+        error_log("STAIRCASE SAVE: No edit permissions - exiting");
         return;
     }
     
@@ -1565,24 +1755,48 @@ function staircase_save_page_options_meta($post_id) {
         global $wpdb;
         $raw_template = sanitize_text_field($_POST['staircase_pylon_raw_template']);
         
+        error_log("STAIRCASE SAVE: Raw template value: '" . $raw_template . "'");
+        error_log("STAIRCASE SAVE: Raw template empty?: " . (empty($raw_template) ? 'YES' : 'NO'));
+        
         // Check if pylon record exists for this post
         $pylon_exists = $wpdb->get_var($wpdb->prepare(
             "SELECT pylon_id FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
             $post_id
         ));
         
+        error_log("STAIRCASE SAVE: Pylon exists? " . ($pylon_exists ? "YES (ID: $pylon_exists)" : "NO"));
+        
         if ($pylon_exists) {
+            // Get current value before update
+            $current_value = $wpdb->get_var($wpdb->prepare(
+                "SELECT staircase_page_template_desired FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+                $post_id
+            ));
+            error_log("STAIRCASE SAVE: Current DB value before update: '" . $current_value . "'");
+            
             // Update existing record
-            $wpdb->update(
+            $result = $wpdb->update(
                 $wpdb->prefix . 'pylons',
                 array('staircase_page_template_desired' => $raw_template),
                 array('rel_wp_post_id' => $post_id),
                 array('%s'),
                 array('%d')
             );
+            
+            error_log("STAIRCASE SAVE: Update result: " . var_export($result, true));
+            error_log("STAIRCASE SAVE: Last DB error: " . $wpdb->last_error);
+            
+            // Check value after update
+            $new_value = $wpdb->get_var($wpdb->prepare(
+                "SELECT staircase_page_template_desired FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+                $post_id
+            ));
+            error_log("STAIRCASE SAVE: New DB value after update: '" . $new_value . "'");
+            error_log("STAIRCASE SAVE: Update successful? " . ($new_value === $raw_template ? "YES" : "NO - values don't match!"));
         } else {
+            error_log("STAIRCASE SAVE: Creating new pylon record");
             // Create new pylon record
-            $wpdb->insert(
+            $result = $wpdb->insert(
                 $wpdb->prefix . 'pylons',
                 array(
                     'rel_wp_post_id' => $post_id,
@@ -1591,6 +1805,10 @@ function staircase_save_page_options_meta($post_id) {
                 ),
                 array('%d', '%s', '%s')
             );
+            
+            error_log("STAIRCASE SAVE: Insert result: " . var_export($result, true));
+            error_log("STAIRCASE SAVE: Last DB error: " . $wpdb->last_error);
+            error_log("STAIRCASE SAVE: Last insert ID: " . $wpdb->insert_id);
         }
     }
     
@@ -3356,21 +3574,21 @@ function staircase_render_batman_hero_box() {
                 
                 <div class="cherry-buttons-container">
                     <?php if ($cherry_button_left_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="cherry-button cherry-button-left">
+                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="batman-hero-button batman-hero-button-left">
                             <?php echo esc_html($cherry_button_left_text); ?>
                         </a>
                     <?php else: ?>
-                        <span class="cherry-button cherry-button-left cherry-button-disabled">
+                        <span class="batman-hero-button batman-hero-button-left batman-hero-button-disabled">
                             <?php echo esc_html($cherry_button_left_text); ?>
                         </span>
                     <?php endif; ?>
                     
                     <?php if ($cherry_button_right_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="cherry-button cherry-button-right">
+                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right">
                             <?php echo esc_html($cherry_button_right_text); ?>
                         </a>
                     <?php else: ?>
-                        <span class="cherry-button cherry-button-right cherry-button-disabled">
+                        <span class="batman-hero-button batman-hero-button-right batman-hero-button-disabled">
                             <?php echo esc_html($cherry_button_right_text); ?>
                         </span>
                     <?php endif; ?>
@@ -3468,7 +3686,7 @@ function staircase_render_batman_hero_box() {
         border-color: #2d5cbf;
     }
     
-    .cherry-button-disabled {
+    .batman-hero-button-disabled {
         cursor: default;
         opacity: 0.6;
         background: #666;
@@ -3867,6 +4085,33 @@ function staircase_render_nile_map_box() {
         </div>
     </section>
     <?php
+}
+
+/**
+ * Render OSB (Our Services Box)
+ */
+function staircase_render_osb_box() {
+    // Only render on front page when enabled
+    if (!is_front_page()) {
+        return;
+    }
+    
+    global $wpdb;
+    $post_id = get_the_ID();
+    $pylons_table = $wpdb->prefix . 'pylons';
+    
+    // Check if OSB is enabled for this page
+    $osb_enabled = $wpdb->get_var($wpdb->prepare(
+        "SELECT osb_is_enabled FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ));
+    
+    if (!$osb_enabled) {
+        return;
+    }
+    
+    // Render the Our Services section
+    staircase_our_services_section();
 }
 
 /**
