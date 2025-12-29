@@ -1163,6 +1163,9 @@ function staircase_render_cherry_full_template() {
     // Cherry template includes batman hero box first
     staircase_render_batman_hero_box();
     
+    // Add blog post meta information for posts only
+    staircase_render_derek_blog_post_meta_box();
+    
     // Cherry template includes chen cards before content
     staircase_render_chen_cards_box();
     
@@ -3909,6 +3912,87 @@ function staircase_render_chen_cards_box() {
     </style>
     <?php
     endif;
+}
+
+/**
+ * Render Derek Blog Post Meta Box Section
+ * Only displays for posts (wp_posts.post_type = 'post')
+ */
+function staircase_render_derek_blog_post_meta_box() {
+    // Only render for posts, not pages
+    if (get_post_type() !== 'post') {
+        return;
+    }
+    
+    $post_id = get_the_ID();
+    $post_date = get_the_date();
+    $author_name = get_the_author();
+    
+    // Get primary category
+    $categories = get_the_category();
+    $primary_category = !empty($categories) ? $categories[0]->name : 'Uncategorized';
+    ?>
+    
+    <section class="derek-blog-post-meta-box">
+        <div class="container">
+            <div class="derek-meta-content">
+                <span class="derek-post-date"><?php echo esc_html($post_date); ?></span>
+                <span class="derek-meta-separator">|</span>
+                <span class="derek-post-author">posted by <?php echo esc_html($author_name); ?></span>
+                <span class="derek-meta-separator">in</span>
+                <span class="derek-post-category"><?php echo esc_html($primary_category); ?></span>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+    .derek-blog-post-meta-box {
+        height: 50px;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .derek-meta-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        color: #666;
+        line-height: 1;
+    }
+    
+    .derek-post-date,
+    .derek-post-author,
+    .derek-post-category {
+        font-weight: 500;
+    }
+    
+    .derek-meta-separator {
+        color: #999;
+        margin: 0 4px;
+    }
+    
+    @media (max-width: 768px) {
+        .derek-blog-post-meta-box {
+            padding: 0 20px;
+        }
+        
+        .derek-meta-content {
+            font-size: 13px;
+            gap: 6px;
+        }
+        
+        .derek-meta-separator {
+            margin: 0 2px;
+        }
+    }
+    </style>
+    
+    <?php
 }
 
 /**
