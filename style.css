@@ -46,6 +46,27 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0;
+}
+
+/* New logo area container */
+.header-logo-area {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    min-height: 86px;
+}
+
+.header-logo-area .site-branding {
+    height: auto;
+    min-height: 86px;
+}
+
+/* New navigation/phone area container */
+.header-nav-area {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
     padding: 1rem 0;
 }
 
@@ -67,9 +88,10 @@ body {
 }
 
 .staircase-logo {
-    height: 40px;
-    width: auto;
-    max-width: 250px;
+    height: 86px !important;
+    width: auto !important;
+    max-width: 251px !important;
+    min-height: 86px;
     vertical-align: middle;
     transition: opacity 0.3s ease;
 }
@@ -85,9 +107,10 @@ body {
 }
 
 .custom-logo {
-    height: 40px;
-    width: auto;
-    max-width: 250px;
+    height: 86px !important;
+    width: auto !important;
+    max-width: 251px !important;
+    min-height: 86px;
     vertical-align: middle;
 }
 
@@ -667,7 +690,17 @@ body {
         flex-wrap: wrap;
     }
     
+    /* Mobile container styles */
+    .header-nav-area {
+        padding: 0.5rem 0;
+        gap: 1rem;
+    }
+    
     /* Mobile Logo Styles */
+    .header-logo-area {
+        padding: 0.25rem 0;
+    }
+    
     .staircase-logo,
     .custom-logo {
         height: 32px;

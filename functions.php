@@ -24,8 +24,8 @@ function staircase_theme_setup() {
     
     // Add support for custom logo
     add_theme_support('custom-logo', array(
-        'height'      => 100,
-        'width'       => 400,
+        'height'      => 86,
+        'width'       => 251,
         'flex-height' => true,
         'flex-width'  => true,
     ));
