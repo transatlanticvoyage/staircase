@@ -1106,6 +1106,10 @@ function staircase_render_template() {
             staircase_render_gooseberry_template();
             break;
             
+        case 'vibrantberry':
+            staircase_render_vibrantberry_template();
+            break;
+            
         case 'cherry':
         case 'homepage-cherry':
             staircase_render_cherry_full_template();
@@ -1141,6 +1145,36 @@ function staircase_render_sarsaparilla_template() {
 function staircase_render_gooseberry_template() {
     // For now, use default template
     staircase_render_default_template();
+}
+
+/**
+ * Render Vibrantberry Template (Custom HTML)
+ */
+function staircase_render_vibrantberry_template() {
+    global $post;
+    
+    // Get the custom HTML content from post meta
+    $custom_html = get_post_meta($post->ID, 'vibrantberry_content_ocean_1', true);
+    
+    // If no custom HTML is set, show a placeholder message
+    if (empty($custom_html)) {
+        $custom_html = '<div style="padding: 40px; text-align: center; background: #f8f9fa; margin: 20px; border-radius: 8px;">
+            <h2>Vibrantberry Template</h2>
+            <p>No custom HTML content has been added yet. Edit this page to add your custom HTML content.</p>
+        </div>';
+    }
+    
+    ?>
+    <main class="site-content vibrantberry-template">
+        <?php echo $custom_html; ?>
+    </main>
+    <style>
+    .vibrantberry-template {
+        width: 100%;
+        min-height: 400px;
+    }
+    </style>
+    <?php
 }
 
 /**
@@ -1532,7 +1566,8 @@ function staircase_get_page_templates() {
         'content-only' => 'Content Only',
         'bilberry' => 'bilberry (bare bones)',
         'sarsaparilla' => 'sarsaparilla',
-        'gooseberry' => 'gooseberry'
+        'gooseberry' => 'gooseberry',
+        'vibrantberry' => 'Vibrantberry (Custom HTML)'
     );
 }
 
@@ -1697,6 +1732,23 @@ function staircase_page_options_meta_box_callback($post) {
         
     <?php endif; ?>
     
+    <?php if ($selected_template === 'vibrantberry'): ?>
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #6f42c1;">
+            <h4 style="margin: 0 0 15px 0; color: #000; font-weight: bold; font-size: 16px;">vibrantberry_content_ocean_1</h4>
+            
+            <div style="margin-bottom: 15px;">
+                <textarea id="vibrantberry_content_ocean_1" name="vibrantberry_content_ocean_1" 
+                          style="width: 100%; height: 150px; font-family: monospace; background-color: #2d3748; color: #e2e8f0; padding: 10px; border: 1px solid #4a5568; border-radius: 4px;"
+                          placeholder="Enter your custom HTML code here..."><?php echo esc_textarea(get_post_meta($post->ID, 'vibrantberry_content_ocean_1', true)); ?></textarea>
+            </div>
+            
+            <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                <strong>Note:</strong> This HTML will replace the entire content area between the header and footer. 
+                Commonly used for rendering "vibe coded" pages from external tools.
+            </p>
+        </div>
+    <?php endif; ?>
+    
     
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1854,6 +1906,35 @@ function staircase_save_page_options_meta($post_id) {
         if (isset($_POST["zarl_card_{$i}_description"])) {
             update_post_meta($post_id, "zarl_card_{$i}_description", sanitize_textarea_field($_POST["zarl_card_{$i}_description"]));
         }
+    }
+    
+    // Save Vibrantberry custom HTML field
+    if (isset($_POST['vibrantberry_content_ocean_1'])) {
+        // Use wp_kses_post to allow safe HTML while stripping dangerous scripts
+        $allowed_html = wp_kses_allowed_html('post');
+        // Allow more HTML tags and attributes that might be used in custom designs
+        $allowed_html = array_merge($allowed_html, array(
+            'div' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'span' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'section' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'header' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'footer' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'main' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'article' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'aside' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'nav' => array('class' => array(), 'id' => array(), 'style' => array()),
+            'style' => array(),
+            'script' => array('type' => array(), 'src' => array())
+        ));
+        
+        // For vibrantberry, we'll be more permissive and just strip script tags for basic security
+        $custom_html = $_POST['vibrantberry_content_ocean_1'];
+        // Remove script tags but allow most other HTML
+        $custom_html = preg_replace('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/mi', '', $custom_html);
+        
+        update_post_meta($post_id, 'vibrantberry_content_ocean_1', $custom_html);
+        
+        error_log("STAIRCASE SAVE: Saved vibrantberry_content_ocean_1 for post {$post_id}");
     }
 }
 add_action('save_post', 'staircase_save_page_options_meta');
