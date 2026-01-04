@@ -1662,6 +1662,7 @@ function staircase_page_options_meta_box_callback($post) {
             • <strong>Full Hero:</strong> Large hero with background<br>
             • <strong>Minimal Hero:</strong> Compact title section<br>
             • <strong>Cherry:</strong> Hero with buttons & phone<br>
+            • <strong>Vibrantberry:</strong> Custom HTML (vibe coded)<br>
             • <strong>Standard:</strong> Traditional page layout<br>
             • <strong>Content Only:</strong> Just page content<br>
             • <strong>Sections Builder:</strong> Custom sections
@@ -1758,7 +1759,8 @@ function staircase_page_options_meta_box_callback($post) {
         // Template value mappings to raw format
         const templateMappings = {
             'homepage-cherry': 'cherry',
-            'content-only': 'content_only'
+            'content-only': 'content_only',
+            'vibrantberry': 'vibrantberry'
         };
         
         function updateRawValue() {
