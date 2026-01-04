@@ -1621,21 +1621,19 @@ function staircase_page_options_meta_box_callback($post) {
     global $wpdb;
     wp_nonce_field('staircase_page_options_meta_box', 'staircase_page_options_meta_box_nonce');
     
-    // First get from postmeta
-    $selected_template = get_post_meta($post->ID, 'staircase_page_template', true);
     $templates = staircase_get_page_templates();
     
-    // Get current value from wp_pylons table
-    $pylon_template = $wpdb->get_var($wpdb->prepare(
+    // Get current value from wp_pylons table ONLY
+    $selected_template = $wpdb->get_var($wpdb->prepare(
         "SELECT staircase_page_template_desired 
          FROM {$wpdb->prefix}pylons 
          WHERE rel_wp_post_id = %d", 
         $post->ID
     ));
     
-    // Prefer pylons value over postmeta if it exists
-    if (!empty($pylon_template)) {
-        $selected_template = $pylon_template;
+    // If no template set in pylons, default to empty (will show first option in dropdown)
+    if (empty($selected_template)) {
+        $selected_template = '';
     }
     
     // Get default template from theme settings
@@ -1655,7 +1653,7 @@ function staircase_page_options_meta_box_callback($post) {
     <p style="margin-top: 15px;">
         <label for="staircase_pylon_raw_template" style="display: block; word-wrap: break-word; overflow-wrap: break-word;"><strong>Raw value of db column:<br>wp_pylons.staircase_page_template_desired</strong></label><br>
         <input type="text" id="staircase_pylon_raw_template" name="staircase_pylon_raw_template" 
-               value="<?php echo esc_attr($pylon_template ?: ''); ?>" 
+               value="<?php echo esc_attr($selected_template ?: ''); ?>" 
                style="width: 100%; margin-top: 5px; font-family: monospace; background-color: #f9f9f9;" 
                placeholder="Select from dropdown to populate">
     </p>
@@ -1680,69 +1678,7 @@ function staircase_page_options_meta_box_callback($post) {
         </p>
     </div>
     
-    <?php if ($selected_template === 'cherry' || $selected_template === 'homepage-cherry'): ?>
-        <div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #0073aa;">
-            <h4 style="margin: 0 0 10px 0; color: #0073aa;">Cherry Options</h4>
-            
-            <p style="margin-bottom: 8px;">
-                <label for="cherry_hero_heading"><strong>Hero Heading:</strong></label><br>
-                <input type="text" id="cherry_hero_heading" name="cherry_hero_heading" 
-                       value="<?php echo esc_attr(get_post_meta($post->ID, 'cherry_hero_heading', true)); ?>" 
-                       style="width: 100%; margin-top: 3px;" 
-                       placeholder="<?php echo esc_attr(get_the_title($post->ID) ?: 'Main Heading'); ?>">
-            </p>
-            
-            <p style="margin-bottom: 8px;">
-                <label for="cherry_hero_subheading"><strong>Hero Subheading:</strong></label><br>
-                <input type="text" id="cherry_hero_subheading" name="cherry_hero_subheading" 
-                       value="<?php echo esc_attr(get_post_meta($post->ID, 'cherry_hero_subheading', true)); ?>" 
-                       style="width: 100%; margin-top: 3px;" 
-                       placeholder="Subtitle or tagline">
-            </p>
-            
-            <p style="font-size: 11px; color: #666; margin-top: 10px;">
-                <strong>Note:</strong> Hero buttons are automatically configured with default text and phone number from the database.
-            </p>
-        </div>
-        
-        <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #28a745;">
-            <h4 style="margin: 0 0 15px 0; color: #28a745;">Zarl Card Block (3 Cards)</h4>
-            
-            <?php for ($i = 1; $i <= 3; $i++): ?>
-                <div style="margin-bottom: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #28a745;">
-                    <h5 style="margin: 0 0 8px 0; color: #495057;">Card <?php echo $i; ?></h5>
-                    
-                    <p style="margin-bottom: 6px;">
-                        <label for="zarl_card_<?php echo $i; ?>_icon"><strong>Icon URL:</strong></label><br>
-                        <input type="url" id="zarl_card_<?php echo $i; ?>_icon" name="zarl_card_<?php echo $i; ?>_icon" 
-                               value="<?php echo esc_url(get_post_meta($post->ID, "zarl_card_{$i}_icon", true)); ?>" 
-                               style="width: 100%; font-size: 11px; margin-top: 2px;" 
-                               placeholder="https://example.com/icon.png">
-                    </p>
-                    
-                    <p style="margin-bottom: 6px;">
-                        <label for="zarl_card_<?php echo $i; ?>_title"><strong>Title:</strong></label><br>
-                        <input type="text" id="zarl_card_<?php echo $i; ?>_title" name="zarl_card_<?php echo $i; ?>_title" 
-                               value="<?php echo esc_attr(get_post_meta($post->ID, "zarl_card_{$i}_title", true)); ?>" 
-                               style="width: 100%; font-size: 11px; margin-top: 2px;" 
-                               placeholder="Card Title">
-                    </p>
-                    
-                    <p style="margin-bottom: 6px;">
-                        <label for="zarl_card_<?php echo $i; ?>_description"><strong>Description:</strong></label><br>
-                        <textarea id="zarl_card_<?php echo $i; ?>_description" name="zarl_card_<?php echo $i; ?>_description" 
-                                  rows="2" style="width: 100%; font-size: 11px; margin-top: 2px; resize: vertical;" 
-                                  placeholder="Card description text"><?php echo esc_textarea(get_post_meta($post->ID, "zarl_card_{$i}_description", true)); ?></textarea>
-                    </p>
-                </div>
-            <?php endfor; ?>
-            
-            <p style="font-size: 11px; color: #666; margin-top: 10px;">
-                Cards will only display if they have a title. Leave title empty to hide a card.
-            </p>
-        </div>
-        
-    <?php endif; ?>
+    <!-- Cherry and zarl card admin interface removed - no longer using postmeta system -->
     
     <?php if ($selected_template === 'vibrantberry'): ?>
         <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #6f42c1;">
@@ -1880,46 +1816,7 @@ function staircase_save_page_options_meta($post_id) {
         }
     }
     
-    // Save Cherry fields
-    if (isset($_POST['cherry_hero_heading'])) {
-        update_post_meta($post_id, 'cherry_hero_heading', sanitize_text_field($_POST['cherry_hero_heading']));
-    }
-    
-    if (isset($_POST['cherry_hero_subheading'])) {
-        update_post_meta($post_id, 'cherry_hero_subheading', sanitize_text_field($_POST['cherry_hero_subheading']));
-    }
-    
-    if (isset($_POST['cherry_button_left_text'])) {
-        update_post_meta($post_id, 'cherry_button_left_text', sanitize_text_field($_POST['cherry_button_left_text']));
-    }
-    
-    if (isset($_POST['cherry_button_left_url'])) {
-        update_post_meta($post_id, 'cherry_button_left_url', esc_url_raw($_POST['cherry_button_left_url']));
-    }
-    
-    if (isset($_POST['cherry_button_right_text'])) {
-        update_post_meta($post_id, 'cherry_button_right_text', sanitize_text_field($_POST['cherry_button_right_text']));
-    }
-    
-    if (isset($_POST['cherry_button_right_url'])) {
-        update_post_meta($post_id, 'cherry_button_right_url', esc_url_raw($_POST['cherry_button_right_url']));
-    }
-    
-    
-    // Save Zarl Card fields
-    for ($i = 1; $i <= 3; $i++) {
-        if (isset($_POST["zarl_card_{$i}_icon"])) {
-            update_post_meta($post_id, "zarl_card_{$i}_icon", esc_url_raw($_POST["zarl_card_{$i}_icon"]));
-        }
-        
-        if (isset($_POST["zarl_card_{$i}_title"])) {
-            update_post_meta($post_id, "zarl_card_{$i}_title", sanitize_text_field($_POST["zarl_card_{$i}_title"]));
-        }
-        
-        if (isset($_POST["zarl_card_{$i}_description"])) {
-            update_post_meta($post_id, "zarl_card_{$i}_description", sanitize_textarea_field($_POST["zarl_card_{$i}_description"]));
-        }
-    }
+    // Cherry fields and zarl cards removed - no longer using postmeta system
     
     // Save Vibrantberry custom HTML field
     if (isset($_POST['vibrantberry_content_ocean_1'])) {
