@@ -1317,9 +1317,14 @@ function staircase_get_current_template() {
         $post_id
     ));
     
+    // Debug logging
+    error_log("STAIRCASE GET TEMPLATE: Post ID: $post_id, Pylon template: " . var_export($pylon_template, true));
+    
     if ($pylon_template) {
         // Normalize the template name to match available templates
-        return staircase_normalize_template_name($pylon_template);
+        $normalized = staircase_normalize_template_name($pylon_template);
+        error_log("STAIRCASE GET TEMPLATE: Normalized: " . var_export($normalized, true));
+        return $normalized;
     }
     
     // If no pylon template found, return cherry as default
@@ -1616,6 +1621,7 @@ function staircase_page_options_meta_box_callback($post) {
     global $wpdb;
     wp_nonce_field('staircase_page_options_meta_box', 'staircase_page_options_meta_box_nonce');
     
+    // First get from postmeta
     $selected_template = get_post_meta($post->ID, 'staircase_page_template', true);
     $templates = staircase_get_page_templates();
     
@@ -1626,6 +1632,11 @@ function staircase_page_options_meta_box_callback($post) {
          WHERE rel_wp_post_id = %d", 
         $post->ID
     ));
+    
+    // Prefer pylons value over postmeta if it exists
+    if (!empty($pylon_template)) {
+        $selected_template = $pylon_template;
+    }
     
     // Get default template from theme settings
     $default_template = get_option('staircase_default_template', 'hero-full');
