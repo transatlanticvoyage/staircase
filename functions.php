@@ -1148,7 +1148,7 @@ function staircase_render_gooseberry_template() {
 }
 
 /**
- * Render Vibrantberry Template (Custom HTML)
+ * Render Vibrantberry Template (Custom HTML with Tailwind CDN - Full Width)
  */
 function staircase_render_vibrantberry_template() {
     global $post;
@@ -1156,25 +1156,35 @@ function staircase_render_vibrantberry_template() {
     // Get the custom HTML content from post meta
     $custom_html = get_post_meta($post->ID, 'vibrantberry_content_ocean_1', true);
     
-    // If no custom HTML is set, show a placeholder message
+    // If no custom HTML is set, show a placeholder message with Tailwind classes
     if (empty($custom_html)) {
-        $custom_html = '<div style="padding: 40px; text-align: center; background: #f8f9fa; margin: 20px; border-radius: 8px;">
-            <h2>Vibrantberry Template</h2>
-            <p>No custom HTML content has been added yet. Edit this page to add your custom HTML content.</p>
+        $custom_html = '<div class="p-10 text-center bg-gray-50 m-5 rounded-lg">
+            <h2 class="text-2xl font-bold mb-4">Vibrantberry Template</h2>
+            <p class="text-gray-600">No custom HTML content has been added yet. Edit this page to add your custom HTML content.</p>
         </div>';
     }
     
+    // Output complete HTML document with Tailwind CDN
     ?>
-    <main class="site-content vibrantberry-template">
-        <?php echo $custom_html; ?>
-    </main>
-    <style>
-    .vibrantberry-template {
-        width: 100%;
-        min-height: 400px;
-    }
-    </style>
+    <!DOCTYPE html>
+    <html <?php language_attributes(); ?>>
+    <head>
+        <meta charset="<?php bloginfo('charset'); ?>">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title><?php wp_title(); ?></title>
+        <!-- Tailwind CSS CDN -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <?php wp_head(); ?>
+    </head>
+    <body class="m-0 p-0">
+        <main class="w-full min-h-screen">
+            <?php echo $custom_html; ?>
+        </main>
+        <?php wp_footer(); ?>
+    </body>
+    </html>
     <?php
+    exit; // Prevent WordPress from adding additional wrappers
 }
 
 /**
