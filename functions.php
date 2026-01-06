@@ -1111,7 +1111,6 @@ function staircase_render_template() {
             break;
             
         case 'cherry':
-        case 'homepage-cherry':
             staircase_render_cherry_full_template();
             break;
             
@@ -1148,10 +1147,34 @@ function staircase_render_gooseberry_template() {
 }
 
 /**
- * Render Vibrantberry Template (Custom HTML with Tailwind CDN - Full Width)
+ * Render Vibrantberry Template (Custom HTML with Tailwind CDN - Full Width with WordPress Integration)
  */
 function staircase_render_vibrantberry_template() {
     global $post;
+    
+    // Add Tailwind CSS CDN to wp_head
+    add_action('wp_head', function() {
+        echo '<script src="https://cdn.tailwindcss.com"></script>';
+        echo '<style>
+            /* Full-width content specific to vibrantberry template */
+            .vibrantberry-content {
+                width: 100vw !important;
+                margin-left: calc(-50vw + 50%) !important;
+                max-width: none !important;
+                padding: 0 !important;
+            }
+            
+            /* Ensure the main content area can accommodate full-width */
+            .site-content,
+            .entry-content,
+            .content-area {
+                overflow: visible !important;
+            }
+        </style>';
+    });
+    
+    // Get WordPress header
+    get_header();
     
     // Get the custom HTML content from post meta
     $custom_html = get_post_meta($post->ID, 'vibrantberry_content_ocean_1', true);
@@ -1164,27 +1187,16 @@ function staircase_render_vibrantberry_template() {
         </div>';
     }
     
-    // Output complete HTML document with Tailwind CDN
     ?>
-    <!DOCTYPE html>
-    <html <?php language_attributes(); ?>>
-    <head>
-        <meta charset="<?php bloginfo('charset'); ?>">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?php wp_title(); ?></title>
-        <!-- Tailwind CSS CDN -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <?php wp_head(); ?>
-    </head>
-    <body class="m-0 p-0">
-        <main class="w-full min-h-screen">
+    <main class="site-content">
+        <div class="vibrantberry-content">
             <?php echo $custom_html; ?>
-        </main>
-        <?php wp_footer(); ?>
-    </body>
-    </html>
+        </div>
+    </main>
     <?php
-    exit; // Prevent WordPress from adding additional wrappers
+    
+    // Get WordPress footer
+    get_footer();
 }
 
 /**
