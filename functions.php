@@ -1236,6 +1236,16 @@ function staircase_render_cherry_full_template() {
     staircase_render_nile_map_box();
     staircase_render_kristina_cta_box();
     staircase_render_victoria_blog_box();
+    
+    // Additional ocean and new box functions
+    staircase_render_ocean1_box();
+    staircase_render_ocean2_box();
+    staircase_render_ocean3_box();
+    staircase_render_brook_video_box();
+    staircase_render_olivia_authlinks_box();
+    staircase_render_ava_whychooseus_box();
+    staircase_render_kendall_ourprocess_box();
+    staircase_render_sara_customhtml_box();
 }
 
 /**
@@ -4332,4 +4342,92 @@ function staircase_render_cherry_template_boxes() {
         staircase_render_kristina_cta_box();
         staircase_render_victoria_blog_box();
     }
+}
+
+/**
+ * Render Ocean1 Box - Placeholder Implementation
+ */
+function staircase_render_ocean1_box() {
+    ?>
+    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
+        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: ocean1_box</span>
+    </section>
+    <?php
+}
+
+/**
+ * Render Ocean2 Box - Placeholder Implementation
+ */
+function staircase_render_ocean2_box() {
+    ?>
+    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
+        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: ocean2_box</span>
+    </section>
+    <?php
+}
+
+/**
+ * Render Ocean3 Box - Placeholder Implementation
+ */
+function staircase_render_ocean3_box() {
+    ?>
+    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
+        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: ocean3_box</span>
+    </section>
+    <?php
+}
+
+/**
+ * Render Brook Video Box - Placeholder Implementation
+ */
+function staircase_render_brook_video_box() {
+    ?>
+    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
+        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: brook_video_box</span>
+    </section>
+    <?php
+}
+
+/**
+ * Render Olivia Auth Links Box - Placeholder Implementation
+ */
+function staircase_render_olivia_authlinks_box() {
+    ?>
+    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
+        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: olivia_authlinks_box</span>
+    </section>
+    <?php
+}
+
+/**
+ * Render Ava Why Choose Us Box - Placeholder Implementation
+ */
+function staircase_render_ava_whychooseus_box() {
+    ?>
+    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
+        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: ava_whychooseus_box</span>
+    </section>
+    <?php
+}
+
+/**
+ * Render Kendall Our Process Box - Placeholder Implementation
+ */
+function staircase_render_kendall_ourprocess_box() {
+    ?>
+    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
+        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: kendall_ourprocess_box</span>
+    </section>
+    <?php
+}
+
+/**
+ * Render Sara Custom HTML Box - Placeholder Implementation
+ */
+function staircase_render_sara_customhtml_box() {
+    ?>
+    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
+        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: sara_customhtml_box</span>
+    </section>
+    <?php
 }
