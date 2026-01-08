@@ -5118,57 +5118,59 @@ function staircase_render_liz_pricing_box() {
     global $wpdb;
     $post_id = get_the_ID();
     
-    // Hardcoded dummy content for Pest Control services
-    // TODO: Replace with database integration
-    ?>
-    <section class="liz-pricing-box" style="background: #f8f9fa; padding: 60px 20px;">
-        <div class="container" style="max-width: 1200px; margin: 0 auto;">
-            <h2 style="text-align: center; font-size: 36px; color: #333; margin-bottom: 20px;">Pest Control Service Pricing</h2>
-            <p style="text-align: center; color: #666; font-size: 18px; margin-bottom: 50px;">Professional pest control solutions for your home and business</p>
-            
-            <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+    // Get pricing data from wp_pylons
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pricing_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT liz_pricing_heading, liz_pricing_description, liz_pricing_body 
+         FROM {$pylons_table} 
+         WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Set defaults for mockup/testing
+    $heading = $pricing_data['liz_pricing_heading'] ?? 'Flat Roofing Services & Pricing';
+    $description = $pricing_data['liz_pricing_description'] ?? 'Compare our prices for various services here:';
+    $body = $pricing_data['liz_pricing_body'] ?? "Flat Roof Installation: $7-$15 per square foot\nTPO/EPDM Installation: $8-$14 per square foot\nRoof Coating: $3-$7 per square foot\nRepairs: Starting at $400";
+    
+    // Only render if at least heading or body has content
+    if (!empty($heading) || !empty($body)) {
+        ?>
+        <section class="liz-pricing-box" style="background: #f8f9fa; padding: 40px 20px;">
+            <div class="container" style="max-width: 800px; margin: 0 auto;">
                 
-                <!-- Service 1 -->
-                <div class="pricing-card" style="background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
-                    <h3 style="color: #2c3e50; font-size: 24px; margin-bottom: 15px;">Residential Pest Control</h3>
-                    <div class="price" style="font-size: 36px; color: #27ae60; font-weight: bold; margin: 20px 0;">$89<span style="font-size: 18px; color: #999;">/month</span></div>
-                    <div class="service-info" style="margin: 20px 0;">
-                        <p style="color: #666; margin: 10px 0;"><strong>Coverage:</strong> Full home interior & exterior</p>
-                        <p style="color: #666; margin: 10px 0;"><strong>Frequency:</strong> Bi-monthly treatments</p>
-                    </div>
-                    <button style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Get Started</button>
-                </div>
+                <?php if (!empty($heading)): ?>
+                <h2 style="font-size: 32px; color: #333; margin-bottom: 15px; text-align: center;">
+                    <?php echo esc_html($heading); ?>
+                </h2>
+                <?php endif; ?>
                 
-                <!-- Service 2 -->
-                <div class="pricing-card" style="background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
-                    <h3 style="color: #2c3e50; font-size: 24px; margin-bottom: 15px;">Commercial Pest Management</h3>
-                    <div class="price" style="font-size: 36px; color: #3498db; font-weight: bold; margin: 20px 0;">$299<span style="font-size: 18px; color: #999;">/month</span></div>
-                    <div class="service-info" style="margin: 20px 0;">
-                        <p style="color: #666; margin: 10px 0;"><strong>Coverage:</strong> Up to 5,000 sq ft facility</p>
-                        <p style="color: #666; margin: 10px 0;"><strong>Frequency:</strong> Monthly inspections & treatment</p>
-                    </div>
-                    <button style="background: #3498db; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Get Quote</button>
-                </div>
+                <?php if (!empty($description)): ?>
+                <p style="color: #666; font-size: 18px; margin-bottom: 30px; text-align: center;">
+                    <?php echo esc_html($description); ?>
+                </p>
+                <?php endif; ?>
                 
-                <!-- Service 3 -->
-                <div class="pricing-card" style="background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
-                    <h3 style="color: #2c3e50; font-size: 24px; margin-bottom: 15px;">Termite Protection Plan</h3>
-                    <div class="price" style="font-size: 36px; color: #e74c3c; font-weight: bold; margin: 20px 0;">$599<span style="font-size: 18px; color: #999;">/year</span></div>
-                    <div class="service-info" style="margin: 20px 0;">
-                        <p style="color: #666; margin: 10px 0;"><strong>Coverage:</strong> Complete termite barrier treatment</p>
-                        <p style="color: #666; margin: 10px 0;"><strong>Frequency:</strong> Annual inspection & warranty</p>
-                    </div>
-                    <button style="background: #e74c3c; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Learn More</button>
+                <?php if (!empty($body)): ?>
+                <div class="pricing-body" style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                    <ul style="list-style: none; padding: 0; margin: 0; font-size: 16px; line-height: 1.8;">
+                        <?php
+                        // Split body content by newlines and create list items
+                        $lines = explode("\n", trim($body));
+                        foreach ($lines as $line) {
+                            $line = trim($line);
+                            if (!empty($line)) {
+                                echo '<li style="margin-bottom: 10px; color: #555;">• ' . esc_html($line) . '</li>';
+                            }
+                        }
+                        ?>
+                    </ul>
                 </div>
+                <?php endif; ?>
                 
             </div>
-            
-            <div style="text-align: center; margin-top: 40px;">
-                <p style="color: #666; font-size: 16px;">All plans include free re-treatments if pests return between scheduled visits</p>
-            </div>
-        </div>
-    </section>
-    <?php
+        </section>
+        <?php
+    }
 }
 
 /**
