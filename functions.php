@@ -1216,8 +1216,100 @@ function staircase_render_plain_post_content() {
  * Render Cherry Full Template
  */
 function staircase_render_cherry_full_template() {
-    // Cherry template includes batman hero box first
+    global $wpdb, $post;
+    
+    // DEBUG: Log cherry template execution
+    error_log("=== CHERRY TEMPLATE DEBUG - Post ID: {$post->ID} ===");
+    
+    // ALWAYS render batman_hero_box first - it's not subject to reordering
     staircase_render_batman_hero_box();
+    
+    // Check for custom box ordering for remaining boxes
+    $box_orders_table = $wpdb->prefix . 'box_orders';
+    error_log("DEBUG: Box orders table: {$box_orders_table}");
+    
+    $custom_order = $wpdb->get_row($wpdb->prepare(
+        "SELECT box_order_json FROM {$box_orders_table} WHERE rel_post_id = %d AND is_active = 1",
+        $post->ID
+    ));
+    
+    error_log("DEBUG: Query executed: " . $wpdb->last_query);
+    error_log("DEBUG: Custom order result: " . ($custom_order ? 'FOUND' : 'NOT FOUND'));
+    if ($custom_order) {
+        error_log("DEBUG: box_order_json: " . $custom_order->box_order_json);
+    }
+    error_log("DEBUG: Last DB error: " . ($wpdb->last_error ?: 'None'));
+    
+    if ($custom_order && !empty($custom_order->box_order_json)) {
+        // Use custom box ordering
+        error_log("DEBUG: Using custom box ordering");
+        $box_order = json_decode($custom_order->box_order_json, true);
+        error_log("DEBUG: JSON decode result: " . (is_array($box_order) ? 'SUCCESS' : 'FAILED'));
+        if ($box_order && is_array($box_order)) {
+            error_log("DEBUG: Box order before sorting: " . json_encode($box_order));
+            // Sort boxes by their order value
+            asort($box_order);
+            error_log("DEBUG: Box order after sorting: " . json_encode($box_order));
+            
+            // Define mapping from box names to functions (batman_hero_box removed)
+            $box_functions = array(
+                'derek_blog_post_meta_box' => 'staircase_render_derek_blog_post_meta_box',
+                'chen_cards_box' => 'staircase_render_chen_cards_box',
+                'plain_post_content' => 'staircase_render_plain_post_content',
+                'osb_box' => 'staircase_render_osb_box',
+                'serena_faq_box' => 'staircase_render_serena_faq_box',
+                'nile_map_box' => 'staircase_render_nile_map_box',
+                'kristina_cta_box' => 'staircase_render_kristina_cta_box',
+                'victoria_blog_box' => 'staircase_render_victoria_blog_box',
+                'baynar1_box' => 'staircase_render_baynar1_box',
+                'ocean1_box' => 'staircase_render_ocean1_box',
+                'ocean2_box' => 'staircase_render_ocean2_box',
+                'ocean3_box' => 'staircase_render_ocean3_box',
+                'brook_video_box' => 'staircase_render_brook_video_box',
+                'olivia_authlinks_box' => 'staircase_render_olivia_authlinks_box',
+                'ava_whychooseus_box' => 'staircase_render_ava_whychooseus_box',
+                'kendall_ourprocess_box' => 'staircase_render_kendall_ourprocess_box',
+                'sara_customhtml_box' => 'staircase_render_sara_customhtml_box',
+                'liz_pricing_box' => 'staircase_render_liz_pricing_box'
+            );
+            
+            // Always render derek_blog_post_meta_box first (after hero)
+            staircase_render_derek_blog_post_meta_box();
+            
+            // Render boxes in custom order
+            error_log("DEBUG: Starting custom box rendering");
+            foreach ($box_order as $box_name => $order) {
+                // Skip batman_hero_box if it exists in the JSON (for backward compatibility)
+                if ($box_name === 'batman_hero_box') {
+                    error_log("DEBUG: Skipping batman_hero_box (already rendered at top)");
+                    continue;
+                }
+                
+                error_log("DEBUG: Processing box: {$box_name} with order: {$order}");
+                if (isset($box_functions[$box_name]) && function_exists($box_functions[$box_name])) {
+                    // Skip derek_blog_post_meta_box as it's already rendered
+                    if ($box_name !== 'derek_blog_post_meta_box') {
+                        error_log("DEBUG: Rendering box: {$box_name}");
+                        call_user_func($box_functions[$box_name]);
+                    } else {
+                        error_log("DEBUG: Skipping derek_blog_post_meta_box (already rendered)");
+                    }
+                } else {
+                    error_log("DEBUG: Box function not found or doesn't exist: {$box_name}");
+                }
+            }
+            error_log("DEBUG: Custom box rendering complete - RETURNING");
+            return;
+        } else {
+            error_log("DEBUG: JSON decode failed or not array");
+        }
+    } else {
+        error_log("DEBUG: No custom order found or empty JSON");
+    }
+    
+    // Use default hardcoded ordering if no custom order exists
+    error_log("DEBUG: Using default hardcoded ordering");
+    // Batman hero box already rendered at the top
     
     // Add blog post meta information for posts only
     staircase_render_derek_blog_post_meta_box();
@@ -1246,6 +1338,8 @@ function staircase_render_cherry_full_template() {
     staircase_render_ava_whychooseus_box();
     staircase_render_kendall_ourprocess_box();
     staircase_render_sara_customhtml_box();
+    staircase_render_liz_pricing_box();
+    staircase_render_baynar1_box();
 }
 
 /**
@@ -4167,11 +4261,13 @@ function staircase_render_nile_map_box() {
         $location_string = implode(', ', $location_parts);
     }
     
-    $fallback_location = 'Dallas, TX'; // Fallback if no location data
-    $final_location = !empty($location_string) ? $location_string : $fallback_location;
+    // Don't render the map if no valid location data is available
+    if (empty($location_string)) {
+        return;
+    }
     
     // URL encode the location for the Google Maps embed
-    $encoded_location = urlencode($final_location);
+    $encoded_location = urlencode($location_string);
     ?>
     <!-- Nile Map Box Section -->
     <section class="nile-map-box">
@@ -4187,7 +4283,7 @@ function staircase_render_nile_map_box() {
                 allowfullscreen="" 
                 loading="lazy" 
                 referrerpolicy="no-referrer-when-downgrade"
-                title="Our Location - <?php echo esc_attr($final_location); ?>">
+                title="Our Location - <?php echo esc_attr($location_string); ?>">
             </iframe>
         </div>
     </section>
@@ -4345,79 +4441,649 @@ function staircase_render_cherry_template_boxes() {
 }
 
 /**
- * Render Ocean1 Box - Placeholder Implementation
+ * Render Ocean1 Box - Article Content Area
  */
 function staircase_render_ocean1_box() {
-    ?>
-    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
-        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: ocean1_box</span>
-    </section>
-    <?php
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT content_ocean_1 FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if content exists and is not null
+    if ($pylon_data && !empty($pylon_data['content_ocean_1'])) {
+        $content = $pylon_data['content_ocean_1'];
+        ?>
+        <section class="ocean1-content-box" style="padding: 40px 20px; background: #ffffff; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
+            <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333;">
+                    <?php echo wp_kses_post(wpautop($content)); ?>
+                </div>
+            </div>
+        </section>
+        <?php
+    }
 }
 
 /**
- * Render Ocean2 Box - Placeholder Implementation
+ * Render Ocean2 Box - Article Content Area
  */
 function staircase_render_ocean2_box() {
-    ?>
-    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
-        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: ocean2_box</span>
-    </section>
-    <?php
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT content_ocean_2 FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if content exists and is not null
+    if ($pylon_data && !empty($pylon_data['content_ocean_2'])) {
+        $content = $pylon_data['content_ocean_2'];
+        ?>
+        <section class="ocean2-content-box" style="padding: 40px 20px; background: #f8f9fa; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
+            <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333;">
+                    <?php echo wp_kses_post(wpautop($content)); ?>
+                </div>
+            </div>
+        </section>
+        <?php
+    }
 }
 
 /**
- * Render Ocean3 Box - Placeholder Implementation
+ * Render Ocean3 Box - Article Content Area
  */
 function staircase_render_ocean3_box() {
-    ?>
-    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
-        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: ocean3_box</span>
-    </section>
-    <?php
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT content_ocean_3 FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if content exists and is not null
+    if ($pylon_data && !empty($pylon_data['content_ocean_3'])) {
+        $content = $pylon_data['content_ocean_3'];
+        ?>
+        <section class="ocean3-content-box" style="padding: 40px 20px; background: #ffffff; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
+            <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333;">
+                    <?php echo wp_kses_post(wpautop($content)); ?>
+                </div>
+            </div>
+        </section>
+        <?php
+    }
 }
 
 /**
- * Render Brook Video Box - Placeholder Implementation
+ * Render Brook Video Box - Video Embeds Section
  */
 function staircase_render_brook_video_box() {
-    ?>
-    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
-        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: brook_video_box</span>
-    </section>
-    <?php
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT 
+            brook_video_heading,
+            brook_video_subheading,
+            brook_video_description,
+            brook_video_1,
+            brook_video_2,
+            brook_video_3,
+            brook_video_4,
+            brook_video_outro
+        FROM {$pylons_table} 
+        WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Check if any field has content
+    $has_content = false;
+    if ($pylon_data) {
+        foreach ($pylon_data as $value) {
+            if (!empty($value)) {
+                $has_content = true;
+                break;
+            }
+        }
+    }
+    
+    // Only render if at least one field has content
+    if ($has_content) {
+        ?>
+        <section class="brook-video-box" style="padding: 40px 20px; background: #fff; border-top: 2px solid #333; border-bottom: 2px solid #333;">
+            <div class="brook-container" style="max-width: 1200px; margin: 0 auto;">
+                <?php if (!empty($pylon_data['brook_video_heading'])): ?>
+                    <h2 style="font-size: 32px; color: #333; margin: 0 0 15px 0; text-align: center;">
+                        <?php echo esc_html($pylon_data['brook_video_heading']); ?>
+                    </h2>
+                <?php endif; ?>
+                
+                <?php if (!empty($pylon_data['brook_video_subheading'])): ?>
+                    <h3 style="font-size: 20px; color: #666; margin: 0 0 20px 0; text-align: center; font-weight: normal;">
+                        <?php echo esc_html($pylon_data['brook_video_subheading']); ?>
+                    </h3>
+                <?php endif; ?>
+                
+                <?php if (!empty($pylon_data['brook_video_description'])): ?>
+                    <div style="font-size: 16px; color: #555; margin: 0 0 30px 0; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;">
+                        <?php echo wp_kses_post(wpautop($pylon_data['brook_video_description'])); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <div class="brook-videos" style="margin: 30px 0;">
+                    <div class="video-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                        <?php 
+                        for ($i = 1; $i <= 4; $i++) {
+                            $video_content = $pylon_data["brook_video_$i"] ?? '';
+                            if (!empty($video_content)): 
+                        ?>
+                            <div class="video-item" style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+                                <?php 
+                                // Check if it's an iframe/embed code or plain text
+                                if (strpos($video_content, '<iframe') !== false || strpos($video_content, '<embed') !== false) {
+                                    // It's an embed code - wrap it in responsive container
+                                    ?>
+                                    <div class="video-responsive" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                                            <?php echo wp_kses($video_content, array(
+                                                'iframe' => array(
+                                                    'src' => true,
+                                                    'width' => true,
+                                                    'height' => true,
+                                                    'frameborder' => true,
+                                                    'allow' => true,
+                                                    'allowfullscreen' => true,
+                                                    'title' => true,
+                                                ),
+                                                'embed' => array(
+                                                    'src' => true,
+                                                    'width' => true,
+                                                    'height' => true,
+                                                    'type' => true,
+                                                )
+                                            )); ?>
+                                        </div>
+                                    </div>
+                                    <?php
+                                } else {
+                                    // It's text content
+                                    ?>
+                                    <div style="font-size: 16px; line-height: 1.6; color: #333;">
+                                        <?php echo wp_kses_post($video_content); ?>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                        <?php 
+                            endif;
+                        }
+                        ?>
+                    </div>
+                </div>
+                
+                <?php if (!empty($pylon_data['brook_video_outro'])): ?>
+                    <div style="font-size: 16px; color: #555; margin: 30px 0 0 0; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;">
+                        <?php echo wp_kses_post(wpautop($pylon_data['brook_video_outro'])); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            
+            <style>
+                /* Mobile optimization for Brook box */
+                @media (max-width: 768px) {
+                    .brook-video-box {
+                        padding: 25px 15px !important;
+                    }
+                    
+                    .brook-video-box h2 {
+                        font-size: 24px !important;
+                    }
+                    
+                    .brook-video-box h3 {
+                        font-size: 18px !important;
+                    }
+                    
+                    .brook-videos .video-grid {
+                        grid-template-columns: 1fr !important;
+                        gap: 15px !important;
+                    }
+                    
+                    .video-item {
+                        padding: 10px !important;
+                    }
+                }
+                
+                /* Make iframe responsive */
+                .video-responsive iframe,
+                .video-responsive embed {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100% !important;
+                    height: 100% !important;
+                }
+            </style>
+        </section>
+        <?php
+    }
 }
 
 /**
- * Render Olivia Auth Links Box - Placeholder Implementation
+ * Render Olivia Auth Links Box - Authority Links Section
  */
 function staircase_render_olivia_authlinks_box() {
-    ?>
-    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
-        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: olivia_authlinks_box</span>
-    </section>
-    <?php
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT 
+            olivia_authlinks_heading,
+            olivia_authlinks_subheading,
+            olivia_authlinks_description,
+            olivia_authlinks_1,
+            olivia_authlinks_2,
+            olivia_authlinks_3,
+            olivia_authlinks_4,
+            olivia_authlinks_5,
+            olivia_authlinks_6,
+            olivia_authlinks_7,
+            olivia_authlinks_8,
+            olivia_authlinks_9,
+            olivia_authlinks_10,
+            olivia_authlinks_outro
+        FROM {$pylons_table} 
+        WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Check if any field has content
+    $has_content = false;
+    if ($pylon_data) {
+        foreach ($pylon_data as $value) {
+            if (!empty($value)) {
+                $has_content = true;
+                break;
+            }
+        }
+    }
+    
+    // Only render if at least one field has content
+    if ($has_content) {
+        ?>
+        <section class="olivia-authlinks-box" style="padding: 40px 20px; background: #f8f9fa; border-top: 2px solid #333; border-bottom: 2px solid #333;">
+            <div class="olivia-container" style="max-width: 1200px; margin: 0 auto;">
+                <?php if (!empty($pylon_data['olivia_authlinks_heading'])): ?>
+                    <h2 style="font-size: 32px; color: #333; margin: 0 0 15px 0; text-align: center;">
+                        <?php echo esc_html($pylon_data['olivia_authlinks_heading']); ?>
+                    </h2>
+                <?php endif; ?>
+                
+                <?php if (!empty($pylon_data['olivia_authlinks_subheading'])): ?>
+                    <h3 style="font-size: 20px; color: #666; margin: 0 0 20px 0; text-align: center; font-weight: normal;">
+                        <?php echo esc_html($pylon_data['olivia_authlinks_subheading']); ?>
+                    </h3>
+                <?php endif; ?>
+                
+                <?php if (!empty($pylon_data['olivia_authlinks_description'])): ?>
+                    <div style="font-size: 16px; color: #555; margin: 0 0 30px 0; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;">
+                        <?php echo wp_kses_post(wpautop($pylon_data['olivia_authlinks_description'])); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <div class="olivia-links" style="margin: 30px 0;">
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <?php 
+                        for ($i = 1; $i <= 10; $i++) {
+                            $link_content = $pylon_data["olivia_authlinks_$i"] ?? '';
+                            if (!empty($link_content)): 
+                        ?>
+                            <li style="margin: 15px 0; padding: 10px 20px; background: white; border-left: 3px solid #0073aa; border-radius: 3px;">
+                                <div style="font-size: 16px; line-height: 1.6; color: #333;">
+                                    <?php echo wp_kses_post($link_content); ?>
+                                </div>
+                            </li>
+                        <?php 
+                            endif;
+                        }
+                        ?>
+                    </ul>
+                </div>
+                
+                <?php if (!empty($pylon_data['olivia_authlinks_outro'])): ?>
+                    <div style="font-size: 16px; color: #555; margin: 30px 0 0 0; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;">
+                        <?php echo wp_kses_post(wpautop($pylon_data['olivia_authlinks_outro'])); ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            
+            <style>
+                /* Mobile optimization for Olivia box */
+                @media (max-width: 768px) {
+                    .olivia-authlinks-box {
+                        padding: 25px 15px !important;
+                    }
+                    
+                    .olivia-authlinks-box h2 {
+                        font-size: 24px !important;
+                    }
+                    
+                    .olivia-authlinks-box h3 {
+                        font-size: 18px !important;
+                    }
+                    
+                    .olivia-links ul li {
+                        margin: 10px 0 !important;
+                        padding: 8px 15px !important;
+                    }
+                }
+                
+                /* Style links within the content */
+                .olivia-links a {
+                    color: #0073aa;
+                    text-decoration: underline;
+                }
+                
+                .olivia-links a:hover {
+                    color: #005a87;
+                    text-decoration: none;
+                }
+            </style>
+        </section>
+        <?php
+    }
 }
 
 /**
  * Render Ava Why Choose Us Box - Placeholder Implementation
  */
 function staircase_render_ava_whychooseus_box() {
-    ?>
-    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
-        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: ava_whychooseus_box</span>
-    </section>
-    <?php
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT 
+            ava_why_choose_us_heading,
+            ava_why_choose_us_subheading,
+            ava_why_choose_us_description,
+            ava_why_choose_us_reason_1,
+            ava_why_choose_us_reason_2,
+            ava_why_choose_us_reason_3,
+            ava_why_choose_us_reason_4,
+            ava_why_choose_us_reason_5,
+            ava_why_choose_us_reason_6,
+            ava_why_choose_us_reason_7,
+            ava_why_choose_us_reason_8,
+            ava_why_choose_us_reason_9,
+            ava_why_choose_us_reason_10
+        FROM {$pylons_table} 
+        WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Check if any field has content
+    $has_content = false;
+    if ($pylon_data) {
+        foreach ($pylon_data as $value) {
+            if (!empty($value)) {
+                $has_content = true;
+                break;
+            }
+        }
+    }
+    
+    // Only render if at least one field has content
+    if ($has_content) {
+        ?>
+        <section class="ava-whychooseus-box" style="padding: 50px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
+            <!-- Decorative background pattern -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px);"></div>
+            
+            <div class="ava-container" style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 1;">
+                <?php if (!empty($pylon_data['ava_why_choose_us_heading'])): ?>
+                    <h2 style="font-size: 36px; color: white; margin: 0 0 15px 0; text-align: center; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
+                        <?php echo esc_html($pylon_data['ava_why_choose_us_heading']); ?>
+                    </h2>
+                <?php endif; ?>
+                
+                <?php if (!empty($pylon_data['ava_why_choose_us_subheading'])): ?>
+                    <h3 style="font-size: 22px; color: rgba(255,255,255,0.95); margin: 0 0 25px 0; text-align: center; font-weight: 300;">
+                        <?php echo esc_html($pylon_data['ava_why_choose_us_subheading']); ?>
+                    </h3>
+                <?php endif; ?>
+                
+                <?php if (!empty($pylon_data['ava_why_choose_us_description'])): ?>
+                    <div style="font-size: 17px; color: rgba(255,255,255,0.9); margin: 0 0 40px 0; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                        <?php echo wp_kses_post(wpautop($pylon_data['ava_why_choose_us_description'])); ?>
+                    </div>
+                <?php endif; ?>
+                
+                <div class="ava-reasons" style="margin: 30px 0;">
+                    <div class="reasons-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                        <?php 
+                        for ($i = 1; $i <= 10; $i++) {
+                            $reason_content = $pylon_data["ava_why_choose_us_reason_$i"] ?? '';
+                            if (!empty($reason_content)): 
+                        ?>
+                            <div class="reason-card" style="background: rgba(255,255,255,0.95); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                                <div style="display: flex; align-items: start;">
+                                    <div style="flex-shrink: 0; width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                        <span style="color: white; font-weight: bold; font-size: 18px;"><?php echo $i; ?></span>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 16px; line-height: 1.6; color: #333;">
+                                            <?php echo wp_kses_post($reason_content); ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php 
+                            endif;
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                /* Hover effect for reason cards */
+                .reason-card:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 6px 12px rgba(0,0,0,0.15) !important;
+                }
+                
+                /* Mobile optimization for Ava box */
+                @media (max-width: 768px) {
+                    .ava-whychooseus-box {
+                        padding: 35px 15px !important;
+                    }
+                    
+                    .ava-whychooseus-box h2 {
+                        font-size: 28px !important;
+                    }
+                    
+                    .ava-whychooseus-box h3 {
+                        font-size: 19px !important;
+                    }
+                    
+                    .ava-reasons .reasons-grid {
+                        grid-template-columns: 1fr !important;
+                        gap: 15px !important;
+                    }
+                    
+                    .reason-card {
+                        padding: 15px !important;
+                    }
+                }
+                
+                /* Style links within the reasons */
+                .ava-reasons a {
+                    color: #667eea;
+                    text-decoration: underline;
+                    font-weight: 500;
+                }
+                
+                .ava-reasons a:hover {
+                    color: #764ba2;
+                    text-decoration: none;
+                }
+            </style>
+        </section>
+        <?php
+    }
 }
 
 /**
- * Render Kendall Our Process Box - Placeholder Implementation
+ * Render Kendall Our Process Box
  */
 function staircase_render_kendall_ourprocess_box() {
+    $current_post_id = get_the_ID();
+    global $wpdb;
+    
+    // Get kendall our process data from wp_pylons table for current post
+    $process_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT kendall_our_process_heading, kendall_our_process_subheading, kendall_our_process_description,
+                kendall_our_process_step_1, kendall_our_process_step_2, kendall_our_process_step_3,
+                kendall_our_process_step_4, kendall_our_process_step_5, kendall_our_process_step_6,
+                kendall_our_process_step_7, kendall_our_process_step_8, kendall_our_process_step_9,
+                kendall_our_process_step_10
+         FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+        $current_post_id
+    ), ARRAY_A);
+    
+    // Check if any process content exists
+    $has_content = false;
+    if ($process_data) {
+        $has_content = !empty($process_data['kendall_our_process_heading']) || 
+                      !empty($process_data['kendall_our_process_subheading']) || 
+                      !empty($process_data['kendall_our_process_description']);
+        
+        // Check if any steps have content
+        for ($i = 1; $i <= 10; $i++) {
+            if (!empty($process_data["kendall_our_process_step_{$i}"])) {
+                $has_content = true;
+                break;
+            }
+        }
+    }
+    
+    // Only render if there's content
+    if (!$has_content) {
+        return;
+    }
+    
     ?>
-    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
-        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: kendall_ourprocess_box</span>
+    <!-- Kendall Our Process Box Section -->
+    <section class="kendall-process-box" style="width: 100%; max-width: 1200px; margin: 40px auto; padding: 20px; background: #f9f9f9; border-radius: 8px; box-sizing: border-box;">
+        <div class="kendall-process-container" style="text-align: center;">
+            
+            <?php if (!empty($process_data['kendall_our_process_heading'])): ?>
+                <h2 style="margin: 0 0 10px 0; font-size: 28px; font-weight: 700; color: #333; line-height: 1.2;">
+                    <?php echo esc_html($process_data['kendall_our_process_heading']); ?>
+                </h2>
+            <?php endif; ?>
+            
+            <?php if (!empty($process_data['kendall_our_process_subheading'])): ?>
+                <h3 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 400; color: #666; line-height: 1.3;">
+                    <?php echo esc_html($process_data['kendall_our_process_subheading']); ?>
+                </h3>
+            <?php endif; ?>
+            
+            <?php if (!empty($process_data['kendall_our_process_description'])): ?>
+                <div style="margin: 0 0 30px 0; font-size: 16px; color: #555; line-height: 1.5; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    <?php echo wp_kses_post(wpautop($process_data['kendall_our_process_description'])); ?>
+                </div>
+            <?php endif; ?>
+            
+            <div class="kendall-process-steps" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; text-align: left;">
+                <?php for ($i = 1; $i <= 10; $i++): ?>
+                    <?php $step_content = $process_data["kendall_our_process_step_{$i}"] ?? ''; ?>
+                    <?php if (!empty($step_content)): ?>
+                        <div class="process-step" style="padding: 20px; background: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #0073aa;">
+                            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                                <span class="step-number" style="flex-shrink: 0; display: inline-block; width: 30px; height: 30px; background: #0073aa; color: white; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; font-size: 14px;">
+                                    <?php echo $i; ?>
+                                </span>
+                                <div class="step-content" style="flex: 1;">
+                                    <span class="step-text" style="font-size: 16px; color: #333; line-height: 1.4; display: block;">
+                                        <?php echo wp_kses_post($step_content); ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endfor; ?>
+            </div>
+            
+        </div>
     </section>
+    
+    <style>
+    /* Mobile responsiveness for kendall process box */
+    @media (max-width: 768px) {
+        .kendall-process-box {
+            margin: 20px 10px !important;
+            padding: 15px !important;
+        }
+        .kendall-process-box h2 {
+            font-size: 24px !important;
+        }
+        .kendall-process-box h3 {
+            font-size: 16px !important;
+        }
+        .kendall-process-steps {
+            grid-template-columns: 1fr !important;
+            gap: 15px !important;
+        }
+        .process-step {
+            padding: 15px !important;
+        }
+        .step-text {
+            font-size: 15px !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .kendall-process-box {
+            margin: 15px 5px !important;
+            padding: 12px !important;
+        }
+        .kendall-process-box h2 {
+            font-size: 22px !important;
+        }
+        .process-step {
+            padding: 12px !important;
+        }
+        .step-number {
+            width: 25px !important;
+            height: 25px !important;
+            line-height: 25px !important;
+            font-size: 12px !important;
+        }
+        .step-text {
+            font-size: 14px !important;
+        }
+    }
+    </style>
     <?php
 }
 
@@ -4425,9 +5091,161 @@ function staircase_render_kendall_ourprocess_box() {
  * Render Sara Custom HTML Box - Placeholder Implementation
  */
 function staircase_render_sara_customhtml_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get sara_customhtml_datum from wp_pylons
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $custom_html = $wpdb->get_var($wpdb->prepare(
+        "SELECT sara_customhtml_datum FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ));
+    
+    // Only render if sara_customhtml_datum has content
+    if (!empty($custom_html)) {
+        ?>
+        <section class="sara-customhtml-box" style="width: 100%;">
+            <?php echo $custom_html; ?>
+        </section>
+        <?php
+    }
+}
+
+/**
+ * Render Liz Pricing Box - Service pricing and information display
+ */
+function staircase_render_liz_pricing_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Hardcoded dummy content for Pest Control services
+    // TODO: Replace with database integration
     ?>
-    <section style="width: 100%; height: 20px; border-top: 1px solid black; border-bottom: 1px solid black; display: flex; align-items: center; justify-content: center;">
-        <span style="font-weight: bold; font-size: 16px; color: black;">awaiting implementation: sara_customhtml_box</span>
+    <section class="liz-pricing-box" style="background: #f8f9fa; padding: 60px 20px;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto;">
+            <h2 style="text-align: center; font-size: 36px; color: #333; margin-bottom: 20px;">Pest Control Service Pricing</h2>
+            <p style="text-align: center; color: #666; font-size: 18px; margin-bottom: 50px;">Professional pest control solutions for your home and business</p>
+            
+            <div class="pricing-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                
+                <!-- Service 1 -->
+                <div class="pricing-card" style="background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
+                    <h3 style="color: #2c3e50; font-size: 24px; margin-bottom: 15px;">Residential Pest Control</h3>
+                    <div class="price" style="font-size: 36px; color: #27ae60; font-weight: bold; margin: 20px 0;">$89<span style="font-size: 18px; color: #999;">/month</span></div>
+                    <div class="service-info" style="margin: 20px 0;">
+                        <p style="color: #666; margin: 10px 0;"><strong>Coverage:</strong> Full home interior & exterior</p>
+                        <p style="color: #666; margin: 10px 0;"><strong>Frequency:</strong> Bi-monthly treatments</p>
+                    </div>
+                    <button style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Get Started</button>
+                </div>
+                
+                <!-- Service 2 -->
+                <div class="pricing-card" style="background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
+                    <h3 style="color: #2c3e50; font-size: 24px; margin-bottom: 15px;">Commercial Pest Management</h3>
+                    <div class="price" style="font-size: 36px; color: #3498db; font-weight: bold; margin: 20px 0;">$299<span style="font-size: 18px; color: #999;">/month</span></div>
+                    <div class="service-info" style="margin: 20px 0;">
+                        <p style="color: #666; margin: 10px 0;"><strong>Coverage:</strong> Up to 5,000 sq ft facility</p>
+                        <p style="color: #666; margin: 10px 0;"><strong>Frequency:</strong> Monthly inspections & treatment</p>
+                    </div>
+                    <button style="background: #3498db; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Get Quote</button>
+                </div>
+                
+                <!-- Service 3 -->
+                <div class="pricing-card" style="background: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;">
+                    <h3 style="color: #2c3e50; font-size: 24px; margin-bottom: 15px;">Termite Protection Plan</h3>
+                    <div class="price" style="font-size: 36px; color: #e74c3c; font-weight: bold; margin: 20px 0;">$599<span style="font-size: 18px; color: #999;">/year</span></div>
+                    <div class="service-info" style="margin: 20px 0;">
+                        <p style="color: #666; margin: 10px 0;"><strong>Coverage:</strong> Complete termite barrier treatment</p>
+                        <p style="color: #666; margin: 10px 0;"><strong>Frequency:</strong> Annual inspection & warranty</p>
+                    </div>
+                    <button style="background: #e74c3c; color: white; padding: 12px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Learn More</button>
+                </div>
+                
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <p style="color: #666; font-size: 16px;">All plans include free re-treatments if pests return between scheduled visits</p>
+            </div>
+        </div>
     </section>
     <?php
+}
+
+/**
+ * Render Baynar1 Box - Mobile-optimized image and text layout
+ */
+function staircase_render_baynar1_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT baynar1_main FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if baynar1_main exists and is not null
+    if ($pylon_data && !empty($pylon_data['baynar1_main'])) {
+        $content = $pylon_data['baynar1_main'];
+        ?>
+        <section class="baynar1-box" style="border-top: 1px solid black; border-bottom: 1px solid black;">
+            <div class="baynar1-container" style="display: flex; flex-direction: row; width: 100%; max-width: 1200px; margin: 0 auto;">
+                <!-- Left side - Image -->
+                <div class="baynar1-image-container" style="flex: 1; background: #f5f5f5; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <div style="color: #666; font-size: 14px;">
+                        [Image Area]
+                    </div>
+                </div>
+                
+                <!-- Vertical divider -->
+                <div class="baynar1-divider" style="width: 1px; background: gray; flex-shrink: 0;"></div>
+                
+                <!-- Right side - Text content -->
+                <div class="baynar1-text-container" style="flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
+                    <div class="baynar1-content">
+                        <?php echo wp_kses_post(wpautop($content)); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                /* Mobile optimization */
+                @media (max-width: 768px) {
+                    .baynar1-container {
+                        flex-direction: column !important;
+                    }
+                    
+                    .baynar1-divider {
+                        display: none;
+                    }
+                    
+                    .baynar1-image-container {
+                        min-height: 150px;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    
+                    .baynar1-text-container {
+                        padding: 15px;
+                    }
+                }
+                
+                /* Ensure text doesn't exceed ~250 words visually */
+                .baynar1-content {
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                
+                .baynar1-content p {
+                    margin-bottom: 1em;
+                }
+                
+                .baynar1-content p:last-child {
+                    margin-bottom: 0;
+                }
+            </style>
+        </section>
+        <?php
+    }
 }
