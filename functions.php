@@ -5127,13 +5127,13 @@ function staircase_render_liz_pricing_box() {
         $post_id
     ), ARRAY_A);
     
-    // Set defaults for mockup/testing
-    $heading = $pricing_data['liz_pricing_heading'] ?? 'Flat Roofing Services & Pricing';
-    $description = $pricing_data['liz_pricing_description'] ?? 'Compare our prices for various services here:';
-    $body = $pricing_data['liz_pricing_body'] ?? "Flat Roof Installation: $7-$15 per square foot\nTPO/EPDM Installation: $8-$14 per square foot\nRoof Coating: $3-$7 per square foot\nRepairs: Starting at $400";
+    // Get values directly from database without fallbacks
+    $heading = $pricing_data['liz_pricing_heading'] ?? '';
+    $description = $pricing_data['liz_pricing_description'] ?? '';
+    $body = $pricing_data['liz_pricing_body'] ?? '';
     
-    // Only render if at least heading or body has content
-    if (!empty($heading) || !empty($body)) {
+    // Only render if there is actual content from database
+    if (!empty($heading) || !empty($description) || !empty($body)) {
         ?>
         <section class="liz-pricing-box" style="background: #f8f9fa; padding: 40px 20px;">
             <div class="container" style="max-width: 800px; margin: 0 auto;">
