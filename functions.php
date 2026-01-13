@@ -1030,6 +1030,22 @@ function staircase_bilberry_template() {
         </div>
     </article>
     
+    <?php
+    // Check if this page has contactpage archetype in wp_pylons and render monica contact box
+    $current_post_id = get_the_ID();
+    global $wpdb;
+    
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT pylon_archetype FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+        $current_post_id
+    ), ARRAY_A);
+    
+    // If this is a contactpage archetype, render the monica contact box
+    if ($pylon_data && $pylon_data['pylon_archetype'] === 'contactpage') {
+        staircase_render_monica_contact_box();
+    }
+    ?>
+    
     <style>
     .bilberry-article {
         max-width: 800px;
@@ -5250,4 +5266,217 @@ function staircase_render_baynar1_box() {
         </section>
         <?php
     }
+}
+
+/**
+ * Render Monica Contact Box Section
+ * Displays a contact form with map embed for contactpage archetype
+ */
+function staircase_render_monica_contact_box() {
+    global $wpdb;
+    
+    // Get data from wp_zen_sitespren table
+    $brand_name = $wpdb->get_var("SELECT driggs_brand_name FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+    $city = $wpdb->get_var("SELECT driggs_city FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+    $state_code = $wpdb->get_var("SELECT driggs_state_code FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+    $phone = $wpdb->get_var("SELECT driggs_phone_1 FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+    $contact_form_code = $wpdb->get_var("SELECT contact_form_1_main_code FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
+    
+    // Format the phone number for display
+    $phone_formatted = $phone ? staircase_format_phone_number($phone) : '';
+    
+    // Clean phone number for tel: link (remove all non-numeric characters)
+    $phone_clean = preg_replace('/[^0-9]/', '', $phone);
+    
+    // Build location string for map embed (same logic as nile map)
+    $location_parts = array();
+    if (!empty($city)) {
+        $location_parts[] = trim($city);
+    }
+    if (!empty($state_code)) {
+        $location_parts[] = trim($state_code);
+    }
+    
+    $location_string = implode(', ', $location_parts);
+    $encoded_location = urlencode($location_string);
+    
+    // Don't render if no location data
+    if (empty($location_string)) {
+        return;
+    }
+    ?>
+    <!-- Monica Contact Box Section -->
+    <section class="monica-contact-box">
+        <div class="monica-container">
+            <!-- Left Side - Map and Info -->
+            <div class="monica-left-section">
+                <div class="monica-contact-info">
+                    <h2 class="monica-heading"><strong>Get In Touch Today</strong></h2>
+                    <h3 class="monica-brand-name"><strong><?php echo esc_html($brand_name); ?></strong></h3>
+                    <p class="monica-service-area">Providing service throughout <?php echo esc_html($city); ?>, <?php echo esc_html($state_code); ?>.</p>
+                    <?php if ($phone_formatted): ?>
+                        <p class="monica-phone">
+                            <a href="tel:<?php echo esc_attr($phone_clean); ?>" class="monica-phone-link">
+                                <?php echo esc_html($phone_formatted); ?>
+                            </a>
+                        </p>
+                    <?php endif; ?>
+                </div>
+                
+                <div class="monica-map-container">
+                    <iframe 
+                        src="https://www.google.com/maps?q=<?php echo $encoded_location; ?>&output=embed"
+                        width="100%" 
+                        height="318" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade"
+                        title="Our Location - <?php echo esc_attr($location_string); ?>">
+                    </iframe>
+                </div>
+            </div>
+            
+            <!-- Right Side - Contact Form -->
+            <div class="monica-right-section">
+                <div class="monica-form-container">
+                    <?php echo do_shortcode($contact_form_code); ?>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <style>
+    /* Monica Contact Box Styles */
+    .monica-contact-box {
+        width: 100%;
+        padding: 40px 0;
+        background: transparent;
+    }
+    
+    .monica-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        gap: 40px;
+        align-items: flex-start;
+    }
+    
+    .monica-left-section {
+        flex: 1;
+        max-width: 636px;
+    }
+    
+    .monica-contact-info {
+        margin-bottom: 30px;
+    }
+    
+    .monica-heading {
+        font-size: 2rem;
+        margin: 0 0 10px 0;
+        color: #333;
+    }
+    
+    .monica-brand-name {
+        font-size: 1.5rem;
+        margin: 0 0 15px 0;
+        color: #333;
+    }
+    
+    .monica-service-area {
+        font-size: 1rem;
+        margin: 0 0 10px 0;
+        color: #666;
+    }
+    
+    .monica-phone {
+        font-size: 1.1rem;
+        margin: 0 0 20px 0;
+        font-weight: 500;
+    }
+    
+    .monica-phone-link {
+        color: #009bff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .monica-phone-link:hover {
+        color: #0073aa;
+        text-decoration: underline;
+    }
+    
+    .monica-map-container {
+        width: 100%;
+        max-width: 636px;
+        height: 318px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .monica-map-container iframe {
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    
+    .monica-right-section {
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .monica-form-container {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .monica-container {
+            flex-direction: column;
+            gap: 30px;
+            padding: 0 15px;
+        }
+        
+        .monica-left-section {
+            max-width: 100%;
+        }
+        
+        .monica-map-container {
+            max-width: 100%;
+            height: 250px;
+        }
+        
+        .monica-heading {
+            font-size: 1.5rem;
+        }
+        
+        .monica-brand-name {
+            font-size: 1.3rem;
+        }
+        
+        .monica-form-container {
+            padding: 20px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .monica-map-container {
+            height: 200px;
+        }
+        
+        .monica-heading {
+            font-size: 1.3rem;
+        }
+        
+        .monica-brand-name {
+            font-size: 1.1rem;
+        }
+    }
+    </style>
+    <?php
 }
