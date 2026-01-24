@@ -444,6 +444,12 @@ function staircase_cherry_hero() {
         $cherry_subheading = $pylon_data['hero_subheading'];
     }
     
+    // Get hero background size setting from wp_pylons (default to 'cover' if not set)
+    $hero_background_size = 'cover'; // Default value
+    if ($pylon_data && !empty($pylon_data['hero_style_setting_background_size'])) {
+        $hero_background_size = $pylon_data['hero_style_setting_background_size'];
+    }
+    
     // Always show buttons with default text
     $cherry_button_left_text = get_post_meta($post_id, 'cherry_button_left_text', true) ?: 'Get Your Estimate';
     $cherry_button_left_url = get_post_meta($post_id, 'cherry_button_left_url', true) ?: '';
@@ -599,7 +605,7 @@ function staircase_cherry_hero() {
     .cherry-hero {
         <?php if (!empty($paragon_image_url)): ?>
         background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<?php echo esc_url($paragon_image_url); ?>');
-        background-size: cover;
+        background-size: <?php echo esc_attr($hero_background_size); ?>;
         background-position: center center;
         background-repeat: no-repeat;
         <?php else: ?>
@@ -3669,6 +3675,12 @@ function staircase_render_batman_hero_box() {
         $cherry_subheading = $pylon_data['hero_subheading'];
     }
     
+    // Get hero background size setting from wp_pylons (default to 'cover' if not set)
+    $hero_background_size = 'cover'; // Default value
+    if ($pylon_data && !empty($pylon_data['hero_style_setting_background_size'])) {
+        $hero_background_size = $pylon_data['hero_style_setting_background_size'];
+    }
+    
     // Always show buttons with default text
     $cherry_button_left_text = get_post_meta($post_id, 'cherry_button_left_text', true) ?: 'Get Your Estimate';
     $cherry_button_left_url = get_post_meta($post_id, 'cherry_button_left_url', true) ?: '';
@@ -3745,7 +3757,7 @@ function staircase_render_batman_hero_box() {
     .cherry-hero {
         <?php if (!empty($paragon_image_url)): ?>
         background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<?php echo esc_url($paragon_image_url); ?>');
-        background-size: cover;
+        background-size: <?php echo esc_attr($hero_background_size); ?>;
         background-position: center center;
         background-repeat: no-repeat;
         <?php else: ?>
