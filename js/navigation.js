@@ -15,6 +15,75 @@
             return;
         }
         
+        // Sticky header scroll behavior
+        const siteHeader = document.querySelector('.site-header');
+        const body = document.body;
+        
+        if (siteHeader) {
+            let lastScrollTop = 0;
+            let isScrolling = false;
+            
+            // Get the actual header height for accurate calculations
+            const getHeaderHeight = () => {
+                return siteHeader.offsetHeight;
+            };
+            
+            // Adjust body padding dynamically
+            const adjustBodyPadding = () => {
+                const headerHeight = getHeaderHeight();
+                const adminBar = document.getElementById('wpadminbar');
+                const adminBarHeight = adminBar ? adminBar.offsetHeight : 0;
+                body.style.paddingTop = (headerHeight + adminBarHeight) + 'px';
+            };
+            
+            function handleScroll() {
+                if (!isScrolling) {
+                    window.requestAnimationFrame(function() {
+                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                        
+                        // Add/remove scrolled class based on scroll position
+                        if (scrollTop > 10) {
+                            siteHeader.classList.add('scrolled');
+                            body.classList.add('header-scrolled');
+                        } else {
+                            siteHeader.classList.remove('scrolled');
+                            body.classList.remove('header-scrolled');
+                        }
+                        
+                        // Adjust padding after class changes
+                        setTimeout(adjustBodyPadding, 310); // Wait for transition to complete
+                        
+                        // Optional: Hide/show header on scroll direction
+                        // Uncomment if you want the header to hide on scroll down
+                        /*
+                        if (scrollTop > lastScrollTop && scrollTop > 100) {
+                            // Scrolling down & past 100px
+                            siteHeader.classList.add('header-hidden');
+                        } else {
+                            // Scrolling up
+                            siteHeader.classList.remove('header-hidden');
+                        }
+                        */
+                        
+                        lastScrollTop = scrollTop;
+                        isScrolling = false;
+                    });
+                    isScrolling = true;
+                }
+            }
+            
+            // Listen for scroll events
+            window.addEventListener('scroll', handleScroll);
+            
+            // Adjust padding on load and resize
+            window.addEventListener('load', adjustBodyPadding);
+            window.addEventListener('resize', adjustBodyPadding);
+            
+            // Check initial scroll position and padding
+            handleScroll();
+            adjustBodyPadding();
+        }
+        
         // Toggle menu on button click
         menuToggle.addEventListener('click', function(e) {
             e.preventDefault();

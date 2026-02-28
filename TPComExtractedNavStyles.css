@@ -1,0 +1,252 @@
+/**
+ * TPCom Extracted Navigation Menu Text Styles
+ * 
+ * These styles have been extracted from a reference site
+ * and adapted for the Staircase WordPress theme.
+ * 
+ * Usage: These styles are applied when "Use TPCom Extracted Nav Styles" 
+ * is enabled in Staircase settings.
+ */
+
+/* ===================================
+   Main Navigation Link Styles
+   =================================== */
+
+/* Base Nav Link Styling */
+body.tpcom-nav-styles .main-navigation a,
+body.tpcom-nav-styles .main-navigation .nav-link {
+    /* Typography */
+    font-family: 'Segoe UI', Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", system-ui, -apple-system, Arial, sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    line-height: 1.5 !important;
+    text-transform: capitalize !important;
+    letter-spacing: 0.3px !important;
+    
+    /* Colors - for light background */
+    color: #333333 !important;
+    
+    /* Spacing */
+    padding: 0.5rem 1rem;
+    
+    /* Display */
+    display: block;
+    text-decoration: none;
+    
+    /* Transitions */
+    transition: color 0.15s ease-in-out;
+}
+
+/* Nav Link Hover State */
+body.tpcom-nav-styles .main-navigation a:hover,
+body.tpcom-nav-styles .main-navigation a:focus {
+    color: #0073aa !important;
+    background-color: rgba(0, 115, 170, 0.05) !important;
+}
+
+/* Active/Current Page Nav Link */
+body.tpcom-nav-styles .main-navigation .current-menu-item > a,
+body.tpcom-nav-styles .main-navigation .current_page_item > a {
+    color: #0073aa !important;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #0073aa !important;
+}
+
+/* ===================================
+   Dropdown Menu Styles
+   =================================== */
+
+/* Dropdown Toggle (Parent Menu Items) */
+body.tpcom-nav-styles .main-navigation .menu-item-has-children > a {
+    white-space: nowrap;
+}
+
+body.tpcom-nav-styles .main-navigation .menu-item-has-children > a::after {
+    /* Dropdown arrow indicator */
+    display: inline-block;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+}
+
+/* Dropdown Menu Container */
+body.tpcom-nav-styles .main-navigation .sub-menu {
+    /* Typography */
+    font-size: 1rem;
+    
+    /* Colors */
+    color: #212529;
+    background-color: #fff;
+    
+    /* Border & Shadow */
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 0.375rem;
+    
+    /* Spacing */
+    padding: 0.5rem 0;
+    margin: 0;
+    
+    /* Display */
+    min-width: 10rem;
+}
+
+/* Dropdown Items */
+body.tpcom-nav-styles .main-navigation .sub-menu a {
+    /* Typography */
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    text-transform: none !important;
+    
+    /* Colors */
+    color: #333333 !important;
+    background-color: transparent;
+    
+    /* Spacing */
+    padding: 0.25rem 1rem;
+    
+    /* Display */
+    display: block;
+    width: 100%;
+    clear: both;
+    text-align: inherit;
+    text-decoration: none;
+    white-space: nowrap;
+    
+    /* Border */
+    border: 0;
+    
+    /* Transitions */
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+/* Dropdown Item Hover State */
+body.tpcom-nav-styles .main-navigation .sub-menu a:hover,
+body.tpcom-nav-styles .main-navigation .sub-menu a:focus {
+    color: #0073aa !important;
+    background-color: #f8f9fa !important;
+}
+
+/* Active Dropdown Item */
+body.tpcom-nav-styles .main-navigation .sub-menu .current-menu-item > a,
+body.tpcom-nav-styles .main-navigation .sub-menu a:active {
+    color: #0073aa !important;
+    background-color: #f0f8ff !important;
+    font-weight: 500 !important;
+}
+
+/* ===================================
+   Header Container Styles
+   =================================== */
+
+body.tpcom-nav-styles .site-header {
+    /* Spacing */
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+body.tpcom-nav-styles .site-header .main-navigation a {
+    color: #333333 !important;
+}
+
+body.tpcom-nav-styles .site-header .main-navigation a:hover,
+body.tpcom-nav-styles .site-header .main-navigation a:focus {
+    color: #0073aa !important;
+}
+
+body.tpcom-nav-styles .site-header .main-navigation .current-menu-item > a,
+body.tpcom-nav-styles .site-header .main-navigation .current_page_item > a {
+    color: #0073aa !important;
+    font-weight: 600 !important;
+}
+
+/* ===================================
+   Responsive Navigation
+   =================================== */
+
+@media (min-width: 768px) {
+    body.tpcom-nav-styles .main-navigation ul {
+        flex-direction: row;
+    }
+    
+    body.tpcom-nav-styles .main-navigation > ul > li > a {
+        padding-right: 0.5rem;
+        padding-left: 0.5rem;
+    }
+    
+    body.tpcom-nav-styles .main-navigation .sub-menu {
+        position: absolute;
+    }
+}
+
+/* ===================================
+   Additional Typography Settings
+   =================================== */
+
+/* Menu Item Typography Details */
+body.tpcom-nav-styles .main-navigation .menu-item {
+    /* Text Transform Options */
+    /* text-transform: uppercase; */
+    /* text-transform: capitalize; */
+    text-transform: none;
+    
+    /* Letter Spacing */
+    letter-spacing: normal;
+    /* Alternative: letter-spacing: 0.05em; */
+    
+    /* Font Weight Variations */
+    /* font-weight: 500; */ /* Medium */
+    /* font-weight: 600; */ /* Semi-bold */
+    /* font-weight: 700; */ /* Bold */
+}
+
+/* ===================================
+   Color Variables Reference
+   =================================== */
+
+/*
+ * Color palette used:
+ * --bs-white: #fff
+ * --bs-gray-100: #f8f9fa
+ * --bs-gray-200: #e9ecef
+ * --bs-gray-300: #dee2e6
+ * --bs-gray-400: #ced4da
+ * --bs-gray-500: #adb5bd
+ * --bs-gray-600: #6c757d
+ * --bs-gray-700: #495057
+ * --bs-gray-800: #343a40
+ * --bs-gray-900: #212529
+ * --bs-primary: #5533ff
+ * --bs-dark: #212529
+ */
+
+/* ===================================
+   Button Styles (for CTA buttons in nav)
+   =================================== */
+
+body.tpcom-nav-styles .header-phone-button {
+    /* Typography */
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    
+    /* Spacing */
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    
+    /* Border */
+    border-radius: 0.375rem;
+    
+    /* Display */
+    display: inline-block;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    
+    /* Transitions */
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}

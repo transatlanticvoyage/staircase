@@ -51,6 +51,16 @@ function staircase_enqueue_assets() {
     // Enqueue Dashicons for frontend use (for service icons)
     wp_enqueue_style('dashicons');
     
+    // Conditionally enqueue TPCom nav styles
+    if (get_option('staircase_use_tpcom_nav_styles', false)) {
+        wp_enqueue_style(
+            'staircase-tpcom-nav-styles',
+            get_template_directory_uri() . '/TPComExtractedNavStyles.css',
+            array('staircase-style'),
+            filemtime(get_template_directory() . '/TPComExtractedNavStyles.css')
+        );
+    }
+    
     // Enqueue navigation script for mobile menu
     wp_enqueue_script(
         'staircase-navigation',
@@ -2091,7 +2101,7 @@ function staircase_add_admin_menu() {
     add_submenu_page(
         'staircase-theme',
         'Theme Settings',
-        'Settings',
+        'Settings / Logo',
         'manage_options',
         'staircase-settings',
         'staircase_settings_page'
@@ -2624,6 +2634,7 @@ function staircase_settings_page() {
         update_option('staircase_show_page_titles', isset($_POST['show_page_titles']));
         update_option('staircase_enable_ruplin_integration', isset($_POST['enable_ruplin_integration']));
         update_option('staircase_custom_css', wp_strip_all_tags($_POST['custom_css']));
+        update_option('staircase_use_tpcom_nav_styles', isset($_POST['use_tpcom_nav_styles']));
         
         // Handle logo upload
         if (!empty($_POST['header_logo_url'])) {
@@ -2642,6 +2653,7 @@ function staircase_settings_page() {
     $enable_ruplin_integration = get_option('staircase_enable_ruplin_integration', true);
     $custom_css = get_option('staircase_custom_css', '');
     $header_logo = get_option('staircase_header_logo', '');
+    $use_tpcom_nav_styles = get_option('staircase_use_tpcom_nav_styles', false);
     ?>
     <div class="wrap">
         <h1>Staircase Theme Settings</h1>
@@ -2726,6 +2738,22 @@ function staircase_settings_page() {
                                 <?php if (!class_exists('SnefuruPlugin')): ?>
                                     <p class="description" style="color: #d63638;">⚠️ Ruplin plugin is not currently active</p>
                                 <?php endif; ?>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>Navigation Styles</h2>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">Navigation Menu Styling</th>
+                            <td>
+                                <label for="use_tpcom_nav_styles">
+                                    <input name="use_tpcom_nav_styles" type="checkbox" id="use_tpcom_nav_styles" value="1" <?php checked($use_tpcom_nav_styles); ?>>
+                                    Use TPCom Extracted Nav Styles
+                                </label>
+                                <p class="description">Apply extracted navigation menu text styles with enhanced typography and spacing</p>
                             </td>
                         </tr>
                     </table>
@@ -5492,3 +5520,12 @@ function staircase_render_monica_contact_box() {
     </style>
     <?php
 }
+
+// Add body class for TPCom nav styles
+function staircase_add_tpcom_nav_body_class($classes) {
+    if (get_option("staircase_use_tpcom_nav_styles", false)) {
+        $classes[] = "tpcom-nav-styles";
+    }
+    return $classes;
+}
+add_filter("body_class", "staircase_add_tpcom_nav_body_class");

@@ -24,6 +24,8 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #fff;
+    padding-top: 86px; /* Account for fixed header */
+    transition: padding-top 0.3s ease;
 }
 
 /* Container */
@@ -37,9 +39,75 @@ body {
 .site-header {
     background-color: #e2e2e2;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 1000;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+/* Account for WordPress admin bar when logged in */
+.admin-bar .site-header {
+    top: 32px;
+}
+
+@media screen and (max-width: 782px) {
+    .admin-bar .site-header {
+        top: 46px;
+    }
+}
+
+/* Account for WordPress admin bar when logged in */
+.admin-bar body {
+    padding-top: 118px; /* 86px header + 32px admin bar */
+}
+
+@media screen and (max-width: 782px) {
+    .admin-bar body {
+        padding-top: 132px; /* 86px header + 46px mobile admin bar */
+    }
+}
+
+/* Scrolled header state */
+.site-header.scrolled {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+
+.site-header.scrolled .header-logo-area {
+    min-height: 60px;
+    transition: min-height 0.3s ease;
+}
+
+.site-header.scrolled .header-logo-area .site-branding {
+    min-height: 60px;
+}
+
+.site-header.scrolled .header-nav-area {
+    padding: 0.5rem 0;
+    transition: padding 0.3s ease;
+}
+
+/* Adjust body padding when header is scrolled */
+body.header-scrolled {
+    padding-top: 60px;
+}
+
+.admin-bar body.header-scrolled {
+    padding-top: 92px; /* 60px header + 32px admin bar */
+}
+
+@media screen and (max-width: 782px) {
+    .admin-bar body.header-scrolled {
+        padding-top: 106px; /* 60px header + 46px mobile admin bar */
+    }
+}
+
+/* Optional: Header hidden state for scroll-down hiding */
+.site-header.header-hidden {
+    transform: translateY(-100%);
+    transition: transform 0.3s ease;
 }
 
 .header-inner {
@@ -55,11 +123,13 @@ body {
     align-items: center;
     padding: 0;
     min-height: 86px;
+    transition: min-height 0.3s ease;
 }
 
 .header-logo-area .site-branding {
     height: auto;
     min-height: 86px;
+    transition: min-height 0.3s ease;
 }
 
 /* New navigation/phone area container */
@@ -68,6 +138,7 @@ body {
     align-items: center;
     gap: 2rem;
     padding: 1rem 0;
+    transition: padding 0.3s ease;
 }
 
 .site-title {
@@ -93,11 +164,17 @@ body {
     max-width: 251px !important;
     min-height: 86px;
     vertical-align: middle;
-    transition: opacity 0.3s ease;
+    transition: height 0.3s ease, opacity 0.3s ease, min-height 0.3s ease;
 }
 
 .staircase-logo:hover {
     opacity: 0.8;
+}
+
+/* Scrolled state for staircase logo */
+.site-header.scrolled .staircase-logo {
+    height: 60px !important;
+    min-height: 60px !important;
 }
 
 /* WordPress custom logo fallback */
@@ -112,6 +189,13 @@ body {
     max-width: 251px !important;
     min-height: 86px;
     vertical-align: middle;
+    transition: height 0.3s ease, min-height 0.3s ease;
+}
+
+/* Scrolled state for custom logo */
+.site-header.scrolled .custom-logo {
+    height: 60px !important;
+    min-height: 60px !important;
 }
 
 /* Navigation */
