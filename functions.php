@@ -3137,6 +3137,7 @@ function zaramax_footer_management_page() {
         update_option('zaramax_footer_map_heading', sanitize_text_field($_POST['footer_map_heading']));
         // Use wp_unslash to preserve shortcodes without adding backslashes
         update_option('zaramax_footer_map_location', wp_unslash($_POST['footer_map_location']));
+        update_option('zaramax_footer_hide_disclaimer', isset($_POST['footer_hide_disclaimer']) ? '1' : '0');
         update_option('zaramax_footer_disclaimer', wp_unslash($_POST['footer_disclaimer']));
         update_option('zaramax_footer_legal_links', wp_unslash($_POST['footer_legal_links']));
         
@@ -3149,6 +3150,7 @@ function zaramax_footer_management_page() {
     $footer_box3_content = get_option('zaramax_footer_box3_content', '');
     $footer_map_heading = get_option('zaramax_footer_map_heading', '');
     $footer_map_location = get_option('zaramax_footer_map_location', '');
+    $footer_hide_disclaimer = get_option('zaramax_footer_hide_disclaimer', '0');
     $footer_disclaimer = get_option('zaramax_footer_disclaimer', '');
     $footer_legal_links = get_option('zaramax_footer_legal_links', '');
     
@@ -3244,6 +3246,13 @@ function zaramax_footer_management_page() {
                         <!-- Disclaimer Area -->
                         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
                             <h3 style="margin-top: 0;">Disclaimer Area</h3>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="footer_hide_disclaimer" name="footer_hide_disclaimer" value="1" <?php checked($footer_hide_disclaimer, '1'); ?> style="margin-right: 8px;">
+                                    <strong>Hide disclaimer (do not output in the footer)</strong>
+                                </label>
+                                <small style="color: #666; display: block; margin-top: 5px;">When checked, the disclaimer will not be displayed in the footer at all.</small>
+                            </div>
                             <label for="footer_disclaimer"><strong>Disclaimer Content (HTML allowed):</strong></label>
                             <textarea id="footer_disclaimer" name="footer_disclaimer" rows="6" style="width: 100%; margin-top: 5px; font-family: monospace; font-size: 12px;" placeholder="Enter disclaimer HTML..."><?php echo esc_textarea($footer_disclaimer); ?></textarea>
                             <small style="color: #666;">HTML allowed. Line breaks preserved automatically.</small>
@@ -3338,6 +3347,7 @@ function zaramax_render_custom_footer() {
     $footer_box3_content = get_option('zaramax_footer_box3_content', '');
     $footer_map_heading = get_option('zaramax_footer_map_heading', '');
     $footer_map_location = get_option('zaramax_footer_map_location', '');
+    $footer_hide_disclaimer = get_option('zaramax_footer_hide_disclaimer', '0');
     $footer_disclaimer = get_option('zaramax_footer_disclaimer', '');
     $footer_legal_links = get_option('zaramax_footer_legal_links', '');
     
@@ -3425,10 +3435,12 @@ function zaramax_render_custom_footer() {
         <div class="zaramax-footer-bottom">
             <div class="footer-bottom-container">
                 <div class="footer-bottom-grid">
-                    <!-- Disclaimer Area -->
-                    <div class="footer-disclaimer">
-                        <?php echo wpautop(do_shortcode($footer_disclaimer)); ?>
-                    </div>
+                    <?php if ($footer_hide_disclaimer !== '1'): ?>
+                        <!-- Disclaimer Area -->
+                        <div class="footer-disclaimer">
+                            <?php echo wpautop(do_shortcode($footer_disclaimer)); ?>
+                        </div>
+                    <?php endif; ?>
                     
                     <!-- Legal Links Area -->
                     <div class="footer-legal-links">
