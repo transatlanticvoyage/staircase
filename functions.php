@@ -881,6 +881,16 @@ function staircase_cherry_hero() {
         echo "<!-- Background Image: None set -->\n";
     }
     
+    // Get hero overlay opacity (default to 50 if not set)
+    $hero_overlay_opacity = 50; // Default value
+    if ($pylon_data && isset($pylon_data['hero_overlay_opacity'])) {
+        $hero_overlay_opacity = intval($pylon_data['hero_overlay_opacity']);
+        // Ensure opacity is between 0 and 100
+        $hero_overlay_opacity = max(0, min(100, $hero_overlay_opacity));
+    }
+    // Convert to decimal for CSS
+    $hero_overlay_opacity_decimal = $hero_overlay_opacity / 100;
+    
     // Default values
     if (empty($cherry_subheading)) {
         $cherry_subheading = get_bloginfo('description');
@@ -897,30 +907,42 @@ function staircase_cherry_hero() {
                 <div class="cherry-buttons-container">
                     <?php if ($cherry_button_left_url): ?>
                         <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="batman-hero-button batman-hero-button-left">
-                            <?php echo esc_html($cherry_button_left_text); ?>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            </svg>
+                            <span><?php echo esc_html($cherry_button_left_text); ?></span>
                         </a>
                     <?php else: ?>
                         <span class="batman-hero-button batman-hero-button-left batman-hero-button-disabled">
-                            <?php echo esc_html($cherry_button_left_text); ?>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            </svg>
+                            <span><?php echo esc_html($cherry_button_left_text); ?></span>
                         </span>
                     <?php endif; ?>
                     
                     <?php if ($cherry_button_right_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right">
-                            <?php echo esc_html($cherry_button_right_text); ?>
+                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right staircase_main_cta_button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            <span><?php echo esc_html($cherry_button_right_text); ?></span>
                         </a>
                     <?php else: ?>
-                        <span class="batman-hero-button batman-hero-button-right batman-hero-button-disabled">
-                            <?php echo esc_html($cherry_button_right_text); ?>
+                        <span class="batman-hero-button batman-hero-button-right batman-hero-button-disabled staircase_main_cta_button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            <span><?php echo esc_html($cherry_button_right_text); ?></span>
                         </span>
                     <?php endif; ?>
                 </div>
                 
                 <?php if ($cherry_phone_number_raw): ?>
-                    <div class="cherry-phone-container" style="text-align: center; margin-top: 15px;">
-                        <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $cherry_phone_number_raw)); ?>" class="cherry-phone">
+                    <div class="phone_display_only_holder_div">
+                        <span class="phone-display-only">
                             <?php echo esc_html($cherry_phone_number_formatted); ?>
-                        </a>
+                        </span>
                     </div>
                 <?php endif; ?>
             </div>
@@ -1021,11 +1043,73 @@ function staircase_cherry_hero() {
     .cherry-buttons-container {
         display: flex;
         justify-content: center;
-        gap: 20px;
-        margin: 0 0 30px 0;
+        gap: 1rem;
+        margin: 2rem 0 30px 0;
         flex-wrap: wrap;
+        padding: 0 20px;
     }
     
+    /* Quantum System Button Styles */
+    .batman-hero-button {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        min-height: 48px; /* Touch-friendly size from quantum */
+    }
+    
+    .batman-hero-button svg {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+    }
+    
+    .batman-hero-button-left {
+        background-color: white !important;
+        color: #414449 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        border: none !important;
+    }
+    
+    .batman-hero-button-left:hover,
+    .batman-hero-button-left:focus {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+        background-color: #f9f9f9 !important;
+        color: #414449 !important;
+    }
+    
+    .batman-hero-button-right {
+        background-color: #23bb72 !important;
+        color: white !important;
+        border: 2px solid #23bb72 !important;
+        box-shadow: none !important;
+    }
+    
+    .batman-hero-button-right:hover,
+    .batman-hero-button-right:focus {
+        background-color: #fd9f1f !important;
+        border-color: #fd9f1f !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(253, 159, 31, 0.4) !important;
+        color: white !important;
+    }
+    
+    .batman-hero-button-disabled {
+        cursor: default;
+        pointer-events: none;
+        opacity: 0.6;
+        background-color: #cccccc !important;
+        color: #666666 !important;
+        border: 2px solid #cccccc !important;
+    }
+    
+    /* Keep old cherry-button classes for backward compatibility */
     .cherry-button {
         display: inline-block;
         padding: 15px 30px;
@@ -1039,55 +1123,47 @@ function staircase_cherry_hero() {
     }
     
     .cherry-button-left {
-        background: #3f72d7;
-        color: white;
-        border: 2px solid #3f72d7;
+        background-color: white;
+        color: #414449;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: none;
     }
     
     .cherry-button-left:hover {
-        background: #2d5cbf;
-        color: white;
-        border-color: #2d5cbf;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        background-color: #f9f9f9;
+        color: #414449;
     }
     
     .cherry-button-right {
-        background: #3f72d7;
+        background-color: #23bb72;
         color: white;
-        border: 2px solid #3f72d7;
+        border: 2px solid #23bb72;
     }
     
     .cherry-button-right:hover {
-        background: #2d5cbf;
+        background-color: #fd9f1f;
+        border-color: #fd9f1f;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(253, 159, 31, 0.4);
         color: white;
-        border-color: #2d5cbf;
     }
     
-    .batman-hero-button-disabled {
-        cursor: default;
-        pointer-events: none;
+    /* Phone display only - not a button */
+    .phone_display_only_holder_div {
+        margin-top: 25px;
+        text-align: center;
     }
     
-    .cherry-phone-container {
-        margin-top: 20px;
-    }
-    
-    .cherry-phone {
+    .phone-display-only {
         display: inline-block;
-        font-size: 1.8rem;
+        font-size: 2rem; /* Enlarged from 1.8rem */
         font-weight: 700;
         color: white;
-        text-decoration: none;
-        padding: 10px 20px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        transition: all 0.3s ease;
-    }
-    
-    .cherry-phone:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-2px);
+        /* Plain text - no link styling */
+        cursor: default;
+        user-select: text; /* Allow text selection */
     }
     
     /* Responsive Design */
@@ -1114,8 +1190,8 @@ function staircase_cherry_hero() {
             min-width: 250px;
         }
         
-        .cherry-phone {
-            font-size: 1.5rem;
+        .phone-display-only {
+            font-size: 1.7rem; /* Enlarged for tablet */
         }
     }
     
@@ -1128,8 +1204,8 @@ function staircase_cherry_hero() {
             font-size: 1.1rem;
         }
         
-        .cherry-phone {
-            font-size: 1.3rem;
+        .phone-display-only {
+            font-size: 1.5rem; /* Enlarged for mobile */
         }
     }
     
@@ -2066,6 +2142,48 @@ function staircase_osb_box_paragon_styles() {
     <?php
 }
 add_action('wp_head', 'staircase_osb_box_paragon_styles');
+
+// Add dynamic CTA button colors
+function staircase_cta_button_dynamic_styles() {
+    $cta_bg_color = get_option('staircase_cta_bg_color', '#23bb73');
+    ?>
+    <style>
+    /* Dynamic CTA Button Colors */
+    .staircase_main_cta_button {
+        background-color: <?php echo esc_attr($cta_bg_color); ?> !important;
+        color: white !important;
+    }
+    
+    /* Header phone button with dynamic color */
+    .header-phone-button.staircase_main_cta_button {
+        background-color: <?php echo esc_attr($cta_bg_color); ?> !important;
+    }
+    
+    /* Hero Call Us Now button with dynamic color */
+    .batman-hero-button-right.staircase_main_cta_button {
+        background-color: <?php echo esc_attr($cta_bg_color); ?> !important;
+        border-color: <?php echo esc_attr($cta_bg_color); ?> !important;
+    }
+    
+    /* Kristina CTA button with dynamic color */
+    .kristina-cta-button.staircase_main_cta_button {
+        background-color: <?php echo esc_attr($cta_bg_color); ?> !important;
+    }
+    
+    /* Footer phone button with dynamic color */
+    .footer-phone-button.staircase_main_cta_button {
+        background-color: <?php echo esc_attr($cta_bg_color); ?> !important;
+    }
+    
+    /* Hover states remain orange as per quantum styling */
+    .staircase_main_cta_button:hover {
+        background-color: #fd9f1f !important;
+        border-color: #fd9f1f !important;
+    }
+    </style>
+    <?php
+}
+add_action('wp_head', 'staircase_cta_button_dynamic_styles');
 
 // Custom excerpt length
 function staircase_excerpt_length($length) {
@@ -3016,6 +3134,12 @@ function staircase_settings_page() {
         update_option('staircase_custom_css', wp_strip_all_tags($_POST['custom_css']));
         update_option('staircase_use_tpcom_nav_styles', isset($_POST['use_tpcom_nav_styles']));
         
+        // Save CTA button color
+        $cta_bg_color = sanitize_hex_color($_POST['staircase_cta_bg_color']);
+        if ($cta_bg_color) {
+            update_option('staircase_cta_bg_color', $cta_bg_color);
+        }
+        
         // Handle logo upload
         if (!empty($_POST['header_logo_url'])) {
             update_option('staircase_header_logo', esc_url_raw($_POST['header_logo_url']));
@@ -3034,6 +3158,7 @@ function staircase_settings_page() {
     $custom_css = get_option('staircase_custom_css', '');
     $header_logo = get_option('staircase_header_logo', '');
     $use_tpcom_nav_styles = get_option('staircase_use_tpcom_nav_styles', false);
+    $cta_bg_color = get_option('staircase_cta_bg_color', '#23bb73'); // Default green color
     ?>
     <div class="wrap">
         <h1>Staircase Theme Settings</h1>
@@ -3134,6 +3259,22 @@ function staircase_settings_page() {
                                     Use TPCom Extracted Nav Styles
                                 </label>
                                 <p class="description">Apply extracted navigation menu text styles with enhanced typography and spacing</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>Main CTA Button Settings</h2>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">BG Color</th>
+                            <td>
+                                <input type="color" name="staircase_cta_bg_color" id="staircase_cta_bg_color" value="<?php echo esc_attr($cta_bg_color); ?>" />
+                                <input type="text" id="staircase_cta_bg_color_text" value="<?php echo esc_attr($cta_bg_color); ?>" class="regular-text" style="margin-left: 10px;" readonly />
+                                <button type="button" id="reset_cta_color" class="button" style="margin-left: 10px;">Reset to Default</button>
+                                <p class="description">Set the background color for main CTA buttons (header phone, hero Call Us Now, CTA section, footer phone). Default: <code>#23bb73</code></p>
+                                <p class="description" style="margin-top: 5px;"><strong>Affected buttons:</strong> Header phone button, Hero "Call Us Now" button, CTA section button, Footer phone button</p>
                             </td>
                         </tr>
                     </table>
@@ -3264,6 +3405,23 @@ function staircase_settings_page() {
                 }
             }, 500);
         }
+        
+        // Color picker functionality
+        $('#staircase_cta_bg_color').on('input', function() {
+            $('#staircase_cta_bg_color_text').val($(this).val());
+        });
+        
+        $('#staircase_cta_bg_color_text').on('input', function() {
+            var color = $(this).val();
+            if (/^#[0-9A-F]{6}$/i.test(color)) {
+                $('#staircase_cta_bg_color').val(color);
+            }
+        });
+        
+        $('#reset_cta_color').on('click', function() {
+            $('#staircase_cta_bg_color').val('#23bb73');
+            $('#staircase_cta_bg_color_text').val('#23bb73');
+        });
     });
     </script>
     <?php
@@ -3766,7 +3924,7 @@ function zaramax_render_custom_footer() {
                         
                         <?php if (!empty($phone_raw)): ?>
                             <div class="footer-phone">
-                                <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $phone_raw)); ?>" class="footer-phone-button">
+                                <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $phone_raw)); ?>" class="footer-phone-button staircase_main_cta_button">
                                     <svg class="phone-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                                     </svg>
@@ -4127,6 +4285,16 @@ function staircase_render_batman_hero_box() {
         echo "<!-- Background Image: None set -->\n";
     }
     
+    // Get hero overlay opacity (default to 50 if not set)
+    $hero_overlay_opacity = 50; // Default value
+    if ($pylon_data && isset($pylon_data['hero_overlay_opacity'])) {
+        $hero_overlay_opacity = intval($pylon_data['hero_overlay_opacity']);
+        // Ensure opacity is between 0 and 100
+        $hero_overlay_opacity = max(0, min(100, $hero_overlay_opacity));
+    }
+    // Convert to decimal for CSS
+    $hero_overlay_opacity_decimal = $hero_overlay_opacity / 100;
+    
     // Default values
     if (empty($cherry_subheading)) {
         $cherry_subheading = get_bloginfo('description');
@@ -4143,30 +4311,42 @@ function staircase_render_batman_hero_box() {
                 <div class="cherry-buttons-container">
                     <?php if ($cherry_button_left_url): ?>
                         <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="batman-hero-button batman-hero-button-left">
-                            <?php echo esc_html($cherry_button_left_text); ?>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            </svg>
+                            <span><?php echo esc_html($cherry_button_left_text); ?></span>
                         </a>
                     <?php else: ?>
                         <span class="batman-hero-button batman-hero-button-left batman-hero-button-disabled">
-                            <?php echo esc_html($cherry_button_left_text); ?>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            </svg>
+                            <span><?php echo esc_html($cherry_button_left_text); ?></span>
                         </span>
                     <?php endif; ?>
                     
                     <?php if ($cherry_button_right_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right">
-                            <?php echo esc_html($cherry_button_right_text); ?>
+                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right staircase_main_cta_button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            <span><?php echo esc_html($cherry_button_right_text); ?></span>
                         </a>
                     <?php else: ?>
-                        <span class="batman-hero-button batman-hero-button-right batman-hero-button-disabled">
-                            <?php echo esc_html($cherry_button_right_text); ?>
+                        <span class="batman-hero-button batman-hero-button-right batman-hero-button-disabled staircase_main_cta_button">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                            </svg>
+                            <span><?php echo esc_html($cherry_button_right_text); ?></span>
                         </span>
                     <?php endif; ?>
                 </div>
                 
                 <?php if ($cherry_phone_number_raw): ?>
-                    <div class="cherry-phone-container" style="text-align: center; margin-top: 15px;">
-                        <a href="tel:<?php echo esc_attr(preg_replace('/[^0-9+]/', '', $cherry_phone_number_raw)); ?>" class="cherry-phone">
+                    <div class="phone_display_only_holder_div">
+                        <span class="phone-display-only">
                             <?php echo esc_html($cherry_phone_number_formatted); ?>
-                        </a>
+                        </span>
                     </div>
                 <?php endif; ?>
             </div>
@@ -4176,17 +4356,47 @@ function staircase_render_batman_hero_box() {
     <style>
     .cherry-hero {
         <?php if (!empty($paragon_image_url)): ?>
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('<?php echo esc_url($paragon_image_url); ?>');
+        /* Image background with opacity overlay */
+        background: 
+            linear-gradient(rgba(0, 0, 0, <?php echo esc_attr($hero_overlay_opacity_decimal); ?>), rgba(0, 0, 0, <?php echo esc_attr($hero_overlay_opacity_decimal); ?>)),
+            url('<?php echo esc_url($paragon_image_url); ?>');
         background-size: <?php echo esc_attr($hero_background_size); ?>;
         background-position: center center;
         background-repeat: no-repeat;
         <?php else: ?>
-        background: #53565b;
+        /* Quantum system gradient background when no image */
+        background: linear-gradient(135deg, #414449 0%, #2a2b2e 100%);
         <?php endif; ?>
         color: white;
         text-align: center;
         padding: 80px 0;
         position: relative;
+        overflow: hidden;
+    }
+    
+    /* Diagonal pattern overlay from quantum system */
+    .cherry-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.1;
+        background-image: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 35px,
+            rgba(255, 255, 255, 0.05) 35px,
+            rgba(255, 255, 255, 0.05) 70px
+        );
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .cherry-hero .container {
+        position: relative;
+        z-index: 2;
     }
     
     .cherry-hero-content {
@@ -4213,11 +4423,73 @@ function staircase_render_batman_hero_box() {
     .cherry-buttons-container {
         display: flex;
         justify-content: center;
-        gap: 20px;
-        margin: 0 0 30px 0;
+        gap: 1rem;
+        margin: 2rem 0 30px 0;
         flex-wrap: wrap;
+        padding: 0 20px;
     }
     
+    /* Quantum System Button Styles */
+    .batman-hero-button {
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 50px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+        min-height: 48px; /* Touch-friendly size from quantum */
+    }
+    
+    .batman-hero-button svg {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+    }
+    
+    .batman-hero-button-left {
+        background-color: white !important;
+        color: #414449 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        border: none !important;
+    }
+    
+    .batman-hero-button-left:hover,
+    .batman-hero-button-left:focus {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4) !important;
+        background-color: #f9f9f9 !important;
+        color: #414449 !important;
+    }
+    
+    .batman-hero-button-right {
+        background-color: #23bb72 !important;
+        color: white !important;
+        border: 2px solid #23bb72 !important;
+        box-shadow: none !important;
+    }
+    
+    .batman-hero-button-right:hover,
+    .batman-hero-button-right:focus {
+        background-color: #fd9f1f !important;
+        border-color: #fd9f1f !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(253, 159, 31, 0.4) !important;
+        color: white !important;
+    }
+    
+    .batman-hero-button-disabled {
+        cursor: default;
+        pointer-events: none;
+        opacity: 0.6;
+        background-color: #cccccc !important;
+        color: #666666 !important;
+        border: 2px solid #cccccc !important;
+    }
+    
+    /* Keep old cherry-button classes for backward compatibility */
     .cherry-button {
         display: inline-block;
         padding: 15px 30px;
@@ -4231,55 +4503,52 @@ function staircase_render_batman_hero_box() {
     }
     
     .cherry-button-left {
-        background: #3f72d7;
-        color: white;
-        border: 2px solid #3f72d7;
+        background-color: white;
+        color: #414449;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: none;
     }
     
     .cherry-button-left:hover {
-        background: #2d5cbf;
-        color: white;
-        border-color: #2d5cbf;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        background-color: #f9f9f9;
+        color: #414449;
     }
     
     .cherry-button-right {
-        background: #3f72d7;
+        background-color: #23bb72;
         color: white;
-        border: 2px solid #3f72d7;
+        border: 2px solid #23bb72;
     }
     
     .cherry-button-right:hover {
-        background: #2d5cbf;
+        background-color: #fd9f1f;
+        border-color: #fd9f1f;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(253, 159, 31, 0.4);
         color: white;
-        border-color: #2d5cbf;
     }
     
-    .batman-hero-button-disabled {
-        cursor: default;
-        opacity: 0.6;
-        background: #666;
-        border-color: #666;
+    /* Phone display only - not a button */
+    .phone_display_only_holder_div {
+        margin-top: 25px;
+        text-align: center;
     }
     
-    .cherry-phone-container {
-        margin-top: 20px;
-    }
-    
-    .cherry-phone {
+    .phone-display-only {
         color: white;
-        font-size: 1.3rem;
+        font-size: 1.6rem; /* Enlarged from 1.3rem */
         font-weight: 600;
         text-decoration: none;
-        border: 2px solid white;
-        padding: 10px 20px;
-        border-radius: 25px;
         display: inline-block;
-        transition: all 0.3s ease;
+        transition: color 0.3s ease;
+        /* No border, padding, or button-like styling */
     }
     
-    .cherry-phone:hover {
-        background: white;
-        color: #333;
+    .phone-display-only:hover {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
     }
     
     @media (max-width: 1200px) {
@@ -4304,8 +4573,8 @@ function staircase_render_batman_hero_box() {
             width: 220px;
         }
         
-        .cherry-phone {
-            font-size: 1.1rem;
+        .phone-display-only {
+            font-size: 1.4rem; /* Enlarged for mobile */
         }
     }
     
@@ -4318,9 +4587,19 @@ function staircase_render_batman_hero_box() {
             font-size: 1.1rem;
         }
         
-        .cherry-phone {
-            font-size: 1rem;
+        .phone-display-only {
+            font-size: 1.2rem; /* Enlarged for small mobile */
         }
+    }
+    
+    /* Fix spacing issue - remove padding between header and hero */
+    .site-content {
+        padding-top: 0 !important;
+    }
+    
+    /* Ensure hero is flush with header */
+    .cherry-hero {
+        margin-top: 0 !important;
     }
     </style>
     <?php
@@ -4363,33 +4642,57 @@ function staircase_render_chen_cards_box() {
     $has_chen_cards = !empty($chen_card_1_title) || !empty($chen_card_2_title) || !empty($chen_card_3_title);
     if ($has_chen_cards): 
     ?>
-    <section class="chen-card-block">
-        <div class="container">
-            <div class="chen-cards-grid">
+    <section class="chen-cards-section">
+        <div class="chen-container">
+            <div class="cards-grid">
                 <?php if (!empty($chen_card_1_title)): ?>
-                    <div class="chen-card">
-                        <h3 class="chen-card-title"><?php echo esc_html($chen_card_1_title); ?></h3>
+                    <div class="service-card">
+                        <!-- Card Icon -->
+                        <div class="card-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title"><?php echo esc_html($chen_card_1_title); ?></h3>
                         <?php if (!empty($chen_card_1_description)): ?>
-                            <p class="chen-card-description"><?php echo esc_html($chen_card_1_description); ?></p>
+                            <p class="card-description"><?php echo esc_html($chen_card_1_description); ?></p>
                         <?php endif; ?>
+                        <!-- Decorative corner accent -->
+                        <div class="card-accent"></div>
                     </div>
                 <?php endif; ?>
                 
                 <?php if (!empty($chen_card_2_title)): ?>
-                    <div class="chen-card">
-                        <h3 class="chen-card-title"><?php echo esc_html($chen_card_2_title); ?></h3>
+                    <div class="service-card">
+                        <!-- Card Icon -->
+                        <div class="card-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title"><?php echo esc_html($chen_card_2_title); ?></h3>
                         <?php if (!empty($chen_card_2_description)): ?>
-                            <p class="chen-card-description"><?php echo esc_html($chen_card_2_description); ?></p>
+                            <p class="card-description"><?php echo esc_html($chen_card_2_description); ?></p>
                         <?php endif; ?>
+                        <!-- Decorative corner accent -->
+                        <div class="card-accent"></div>
                     </div>
                 <?php endif; ?>
                 
                 <?php if (!empty($chen_card_3_title)): ?>
-                    <div class="chen-card">
-                        <h3 class="chen-card-title"><?php echo esc_html($chen_card_3_title); ?></h3>
+                    <div class="service-card">
+                        <!-- Card Icon -->
+                        <div class="card-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title"><?php echo esc_html($chen_card_3_title); ?></h3>
                         <?php if (!empty($chen_card_3_description)): ?>
-                            <p class="chen-card-description"><?php echo esc_html($chen_card_3_description); ?></p>
+                            <p class="card-description"><?php echo esc_html($chen_card_3_description); ?></p>
                         <?php endif; ?>
+                        <!-- Decorative corner accent -->
+                        <div class="card-accent"></div>
                     </div>
                 <?php endif; ?>
             </div>
@@ -4397,81 +4700,129 @@ function staircase_render_chen_cards_box() {
     </section>
     
     <style>
-    .chen-card-block {
-        padding: 60px 0;
-        background: #f9f9f9;
+    /* Quantum System Chen Cards Styles */
+    .chen-cards-section {
+        padding: 80px 20px;
+        background: #f8f9fa; /* Light gray background from quantum system */
     }
     
-    .chen-cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 40px;
+    .chen-container {
         max-width: 1200px;
         margin: 0 auto;
     }
     
-    .chen-card {
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Quantum system responsive grid */
+        gap: 30px;
+        margin-top: 20px;
+    }
+    
+    .service-card {
         background: white;
         border-radius: 12px;
         padding: 40px 30px;
-        text-align: center;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Quantum system shadow */
+        transition: all 0.3s ease;
         position: relative;
+        overflow: hidden;
     }
     
-    .chen-card:hover {
+    .service-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12); /* Enhanced shadow on hover */
     }
     
-    .chen-card-title {
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #2563eb, #1e40af); /* Gradient from quantum system */
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .card-title {
         font-size: 1.5rem;
-        font-weight: 600;
-        margin: 0 0 15px 0;
-        color: #333;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #1a1a1a;
         line-height: 1.3;
     }
     
-    .chen-card-description {
+    .card-description {
+        color: #6b7280; /* Quantum system gray */
+        line-height: 1.7;
         font-size: 1rem;
-        line-height: 1.6;
-        color: #666;
         margin: 0;
     }
     
-    @media (max-width: 1200px) {
-        .chen-cards-grid {
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-        }
-        
-        .chen-card {
-            padding: 30px 25px;
+    .card-accent {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(30, 64, 175, 0.1));
+        border-radius: 50%;
+    }
+    
+    /* Ensure proper grid layout on larger tablets */
+    @media (max-width: 1024px) {
+        .cards-grid {
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
         }
     }
     
+    /* Tablet Styles */
     @media (max-width: 768px) {
-        .chen-card-block {
-            padding: 40px 0;
+        .chen-cards-section {
+            padding: 60px 20px;
         }
         
-        .chen-cards-grid {
+        .cards-grid {
             grid-template-columns: 1fr;
             gap: 25px;
-            padding: 0 20px;
         }
         
-        .chen-card {
-            padding: 25px 20px;
+        .service-card {
+            padding: 35px 25px;
         }
         
-        .chen-card-title {
+        .card-title {
             font-size: 1.3rem;
         }
+    }
+    
+    /* Mobile Styles */
+    @media (max-width: 480px) {
+        .chen-cards-section {
+            padding: 40px 15px;
+        }
         
-        .chen-card-description {
-            font-size: 0.9rem;
+        .cards-grid {
+            gap: 20px;
+        }
+        
+        .service-card {
+            padding: 30px 20px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+        }
+        
+        .card-description {
+            font-size: 0.95rem;
         }
     }
     </style>
@@ -4783,11 +5134,11 @@ function staircase_render_kristina_cta_box() {
             <p class="kristina-cta-subtext">Contact us today for professional service and free estimates</p>
             
             <?php if (!empty($kristina_phone_number_raw)): ?>
-                <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="kristina-cta-button">
+                <a href="tel:<?php echo esc_attr($clean_phone); ?>" class="kristina-cta-button staircase_main_cta_button">
                     Call Now
                 </a>
             <?php else: ?>
-                <a href="tel:555-0123" class="kristina-cta-button">
+                <a href="tel:555-0123" class="kristina-cta-button staircase_main_cta_button">
                     Call Now
                 </a>
             <?php endif; ?>
@@ -5302,9 +5653,9 @@ function staircase_render_ava_whychooseus_box() {
     // Only render if at least one field has content
     if ($has_content) {
         ?>
-        <section class="ava-whychooseus-box" style="padding: 50px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden;">
-            <!-- Decorative background pattern -->
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px);"></div>
+        <section class="ava-whychooseus-box" style="padding: 50px 20px; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); position: relative; overflow: hidden;">
+            <!-- Quantum system background pattern -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.05; background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
             
             <div class="ava-container" style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 1;">
                 <?php if (!empty($pylon_data['ava_why_choose_us_heading'])): ?>
@@ -5334,7 +5685,7 @@ function staircase_render_ava_whychooseus_box() {
                         ?>
                             <div class="reason-card" style="background: rgba(255,255,255,0.95); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s ease;">
                                 <div style="display: flex; align-items: start;">
-                                    <div style="flex-shrink: 0; width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                    <div style="flex-shrink: 0; width: 40px; height: 40px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);">
                                         <span style="color: white; font-weight: bold; font-size: 18px;"><?php echo $i; ?></span>
                                     </div>
                                     <div style="flex: 1;">
@@ -5462,30 +5813,50 @@ function staircase_render_kendall_ourprocess_box() {
                 </div>
             <?php endif; ?>
             
-            <div class="kendall-process-steps" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto; text-align: left;">
-                <?php for ($i = 1; $i <= 10; $i++): ?>
-                    <?php $step_content = $process_data["kendall_our_process_step_{$i}"] ?? ''; ?>
-                    <?php if (!empty($step_content)): ?>
-                        <div class="process-step" style="padding: 20px; background: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid #0073aa;">
-                            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                                <span class="step-number" style="flex-shrink: 0; display: inline-block; width: 30px; height: 30px; background: #0073aa; color: white; border-radius: 50%; text-align: center; line-height: 30px; font-weight: 700; font-size: 14px;">
-                                    <?php echo $i; ?>
-                                </span>
-                                <div class="step-content" style="flex: 1;">
-                                    <span class="step-text" style="font-size: 16px; color: #333; line-height: 1.4; display: block;">
-                                        <?php echo wp_kses_post($step_content); ?>
-                                    </span>
-                                </div>
-                            </div>
+            <!-- Process steps with quantum styling -->
+            <div class="kendall-process-steps" style="position: relative; max-width: 900px; margin: 0 auto;">
+                <!-- Vertical line connector (quantum style) -->
+                <div class="process-line-connector" style="position: absolute; left: 30px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%); opacity: 0.3;"></div>
+                
+                <?php 
+                $step_count = 0;
+                for ($i = 1; $i <= 10; $i++): 
+                    $step_content = $process_data["kendall_our_process_step_{$i}"] ?? '';
+                    if (!empty($step_content)):
+                        $step_count++;
+                ?>
+                    <div class="process-step" style="display: flex; align-items: flex-start; margin-bottom: 40px; position: relative;">
+                        <!-- Step number circle (quantum gradient style) -->
+                        <div class="step-number" style="min-width: 60px; height: 60px; background: linear-gradient(135deg, #2563eb, #1e40af); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.25rem; position: relative; z-index: 1; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);">
+                            <?php echo $step_count; ?>
                         </div>
-                    <?php endif; ?>
-                <?php endfor; ?>
+                        
+                        <!-- Step content (quantum card style) -->
+                        <div class="step-content" style="flex: 1; margin-left: 30px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); position: relative; transition: all 0.3s ease;">
+                            <!-- Arrow pointing from circle to content -->
+                            <div class="step-arrow" style="position: absolute; left: -10px; top: 20px; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-right: 10px solid white;"></div>
+                            
+                            <span class="step-text" style="color: #374151; line-height: 1.7; font-size: 1.05rem; display: block;">
+                                <?php echo wp_kses_post($step_content); ?>
+                            </span>
+                        </div>
+                    </div>
+                <?php 
+                    endif;
+                endfor; 
+                ?>
             </div>
             
         </div>
     </section>
     
     <style>
+    /* Hover effect for process steps (quantum enhancement) */
+    .process-step:hover .step-content {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+        transform: translateX(5px) !important;
+    }
+    
     /* Mobile responsiveness for kendall process box */
     @media (max-width: 768px) {
         .kendall-process-box {
@@ -5499,14 +5870,25 @@ function staircase_render_kendall_ourprocess_box() {
             font-size: 16px !important;
         }
         .kendall-process-steps {
-            grid-template-columns: 1fr !important;
-            gap: 15px !important;
+            padding: 0 10px !important;
+        }
+        .process-line-connector {
+            left: 20px !important;
         }
         .process-step {
-            padding: 15px !important;
+            margin-bottom: 30px !important;
+        }
+        .process-step .step-number {
+            min-width: 50px !important;
+            height: 50px !important;
+            font-size: 1.1rem !important;
+        }
+        .process-step .step-content {
+            margin-left: 20px !important;
+            padding: 20px !important;
         }
         .step-text {
-            font-size: 15px !important;
+            font-size: 0.95rem !important;
         }
     }
     
@@ -5518,17 +5900,24 @@ function staircase_render_kendall_ourprocess_box() {
         .kendall-process-box h2 {
             font-size: 22px !important;
         }
-        .process-step {
-            padding: 12px !important;
+        .process-line-connector {
+            left: 15px !important;
+            width: 1px !important;
         }
-        .step-number {
-            width: 25px !important;
-            height: 25px !important;
-            line-height: 25px !important;
-            font-size: 12px !important;
+        .process-step .step-number {
+            min-width: 40px !important;
+            height: 40px !important;
+            font-size: 1rem !important;
+        }
+        .process-step .step-content {
+            margin-left: 15px !important;
+            padding: 15px !important;
+        }
+        .step-arrow {
+            display: none !important;
         }
         .step-text {
-            font-size: 14px !important;
+            font-size: 0.9rem !important;
         }
     }
     </style>
