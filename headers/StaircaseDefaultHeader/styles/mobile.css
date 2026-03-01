@@ -1,0 +1,115 @@
+/**
+ * StaircaseDefaultHeader - Mobile Styles
+ * Applies to screens 480px and below
+ * Optimizations for small screens
+ */
+
+/* Container Adjustments */
+.sdhdr-container {
+    padding: 0 10px;
+}
+
+.sdhdr-inner {
+    min-height: 55px;
+    padding: 8px 0;
+}
+
+/* Logo Optimizations */
+.sdhdr-logo {
+    max-height: 40px;
+}
+
+.sdhdr-site-title {
+    font-size: 1.2rem;
+}
+
+/* Full Width Mobile Menu */
+.sdhdr-navigation {
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Menu Items */
+.sdhdr-menu a {
+    padding: 12px 15px;
+    font-size: 0.95rem;
+}
+
+.sdhdr-submenu a {
+    padding-left: 30px;
+    font-size: 0.9rem;
+}
+
+.sdhdr-submenu .sdhdr-submenu a {
+    padding-left: 45px;
+}
+
+/* Compact Phone Button */
+.sdhdr-phone {
+    display: flex;
+    order: -1; /* Move before menu toggle */
+}
+
+.sdhdr-phone-button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
+.sdhdr-phone-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* Hide phone number text on very small screens */
+@media (max-width: 360px) {
+    .sdhdr-phone-number {
+        display: none;
+    }
+    
+    .sdhdr-phone-button {
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+        justify-content: center;
+    }
+}
+
+/* Menu Toggle Position */
+.sdhdr-menu-toggle {
+    margin-left: 10px;
+}
+
+/* Scrolled State Adjustments */
+.sdhdr-header.is-scrolled .sdhdr-inner {
+    min-height: 48px;
+}
+
+.sdhdr-header.is-scrolled .sdhdr-logo {
+    max-height: 35px;
+}
+
+/* Body Padding Adjustment */
+body.has-staircase-default-header {
+    padding-top: 63px;
+}
+
+/* Touch-Friendly Tap Targets */
+.sdhdr-menu a,
+.sdhdr-dropdown-toggle {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+.sdhdr-dropdown-toggle {
+    width: 44px;
+    height: 44px;
+    right: 5px;
+}
+
+/* Smooth Scrolling for iOS */
+.sdhdr-navigation {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+}

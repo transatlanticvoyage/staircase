@@ -6,6 +6,9 @@
  */
 // Test comment for VSCode trigger - functions.php
 
+// Load the header system early
+require_once get_template_directory() . '/headers/header-loader.php';
+
 // Theme Setup
 function staircase_theme_setup() {
     // Add theme support for various features

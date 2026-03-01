@@ -1,0 +1,59 @@
+/**
+ * StaircaseDefaultHeader - Admin Bar Styles
+ * Adjustments when WordPress admin bar is showing
+ */
+
+/* Desktop Admin Bar Adjustments */
+@media (min-width: 601px) {
+    .admin-bar .sdhdr-header {
+        top: 32px;
+    }
+    
+    .admin-bar.has-staircase-default-header {
+        padding-top: 117px; /* 85px header + 32px admin bar */
+    }
+    
+    .admin-bar .sdhdr-header.is-scrolled + body {
+        padding-top: 107px; /* 75px scrolled header + 32px admin bar */
+    }
+}
+
+/* Mobile Admin Bar Adjustments */
+@media (max-width: 600px) {
+    .admin-bar .sdhdr-header {
+        top: 46px;
+    }
+    
+    .admin-bar.has-staircase-default-header {
+        padding-top: 109px; /* 63px header + 46px admin bar */
+    }
+}
+
+/* Tablet Specific Admin Bar */
+@media (min-width: 481px) and (max-width: 768px) {
+    .admin-bar.has-staircase-default-header {
+        padding-top: 121px; /* 75px header + 46px admin bar */
+    }
+}
+
+/* Fixed positioning for mobile menu with admin bar */
+@media (max-width: 768px) {
+    .admin-bar .sdhdr-navigation {
+        max-height: calc(100vh - 106px); /* Viewport - header - admin bar */
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-bar .sdhdr-navigation {
+        max-height: calc(100vh - 109px);
+    }
+}
+
+/* Smooth transitions when admin bar appears/disappears */
+.sdhdr-header {
+    transition: top 0.3s ease, box-shadow 0.3s ease;
+}
+
+body {
+    transition: padding-top 0.3s ease;
+}

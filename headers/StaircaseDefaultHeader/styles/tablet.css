@@ -1,0 +1,115 @@
+/**
+ * StaircaseDefaultHeader - Tablet Styles
+ * Applies to screens 481px to 768px
+ * Bridge between mobile and desktop
+ */
+
+/* Container */
+.sdhdr-container {
+    padding: 0 20px;
+}
+
+.sdhdr-inner {
+    min-height: 65px;
+    padding: 10px 0;
+}
+
+/* Logo Area */
+.sdhdr-logo {
+    max-height: 45px;
+}
+
+.sdhdr-site-title {
+    font-size: 1.4rem;
+}
+
+/* Navigation - Still mobile menu on tablets */
+.sdhdr-navigation {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Better spacing for tablet */
+.sdhdr-menu a {
+    padding: 14px 20px;
+    font-size: 1rem;
+}
+
+.sdhdr-submenu a {
+    padding-left: 35px;
+}
+
+/* Phone Button - More prominent */
+.sdhdr-phone {
+    display: flex;
+}
+
+.sdhdr-phone-button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+}
+
+.sdhdr-phone-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.sdhdr-phone-number {
+    display: inline; /* Ensure number shows on tablets */
+}
+
+/* Menu Toggle */
+.sdhdr-menu-toggle {
+    margin-left: 15px;
+}
+
+/* Two-column menu layout for tablets in landscape */
+@media (min-width: 600px) and (max-width: 768px) and (orientation: landscape) {
+    .sdhdr-navigation {
+        padding: 10px;
+    }
+    
+    .sdhdr-menu {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .sdhdr-menu > li {
+        flex: 0 0 50%;
+    }
+    
+    .sdhdr-menu > li:nth-child(odd) {
+        border-right: 1px solid #f0f0f0;
+    }
+}
+
+/* Scrolled State */
+.sdhdr-header.is-scrolled .sdhdr-inner {
+    min-height: 55px;
+}
+
+.sdhdr-header.is-scrolled .sdhdr-logo {
+    max-height: 40px;
+}
+
+/* Body Padding */
+body.has-staircase-default-header {
+    padding-top: 75px;
+}
+
+/* Hover Effects - Enable for tablets with mouse/trackpad */
+@media (hover: hover) {
+    .sdhdr-menu a:hover {
+        background-color: #f8f8f8;
+        padding-left: 25px;
+        transition: padding-left 0.3s ease;
+    }
+    
+    .sdhdr-submenu a:hover {
+        padding-left: 40px;
+    }
+}

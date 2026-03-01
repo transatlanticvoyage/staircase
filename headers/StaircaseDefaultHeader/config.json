@@ -1,0 +1,68 @@
+{
+    "name": "StaircaseDefaultHeader",
+    "version": "1.0.0",
+    "description": "Default header for Staircase theme with responsive navigation",
+    "author": "Staircase Theme",
+    "breakpoints": {
+        "mobile": 480,
+        "tablet": 768,
+        "desktop": 769,
+        "large": 1200,
+        "xlarge": 1400
+    },
+    "colors": {
+        "background": "#ffffff",
+        "text": "#333333",
+        "accent": "#23bb73",
+        "hover": "#fd9f1f",
+        "border": "#f0f0f0",
+        "shadow": "rgba(0, 0, 0, 0.1)"
+    },
+    "spacing": {
+        "container_padding_mobile": "10px",
+        "container_padding_tablet": "20px",
+        "container_padding_desktop": "30px",
+        "nav_gap": "30px",
+        "menu_item_padding": "15px",
+        "logo_max_height": "50px",
+        "logo_max_height_scrolled": "40px"
+    },
+    "typography": {
+        "menu_font_size": "1rem",
+        "menu_font_weight": "500",
+        "phone_font_size": "0.95rem",
+        "phone_font_weight": "600"
+    },
+    "animations": {
+        "transition_duration": "0.3s",
+        "transition_easing": "ease",
+        "dropdown_delay": "300ms"
+    },
+    "features": {
+        "sticky": true,
+        "transparent": false,
+        "search": false,
+        "mega_menu": false,
+        "hover_intent": true,
+        "scroll_hide": false,
+        "mobile_overlay": false
+    },
+    "mobile": {
+        "menu_type": "slide",
+        "menu_position": "top",
+        "show_phone": true,
+        "simplified_logo": false
+    },
+    "accessibility": {
+        "enable_focus_trap": true,
+        "enable_aria": true,
+        "enable_keyboard_nav": true,
+        "skip_link": true
+    },
+    "compatibility": {
+        "supports_silkweaver": true,
+        "supports_custom_walker": true,
+        "wordpress_min_version": "5.0",
+        "php_min_version": "7.4"
+    }
+}

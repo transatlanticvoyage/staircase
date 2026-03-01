@@ -1,0 +1,295 @@
+/**
+ * StaircaseDefaultHeader - Base Styles
+ * Mobile-first approach - these are the foundation styles
+ * No media queries here - pure mobile styles
+ */
+
+/* Reset and Base */
+.sdhdr-header * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Container */
+.sdhdr-header {
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.sdhdr-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.sdhdr-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 60px;
+    padding: 10px 0;
+}
+
+/* Logo Area */
+.sdhdr-logo-area {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.sdhdr-branding {
+    display: flex;
+    align-items: center;
+}
+
+.sdhdr-logo-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.sdhdr-logo-link:hover {
+    opacity: 0.8;
+}
+
+.sdhdr-logo {
+    max-height: 50px;
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+.sdhdr-site-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.sdhdr-site-title a {
+    color: #333333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.sdhdr-site-title a:hover {
+    color: #23bb73;
+}
+
+/* Navigation Area Container */
+.sdhdr-nav-area {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+}
+
+/* Navigation Base Styles */
+.sdhdr-navigation {
+    display: none; /* Hidden on mobile by default */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.sdhdr-navigation.is-active {
+    display: block;
+}
+
+/* Menu Styles */
+.sdhdr-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sdhdr-menu li {
+    position: relative;
+}
+
+.sdhdr-menu a {
+    display: block;
+    padding: 15px 20px;
+    color: #333333;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sdhdr-menu a:hover {
+    background-color: #f8f8f8;
+    color: #23bb73;
+}
+
+/* Current/Active Menu Item */
+.sdhdr-current > a,
+.sdhdr-menu .current-menu-item > a {
+    color: #23bb73;
+    font-weight: 600;
+}
+
+/* Submenu Styles */
+.sdhdr-submenu {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background: #f8f8f8;
+}
+
+.sdhdr-has-children.is-open > .sdhdr-submenu {
+    display: block;
+}
+
+.sdhdr-submenu a {
+    padding-left: 35px;
+    font-size: 0.95rem;
+}
+
+.sdhdr-submenu .sdhdr-submenu a {
+    padding-left: 50px;
+}
+
+/* Dropdown Toggle Button */
+.sdhdr-dropdown-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 5px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.sdhdr-dropdown-toggle:hover {
+    color: #23bb73;
+}
+
+.sdhdr-dropdown-toggle svg {
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.sdhdr-has-children.is-open > .sdhdr-dropdown-toggle svg {
+    transform: rotate(180deg);
+}
+
+/* Mobile Menu Toggle */
+.sdhdr-menu-toggle {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.sdhdr-toggle-line {
+    display: block;
+    width: 25px;
+    height: 2px;
+    background-color: #333333;
+    margin: 3px 0;
+    transition: all 0.3s ease;
+}
+
+.sdhdr-menu-toggle.is-active .sdhdr-toggle-line:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.sdhdr-menu-toggle.is-active .sdhdr-toggle-line:nth-child(2) {
+    opacity: 0;
+}
+
+.sdhdr-menu-toggle.is-active .sdhdr-toggle-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Phone Button */
+.sdhdr-phone {
+    display: none; /* Hidden on mobile by default */
+}
+
+.sdhdr-phone-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: #23bb73;
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.sdhdr-phone-button:hover {
+    background-color: #fd9f1f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(253, 159, 31, 0.3);
+}
+
+.sdhdr-phone-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.sdhdr-phone-number {
+    line-height: 1;
+}
+
+/* Header States */
+.sdhdr-header.is-scrolled {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.sdhdr-header.is-scrolled .sdhdr-inner {
+    min-height: 50px;
+    padding: 5px 0;
+}
+
+.sdhdr-header.is-scrolled .sdhdr-logo {
+    max-height: 40px;
+}
+
+/* Body Padding for Fixed Header */
+body.has-staircase-default-header {
+    padding-top: 80px;
+}
+
+/* Utility Classes */
+.sdhdr-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}

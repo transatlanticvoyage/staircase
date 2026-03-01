@@ -1,0 +1,231 @@
+/**
+ * StaircaseDefaultHeader - Desktop Styles  
+ * Applies to screens 769px and above
+ * Full desktop experience with horizontal navigation
+ */
+
+/* Container */
+.sdhdr-container {
+    padding: 0 30px;
+}
+
+.sdhdr-inner {
+    min-height: 70px;
+    padding: 15px 0;
+}
+
+/* Logo Area */
+.sdhdr-logo {
+    max-height: 50px;
+}
+
+.sdhdr-site-title {
+    font-size: 1.6rem;
+}
+
+/* Hide Mobile Toggle */
+.sdhdr-menu-toggle {
+    display: none;
+}
+
+/* Desktop Navigation Layout */
+.sdhdr-navigation {
+    display: block !important;
+    position: static;
+    background: none;
+    box-shadow: none;
+    margin-right: 20px;
+}
+
+/* Horizontal Menu */
+.sdhdr-menu {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.sdhdr-menu > li {
+    position: relative;
+}
+
+.sdhdr-menu a {
+    padding: 10px 15px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    position: relative;
+    white-space: nowrap;
+}
+
+.sdhdr-menu > li > a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 15px;
+    right: 15px;
+    height: 3px;
+    background-color: #23bb73;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.sdhdr-menu > li > a:hover::after,
+.sdhdr-menu > li.sdhdr-current > a::after,
+.sdhdr-menu > li.current-menu-item > a::after {
+    transform: scaleX(1);
+}
+
+/* Hide dropdown toggle on desktop */
+.sdhdr-menu > li > .sdhdr-dropdown-toggle {
+    display: none;
+}
+
+/* Desktop Dropdown Menus */
+.sdhdr-submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 220px;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.sdhdr-has-children:hover > .sdhdr-submenu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.sdhdr-submenu li {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sdhdr-submenu li:last-child {
+    border-bottom: none;
+}
+
+.sdhdr-submenu a {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.sdhdr-submenu a:hover {
+    background-color: #f8f8f8;
+    color: #23bb73;
+    padding-left: 25px;
+}
+
+/* Third Level Menus */
+.sdhdr-submenu .sdhdr-submenu {
+    top: 0;
+    left: 100%;
+    margin-left: 5px;
+}
+
+.sdhdr-submenu .sdhdr-has-children:hover > .sdhdr-submenu {
+    display: block;
+}
+
+/* Dropdown Arrow for Parents */
+.sdhdr-has-children > a::after {
+    content: '▾';
+    margin-left: 5px;
+    font-size: 0.8em;
+    opacity: 0.6;
+}
+
+.sdhdr-submenu .sdhdr-has-children > a::after {
+    content: '▸';
+    float: right;
+}
+
+/* Phone Button - Full Display */
+.sdhdr-phone {
+    display: flex;
+}
+
+.sdhdr-phone-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(35, 187, 115, 0.2);
+}
+
+.sdhdr-phone-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(253, 159, 31, 0.3);
+}
+
+/* Scrolled State */
+.sdhdr-header.is-scrolled .sdhdr-inner {
+    min-height: 60px;
+    padding: 10px 0;
+}
+
+.sdhdr-header.is-scrolled .sdhdr-logo {
+    max-height: 40px;
+}
+
+.sdhdr-header.is-scrolled .sdhdr-menu a {
+    padding: 8px 15px;
+}
+
+/* Body Padding */
+body.has-staircase-default-header {
+    padding-top: 85px;
+}
+
+/* Large Desktop Optimizations */
+@media (min-width: 1200px) {
+    .sdhdr-container {
+        max-width: 1200px;
+    }
+    
+    .sdhdr-menu a {
+        padding: 12px 18px;
+        font-size: 1rem;
+    }
+    
+    .sdhdr-menu {
+        gap: 10px;
+    }
+}
+
+/* Extra Large Screens */
+@media (min-width: 1400px) {
+    .sdhdr-container {
+        max-width: 1320px;
+    }
+}
+
+/* Mega Menu Support (Future Enhancement) */
+.sdhdr-has-megamenu > .sdhdr-submenu {
+    width: 100vw;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(-10px);
+    max-width: 1200px;
+}
+
+.sdhdr-has-megamenu:hover > .sdhdr-submenu {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Sticky Header Enhancement */
+@media (min-width: 769px) {
+    .sdhdr-header {
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.95);
+    }
+    
+    .sdhdr-header.is-scrolled {
+        background-color: rgba(255, 255, 255, 0.98);
+    }
+}
