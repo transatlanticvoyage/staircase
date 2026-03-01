@@ -159,10 +159,10 @@ body.header-scrolled {
 }
 
 .staircase-logo {
-    height: 86px !important;
+    height: auto !important;
     width: auto !important;
-    max-width: 251px !important;
-    min-height: 86px;
+    max-width: 351px !important;  /* Increased from 251px (140% larger) */
+    max-height: 86px !important;  /* Changed from fixed height to max-height to maintain proportions */
     vertical-align: middle;
     transition: height 0.3s ease, opacity 0.3s ease, min-height 0.3s ease;
 }
@@ -173,8 +173,8 @@ body.header-scrolled {
 
 /* Scrolled state for staircase logo */
 .site-header.scrolled .staircase-logo {
-    height: 60px !important;
-    min-height: 60px !important;
+    height: auto !important;
+    max-height: 60px !important;  /* Changed from fixed height to max-height to maintain proportions */
 }
 
 /* WordPress custom logo fallback */
@@ -787,8 +787,9 @@ body.header-scrolled {
     
     .staircase-logo,
     .custom-logo {
-        height: 32px;
-        max-width: 180px;
+        height: auto;
+        max-height: 32px;
+        max-width: 252px;  /* Increased from 180px (140% larger) */
     }
     
     /* Hero Section Mobile */

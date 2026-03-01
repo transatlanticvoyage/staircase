@@ -316,6 +316,376 @@ function staircase_enqueue_assets() {
 }
 add_action('wp_enqueue_scripts', 'staircase_enqueue_assets');
 
+// Frontend Jezel Widget for Admin Users
+function staircase_frontend_jezel_widget() {
+    // Only load for logged-in users who can edit posts
+    if (!is_user_logged_in() || !current_user_can('edit_posts')) {
+        return; // Public users get nothing - zero performance impact
+    }
+    
+    // Don't show in admin area or on login page
+    if (is_admin() || $GLOBALS['pagenow'] === 'wp-login.php') {
+        return;
+    }
+    
+    global $post;
+    $post_id = is_singular() ? get_the_ID() : 0;
+    
+    ?>
+    <!-- Frontend Jezel Widget - Admin Only -->
+    <div id="jezel-frontend-widget" class="jezel-frontend-container">
+        <!-- Collapse Toggle -->
+        <button id="jezel-toggle" class="jezel-btn jezel-toggle-btn" onclick="toggleJezelWidget()" title="Toggle Jezel Widget">
+            <span class="jezel-toggle-icon">▶</span>
+        </button>
+        
+        <div id="jezel-buttons" class="jezel-buttons-wrapper">
+            <!-- Scroll Navigation Buttons -->
+            <button class="jezel-btn jezel-scroll-btn" onclick="jezelScrollToTop()" title="Scroll to top">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+            </button>
+            
+            <button class="jezel-btn jezel-scroll-btn" onclick="jezelScrollTo(0.25)" title="Scroll to 25%">
+                <span>25</span>
+            </button>
+            
+            <button class="jezel-btn jezel-scroll-btn" onclick="jezelScrollTo(0.50)" title="Scroll to middle">
+                <span>M</span>
+            </button>
+            
+            <button class="jezel-btn jezel-scroll-btn" onclick="jezelScrollTo(0.75)" title="Scroll to 75%">
+                <span>75</span>
+            </button>
+            
+            <button class="jezel-btn jezel-scroll-btn" onclick="jezelScrollToBottom()" title="Scroll to bottom">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            
+            <?php if ($post_id): ?>
+            <div class="jezel-divider"></div>
+            
+            <!-- Quick Jump to Sections -->
+            <button class="jezel-btn jezel-section-btn" onclick="jezelJumpToSection('.hero-section, .batman-hero-section')" title="Jump to Hero">
+                <span>H</span>
+            </button>
+            
+            <button class="jezel-btn jezel-section-btn" onclick="jezelJumpToSection('.chen-cards-section')" title="Jump to Cards">
+                <span>C</span>
+            </button>
+            
+            <button class="jezel-btn jezel-section-btn" onclick="jezelJumpToSection('.serena-faq-section')" title="Jump to FAQ">
+                <span>F</span>
+            </button>
+            
+            <div class="jezel-divider"></div>
+            
+            <!-- Edit Links -->
+            <button class="jezel-btn jezel-edit-btn" onclick="window.open('<?php echo admin_url('admin.php?page=telescope&post_id=' . $post_id); ?>', '_blank')" title="Edit in Telescope">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path>
+                    <polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon>
+                </svg>
+            </button>
+            
+            <button class="jezel-btn jezel-wp-btn" onclick="window.open('<?php echo admin_url('post.php?post=' . $post_id . '&action=edit'); ?>', '_blank')" title="Edit in WordPress">
+                <span style="font-size: 11px;">WP</span>
+            </button>
+            <?php endif; ?>
+            
+            <!-- Cache Clear (if available) -->
+            <?php if (function_exists('wp_cache_clear_cache')): ?>
+            <button class="jezel-btn jezel-cache-btn" onclick="jezelClearCache()" title="Clear Page Cache">
+                <span style="font-size: 11px;">CC</span>
+            </button>
+            <?php endif; ?>
+        </div>
+    </div>
+    
+    <style>
+    /* Frontend Jezel Widget Styles */
+    .jezel-frontend-container {
+        position: fixed;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .jezel-buttons-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        transition: all 0.3s ease;
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .jezel-frontend-container.collapsed .jezel-buttons-wrapper {
+        opacity: 0;
+        transform: translateX(-100px);
+        pointer-events: none;
+        width: 0;
+        overflow: hidden;
+    }
+    
+    .jezel-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        background: rgba(168, 197, 230, 0.95);
+        border: 1px solid rgba(75, 85, 99, 0.8);
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1f2937;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .jezel-btn:hover {
+        background: rgba(107, 114, 128, 0.95);
+        transform: translateX(3px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+    
+    .jezel-toggle-btn {
+        background: rgba(74, 74, 74, 0.9);
+        color: white;
+        width: 25px;
+        height: 45px;
+        border-radius: 0 6px 6px 0;
+        padding: 0 5px;
+    }
+    
+    .jezel-toggle-btn:hover {
+        background: rgba(90, 90, 90, 0.95);
+        transform: none;
+    }
+    
+    .jezel-toggle-icon {
+        transition: transform 0.3s ease;
+        display: inline-block;
+        font-size: 12px;
+    }
+    
+    .jezel-frontend-container.collapsed .jezel-toggle-icon {
+        transform: rotate(180deg);
+    }
+    
+    .jezel-divider {
+        height: 1px;
+        background: rgba(75, 85, 99, 0.3);
+        margin: 3px 5px;
+    }
+    
+    .jezel-section-btn {
+        background: rgba(168, 230, 168, 0.95);
+    }
+    
+    .jezel-edit-btn {
+        background: rgba(59, 130, 246, 0.95);
+        color: white;
+    }
+    
+    .jezel-edit-btn:hover {
+        background: rgba(37, 99, 235, 0.95);
+    }
+    
+    .jezel-wp-btn {
+        background: rgba(33, 37, 41, 0.95);
+        color: white;
+    }
+    
+    .jezel-wp-btn:hover {
+        background: rgba(0, 0, 0, 0.95);
+    }
+    
+    .jezel-cache-btn {
+        background: rgba(239, 68, 68, 0.95);
+        color: white;
+    }
+    
+    .jezel-cache-btn:hover {
+        background: rgba(220, 38, 38, 0.95);
+    }
+    
+    /* Hide on mobile */
+    @media (max-width: 768px) {
+        .jezel-frontend-container {
+            display: none;
+        }
+    }
+    
+    /* Adjust position when admin bar is present */
+    body.admin-bar .jezel-frontend-container {
+        top: calc(50% + 16px);
+    }
+    
+    /* Animation for widget appearance */
+    @keyframes jezelSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50%) translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+    }
+    
+    .jezel-frontend-container {
+        animation: jezelSlideIn 0.5s ease;
+    }
+    </style>
+    
+    <script>
+    // Jezel Frontend Widget JavaScript
+    (function() {
+        // Scroll Functions
+        window.jezelScrollToTop = function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        };
+        
+        window.jezelScrollToBottom = function() {
+            window.scrollTo({
+                top: document.documentElement.scrollHeight,
+                behavior: 'smooth'
+            });
+        };
+        
+        window.jezelScrollTo = function(percentage) {
+            const targetPosition = document.documentElement.scrollHeight * percentage;
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
+            });
+        };
+        
+        window.jezelJumpToSection = function(selector) {
+            const element = document.querySelector(selector);
+            if (element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            } else {
+                console.log('Jezel: Section not found - ' + selector);
+            }
+        };
+        
+        window.toggleJezelWidget = function() {
+            const widget = document.getElementById('jezel-frontend-widget');
+            widget.classList.toggle('collapsed');
+            
+            // Save state to localStorage
+            const isCollapsed = widget.classList.contains('collapsed');
+            localStorage.setItem('jezelWidgetCollapsed', isCollapsed);
+        };
+        
+        <?php if (function_exists('wp_cache_clear_cache')): ?>
+        window.jezelClearCache = function() {
+            if (confirm('Clear cache for this page?')) {
+                // Create AJAX request to clear cache
+                fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'action=jezel_clear_cache&nonce=<?php echo wp_create_nonce('jezel_cache_nonce'); ?>&post_id=<?php echo $post_id; ?>',
+                    credentials: 'same-origin'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Cache cleared! Reloading page...');
+                        location.reload();
+                    } else {
+                        alert('Failed to clear cache');
+                    }
+                });
+            }
+        };
+        <?php endif; ?>
+        
+        // Restore collapsed state from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const widget = document.getElementById('jezel-frontend-widget');
+            const isCollapsed = localStorage.getItem('jezelWidgetCollapsed') === 'true';
+            
+            if (isCollapsed) {
+                widget.classList.add('collapsed');
+            }
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                // Alt+J to toggle widget
+                if (e.altKey && e.key === 'j') {
+                    e.preventDefault();
+                    toggleJezelWidget();
+                }
+                
+                // Alt+T for top
+                if (e.altKey && e.key === 't') {
+                    e.preventDefault();
+                    jezelScrollToTop();
+                }
+                
+                // Alt+B for bottom
+                if (e.altKey && e.key === 'b') {
+                    e.preventDefault();
+                    jezelScrollToBottom();
+                }
+            });
+        });
+    })();
+    </script>
+    <?php
+}
+add_action('wp_footer', 'staircase_frontend_jezel_widget', 999);
+
+// AJAX handler for cache clearing (if needed)
+add_action('wp_ajax_jezel_clear_cache', 'staircase_jezel_clear_cache_handler');
+function staircase_jezel_clear_cache_handler() {
+    // Verify nonce
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'jezel_cache_nonce')) {
+        wp_send_json_error('Invalid nonce');
+        return;
+    }
+    
+    // Check permissions
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Insufficient permissions');
+        return;
+    }
+    
+    // Clear cache if function exists
+    if (function_exists('wp_cache_clear_cache')) {
+        global $file_prefix;
+        wp_cache_clear_cache($file_prefix);
+        wp_send_json_success('Cache cleared');
+    } else {
+        wp_send_json_error('Cache function not available');
+    }
+}
+
+// End of Frontend Jezel Widget
+
 // Custom Walker for Navigation Menu
 class Staircase_Walker_Nav_Menu extends Walker_Nav_Menu {
     
@@ -1283,7 +1653,7 @@ function staircase_render_cherry_full_template() {
             asort($box_order);
             error_log("DEBUG: Box order after sorting: " . json_encode($box_order));
             
-            // Define mapping from box names to functions (batman_hero_box removed)
+            // Define mapping from box names to functions (batman_hero_box and baynar boxes removed)
             $box_functions = array(
                 'derek_blog_post_meta_box' => 'staircase_render_derek_blog_post_meta_box',
                 'chen_cards_box' => 'staircase_render_chen_cards_box',
@@ -1293,7 +1663,10 @@ function staircase_render_cherry_full_template() {
                 'nile_map_box' => 'staircase_render_nile_map_box',
                 'kristina_cta_box' => 'staircase_render_kristina_cta_box',
                 'victoria_blog_box' => 'staircase_render_victoria_blog_box',
-                'baynar1_box' => 'staircase_render_baynar1_box',
+                'content_bay_1_box' => 'staircase_render_content_bay_1_box',
+                'content_bay_2_box' => 'staircase_render_content_bay_2_box',
+                'content_lake_box' => 'staircase_render_content_lake_box',
+                'content_sea_box' => 'staircase_render_content_sea_box',
                 'ocean1_box' => 'staircase_render_ocean1_box',
                 'ocean2_box' => 'staircase_render_ocean2_box',
                 'ocean3_box' => 'staircase_render_ocean3_box',
@@ -1349,6 +1722,14 @@ function staircase_render_cherry_full_template() {
     // Cherry template includes chen cards before content
     staircase_render_chen_cards_box();
     
+    // Render content_bay_1 and content_bay_2 boxes
+    staircase_render_content_bay_1_box();
+    staircase_render_content_bay_2_box();
+    
+    // Render content_lake and content_sea boxes after bay boxes
+    staircase_render_content_lake_box();
+    staircase_render_content_sea_box();
+    
     // Render main content in container
     staircase_render_plain_post_content();
     
@@ -1371,7 +1752,6 @@ function staircase_render_cherry_full_template() {
     staircase_render_kendall_ourprocess_box();
     staircase_render_sara_customhtml_box();
     staircase_render_liz_pricing_box();
-    staircase_render_baynar1_box();
 }
 
 /**
@@ -4526,9 +4906,9 @@ function staircase_render_ocean1_box() {
     if ($pylon_data && !empty($pylon_data['content_ocean_1'])) {
         $content = $pylon_data['content_ocean_1'];
         ?>
-        <section class="ocean1-content-box" style="padding: 40px 20px; background: #ffffff; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
+        <section class="ocean1-content-box" style="padding: 40px 20px; background: #ffffff;">
             <div class="container" style="max-width: 1200px; margin: 0 auto;">
-                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333;">
+                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333; border: 2px solid gray; border-radius: 20px; padding: 30px;">
                     <?php echo wp_kses_post(wpautop($content)); ?>
                 </div>
             </div>
@@ -4555,9 +4935,9 @@ function staircase_render_ocean2_box() {
     if ($pylon_data && !empty($pylon_data['content_ocean_2'])) {
         $content = $pylon_data['content_ocean_2'];
         ?>
-        <section class="ocean2-content-box" style="padding: 40px 20px; background: #f8f9fa; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
+        <section class="ocean2-content-box" style="padding: 40px 20px; background: #f8f9fa;">
             <div class="container" style="max-width: 1200px; margin: 0 auto;">
-                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333;">
+                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333; border: 2px solid gray; border-radius: 20px; padding: 30px; background: white;">
                     <?php echo wp_kses_post(wpautop($content)); ?>
                 </div>
             </div>
@@ -4584,9 +4964,9 @@ function staircase_render_ocean3_box() {
     if ($pylon_data && !empty($pylon_data['content_ocean_3'])) {
         $content = $pylon_data['content_ocean_3'];
         ?>
-        <section class="ocean3-content-box" style="padding: 40px 20px; background: #ffffff; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0;">
+        <section class="ocean3-content-box" style="padding: 40px 20px; background: #ffffff;">
             <div class="container" style="max-width: 1200px; margin: 0 auto;">
-                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333;">
+                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333; border: 2px solid gray; border-radius: 20px; padding: 30px;">
                     <?php echo wp_kses_post(wpautop($content)); ?>
                 </div>
             </div>
@@ -5315,6 +5695,321 @@ function staircase_render_baynar1_box() {
                     margin-bottom: 0;
                 }
             </style>
+        </section>
+        <?php
+    }
+}
+
+/**
+ * Render Baynar2 Box - Mobile-optimized image and text layout
+ */
+function staircase_render_baynar2_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT baynar2_main FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if baynar2_main exists and is not null
+    if ($pylon_data && !empty($pylon_data['baynar2_main'])) {
+        $content = $pylon_data['baynar2_main'];
+        ?>
+        <section class="baynar2-box" style="border-top: 1px solid black; border-bottom: 1px solid black;">
+            <div class="baynar2-container" style="display: flex; flex-direction: row; width: 100%; max-width: 1200px; margin: 0 auto;">
+                <!-- Left side - Image -->
+                <div class="baynar2-image-container" style="flex: 1; background: #f5f5f5; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <div style="color: #666; font-size: 14px;">
+                        [Image Area]
+                    </div>
+                </div>
+                
+                <!-- Vertical divider -->
+                <div class="baynar2-divider" style="width: 1px; background: gray; flex-shrink: 0;"></div>
+                
+                <!-- Right side - Text content -->
+                <div class="baynar2-text-container" style="flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
+                    <div class="baynar2-content">
+                        <?php echo wp_kses_post(wpautop($content)); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                /* Mobile optimization */
+                @media (max-width: 768px) {
+                    .baynar2-container {
+                        flex-direction: column !important;
+                    }
+                    
+                    .baynar2-divider {
+                        display: none;
+                    }
+                    
+                    .baynar2-image-container {
+                        min-height: 150px;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    
+                    .baynar2-text-container {
+                        padding: 15px;
+                    }
+                }
+                
+                /* Ensure text doesn't exceed ~250 words visually */
+                .baynar2-content {
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                
+                .baynar2-content p {
+                    margin-bottom: 1em;
+                }
+                
+                .baynar2-content p:last-child {
+                    margin-bottom: 0;
+                }
+            </style>
+        </section>
+        <?php
+    }
+}
+
+/**
+ * Render Content Bay 1 Box - Mobile-optimized image and text layout
+ */
+function staircase_render_content_bay_1_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data including image ID
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT content_bay_1, content_bay_1_image_id FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if content_bay_1 exists and is not null
+    if ($pylon_data && !empty($pylon_data['content_bay_1'])) {
+        $content = $pylon_data['content_bay_1'];
+        $image_id = !empty($pylon_data['content_bay_1_image_id']) ? intval($pylon_data['content_bay_1_image_id']) : 0;
+        ?>
+        <section class="content-bay-1-box" style="border-top: 1px solid black; border-bottom: 1px solid black;">
+            <div class="content-bay-1-container" style="display: flex; flex-direction: row; width: 100%; max-width: 1200px; margin: 0 auto;">
+                <!-- Left side - Text content (on desktop) -->
+                <div class="content-bay-1-text-container" style="flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center; order: 1;">
+                    <div class="content-bay-1-content">
+                        <?php echo wp_kses_post(wpautop($content)); ?>
+                    </div>
+                </div>
+                
+                <!-- Vertical divider -->
+                <div class="content-bay-1-divider" style="width: 1px; background: gray; flex-shrink: 0; order: 2;"></div>
+                
+                <!-- Right side - Image (on desktop) -->
+                <div class="content-bay-1-image-container" style="flex: 1; background: #f5f5f5; min-height: 200px; display: flex; align-items: center; justify-content: center; order: 3;">
+                    <?php if ($image_id && wp_attachment_is_image($image_id)): 
+                        $image_url = wp_get_attachment_image_url($image_id, 'large');
+                        $image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+                    ?>
+                        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                    <?php else: ?>
+                        <!-- Star icon fallback -->
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="#4a4a4a">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <style>
+                /* Mobile optimization */
+                @media (max-width: 768px) {
+                    .content-bay-1-container {
+                        flex-direction: column !important;
+                    }
+                    
+                    .content-bay-1-divider {
+                        display: none;
+                    }
+                    
+                    .content-bay-1-image-container {
+                        min-height: 150px;
+                        border-bottom: 1px solid #ddd;
+                        order: 1 !important; /* Image first on mobile */
+                    }
+                    
+                    .content-bay-1-text-container {
+                        padding: 15px;
+                        order: 2 !important; /* Text second on mobile */
+                    }
+                }
+                
+                /* Ensure text doesn't exceed ~250 words visually */
+                .content-bay-1-content {
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                
+                .content-bay-1-content p {
+                    margin-bottom: 1em;
+                }
+                
+                .content-bay-1-content p:last-child {
+                    margin-bottom: 0;
+                }
+            </style>
+        </section>
+        <?php
+    }
+}
+
+/**
+ * Render Content Bay 2 Box - Mobile-optimized image and text layout
+ */
+function staircase_render_content_bay_2_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data including image ID
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT content_bay_2, content_bay_2_image_id FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if content_bay_2 exists and is not null
+    if ($pylon_data && !empty($pylon_data['content_bay_2'])) {
+        $content = $pylon_data['content_bay_2'];
+        $image_id = !empty($pylon_data['content_bay_2_image_id']) ? intval($pylon_data['content_bay_2_image_id']) : 0;
+        ?>
+        <section class="content-bay-2-box" style="border-top: 1px solid black; border-bottom: 1px solid black;">
+            <div class="content-bay-2-container" style="display: flex; flex-direction: row; width: 100%; max-width: 1200px; margin: 0 auto;">
+                <!-- Left side - Image -->
+                <div class="content-bay-2-image-container" style="flex: 1; background: #f5f5f5; min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <?php if ($image_id && wp_attachment_is_image($image_id)): 
+                        $image_url = wp_get_attachment_image_url($image_id, 'large');
+                        $image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+                    ?>
+                        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" style="width: 100%; height: 100%; object-fit: cover;">
+                    <?php else: ?>
+                        <!-- Star icon fallback -->
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="#4a4a4a">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Vertical divider -->
+                <div class="content-bay-2-divider" style="width: 1px; background: gray; flex-shrink: 0;"></div>
+                
+                <!-- Right side - Text content -->
+                <div class="content-bay-2-text-container" style="flex: 1; padding: 20px; display: flex; flex-direction: column; justify-content: center;">
+                    <div class="content-bay-2-content">
+                        <?php echo wp_kses_post(wpautop($content)); ?>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                /* Mobile optimization */
+                @media (max-width: 768px) {
+                    .content-bay-2-container {
+                        flex-direction: column !important;
+                    }
+                    
+                    .content-bay-2-divider {
+                        display: none;
+                    }
+                    
+                    .content-bay-2-image-container {
+                        min-height: 150px;
+                        border-bottom: 1px solid #ddd;
+                    }
+                    
+                    .content-bay-2-text-container {
+                        padding: 15px;
+                    }
+                }
+                
+                /* Ensure text doesn't exceed ~250 words visually */
+                .content-bay-2-content {
+                    font-size: 14px;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                
+                .content-bay-2-content p {
+                    margin-bottom: 1em;
+                }
+                
+                .content-bay-2-content p:last-child {
+                    margin-bottom: 0;
+                }
+            </style>
+        </section>
+        <?php
+    }
+}
+
+/**
+ * Render Content Lake Box - Ocean-style content section
+ */
+function staircase_render_content_lake_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT content_lake FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if content_lake exists and is not null
+    if ($pylon_data && !empty($pylon_data['content_lake'])) {
+        $content = $pylon_data['content_lake'];
+        ?>
+        <section class="content-lake-box" style="padding: 40px 20px; background: #ffffff;">
+            <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333; border: 2px solid gray; border-radius: 20px; padding: 30px;">
+                    <?php echo wp_kses_post(wpautop($content)); ?>
+                </div>
+            </div>
+        </section>
+        <?php
+    }
+}
+
+/**
+ * Render Content Sea Box - Ocean-style content section
+ */
+function staircase_render_content_sea_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Get wp_pylons data
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT content_sea FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Only render if content_sea exists and is not null
+    if ($pylon_data && !empty($pylon_data['content_sea'])) {
+        $content = $pylon_data['content_sea'];
+        ?>
+        <section class="content-sea-box" style="padding: 40px 20px; background: #ffffff;">
+            <div class="container" style="max-width: 1200px; margin: 0 auto;">
+                <div class="article-content" style="font-size: 16px; line-height: 1.6; color: #333; border: 2px solid gray; border-radius: 20px; padding: 30px;">
+                    <?php echo wp_kses_post(wpautop($content)); ?>
+                </div>
+            </div>
         </section>
         <?php
     }

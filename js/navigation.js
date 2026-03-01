@@ -119,7 +119,44 @@
         const dropdownToggleLinks = document.querySelectorAll('.main-navigation .menu-item-has-children > a');
         const dropdownToggleButtons = document.querySelectorAll('.dropdown-toggle');
         
-        // Handle dropdown toggle button clicks (for mobile)
+        // Handle parent menu item clicks on mobile
+        dropdownToggleLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                // Only handle clicks on mobile
+                if (window.innerWidth <= 768) {
+                    // Check if this is a parent item without a real URL (# or empty)
+                    const href = this.getAttribute('href');
+                    if (!href || href === '#' || href === '') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        const parentLi = this.parentNode;
+                        const submenu = parentLi.querySelector('.sub-menu');
+                        const isOpen = parentLi.classList.contains('dropdown-open');
+                        
+                        // Close all other dropdowns
+                        document.querySelectorAll('.menu-item-has-children').forEach(function(item) {
+                            if (item !== parentLi) {
+                                item.classList.remove('dropdown-open');
+                            }
+                        });
+                        
+                        // Toggle current dropdown
+                        if (submenu) {
+                            parentLi.classList.toggle('dropdown-open');
+                            
+                            // Update aria-expanded if there's a dropdown indicator
+                            const indicator = this.querySelector('.dropdown-indicator');
+                            if (indicator) {
+                                this.setAttribute('aria-expanded', !isOpen);
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Handle dropdown toggle button clicks (for mobile) - if they exist
         dropdownToggleButtons.forEach(function(button) {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -214,7 +251,7 @@
     });
 })();
 
-// Add CSS for hamburger animation
+// Add CSS for hamburger animation and mobile menu fixes
 const style = document.createElement('style');
 style.textContent = `
     .menu-toggle.is-active span:nth-child(1) {
@@ -227,6 +264,58 @@ style.textContent = `
     
     .menu-toggle.is-active span:nth-child(3) {
         transform: rotate(-45deg) translate(7px, -6px);
+    }
+    
+    /* Mobile menu fixes - ensure sub-menus are hidden by default */
+    @media (max-width: 768px) {
+        .main-navigation .sub-menu {
+            display: none !important;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .main-navigation .menu-item-has-children.dropdown-open > .sub-menu {
+            display: block !important;
+            max-height: 1000px;
+            transition: max-height 0.3s ease-in;
+        }
+        
+        /* Add visual indicator for expandable parent items on mobile */
+        .main-navigation .menu-item-has-children > a {
+            position: relative;
+            padding-right: 40px;
+        }
+        
+        .main-navigation .menu-item-has-children > a::after {
+            content: '+';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .main-navigation .menu-item-has-children.dropdown-open > a::after {
+            content: '−';
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        /* Style the dropdown indicator if it exists */
+        .main-navigation .dropdown-indicator {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .main-navigation .menu-item-has-children.dropdown-open .dropdown-indicator {
+            transform: translateY(-50%) rotate(180deg);
+        }
     }
 `;
 document.head.appendChild(style);
