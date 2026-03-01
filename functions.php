@@ -6200,18 +6200,24 @@ function staircase_render_content_bay_1_box() {
                 <div class="content-bay-1-divider" style="width: 1px; background: gray; flex-shrink: 0; order: 2;"></div>
                 
                 <!-- Right side - Image (on desktop) -->
-                <div class="content-bay-1-image-container" style="flex: 1; background: #f5f5f5; min-height: 200px; display: flex; align-items: center; justify-content: center; order: 3;">
-                    <?php if ($image_id && wp_attachment_is_image($image_id)): 
-                        $image_url = wp_get_attachment_image_url($image_id, 'large');
-                        $image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
-                    ?>
-                        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                    <?php else: ?>
-                        <!-- Star icon fallback -->
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="#4a4a4a">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                    <?php endif; ?>
+                <?php 
+                $has_image = $image_id && wp_attachment_is_image($image_id);
+                $align_items = $has_image ? 'flex-start' : 'center';
+                ?>
+                <div class="content-bay-1-image-container" style="flex: 1; background: #f5f5f5; min-height: 200px; display: flex; align-items: <?php echo $align_items; ?>; justify-content: center; order: 3;">
+                    <div class="content-bay-1-image-container-inner" style="width: 100%; max-height: 500px; display: flex; align-items: <?php echo $align_items; ?>; justify-content: center; overflow: hidden;">
+                        <?php if ($has_image): 
+                            $image_url = wp_get_attachment_image_url($image_id, 'large');
+                            $image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+                        ?>
+                            <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" style="width: 100%; height: auto; max-height: 500px; object-fit: contain;">
+                        <?php else: ?>
+                            <!-- Star icon fallback -->
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="#4a4a4a">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
             
@@ -6280,18 +6286,24 @@ function staircase_render_content_bay_2_box() {
         <section class="content-bay-2-box" style="border-top: 1px solid black; border-bottom: 1px solid black;">
             <div class="content-bay-2-container" style="display: flex; flex-direction: row; width: 100%; max-width: 1200px; margin: 0 auto;">
                 <!-- Left side - Image -->
-                <div class="content-bay-2-image-container" style="flex: 1; background: #f5f5f5; min-height: 200px; display: flex; align-items: center; justify-content: center;">
-                    <?php if ($image_id && wp_attachment_is_image($image_id)): 
-                        $image_url = wp_get_attachment_image_url($image_id, 'large');
-                        $image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
-                    ?>
-                        <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" style="width: 100%; height: 100%; object-fit: cover;">
-                    <?php else: ?>
-                        <!-- Star icon fallback -->
-                        <svg width="80" height="80" viewBox="0 0 24 24" fill="#4a4a4a">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                        </svg>
-                    <?php endif; ?>
+                <?php 
+                $has_image = $image_id && wp_attachment_is_image($image_id);
+                $align_items = $has_image ? 'flex-start' : 'center';
+                ?>
+                <div class="content-bay-2-image-container" style="flex: 1; background: #f5f5f5; min-height: 200px; display: flex; align-items: <?php echo $align_items; ?>; justify-content: center;">
+                    <div class="content-bay-2-image-container-inner" style="width: 100%; max-height: 500px; display: flex; align-items: <?php echo $align_items; ?>; justify-content: center; overflow: hidden;">
+                        <?php if ($has_image): 
+                            $image_url = wp_get_attachment_image_url($image_id, 'large');
+                            $image_alt = get_post_meta($image_id, '_wp_attachment_image_alt', true);
+                        ?>
+                            <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($image_alt); ?>" style="width: 100%; height: auto; max-height: 500px; object-fit: contain;">
+                        <?php else: ?>
+                            <!-- Star icon fallback -->
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="#4a4a4a">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        <?php endif; ?>
+                    </div>
                 </div>
                 
                 <!-- Vertical divider -->
