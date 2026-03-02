@@ -2159,9 +2159,11 @@ function staircase_osb_box_paragon_styles() {
 }
 add_action('wp_head', 'staircase_osb_box_paragon_styles');
 
-// Add dynamic CTA button colors
+// Add dynamic CTA button colors and footer styles
 function staircase_cta_button_dynamic_styles() {
     $cta_bg_color = get_option('staircase_cta_bg_color', '#23bb73');
+    $footer_link_color = get_option('staircase_footer_default_link_color', '#fdfdfd');
+    $footer_logo_bg_color = get_option('staircase_footer_logo_bg_color', '#fdfdfd');
     ?>
     <style>
     /* Dynamic CTA Button Colors */
@@ -2195,6 +2197,37 @@ function staircase_cta_button_dynamic_styles() {
     .staircase_main_cta_button:hover {
         background-color: #fd9f1f !important;
         border-color: #fd9f1f !important;
+    }
+    
+    /* Dynamic Footer Link Colors */
+    footer a,
+    .site-footer a,
+    #footer a,
+    .footer a {
+        color: <?php echo esc_attr($footer_link_color); ?> !important;
+    }
+    
+    footer a:hover,
+    .site-footer a:hover,
+    #footer a:hover,
+    .footer a:hover {
+        opacity: 0.8;
+    }
+    
+    /* Footer Logo Wrapper Styles */
+    .footer-logo-wrapper {
+        display: inline-block;
+        background-color: <?php echo esc_attr($footer_logo_bg_color); ?>;
+        border-radius: 8px;
+        overflow: hidden;
+        line-height: 0; /* Remove spacing below image */
+    }
+    
+    .footer-logo-wrapper img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px; /* Apply to image as well for consistency */
     }
     </style>
     <?php
@@ -3156,6 +3189,18 @@ function staircase_settings_page() {
             update_option('staircase_cta_bg_color', $cta_bg_color);
         }
         
+        // Save footer link color
+        $footer_link_color = sanitize_hex_color($_POST['staircase_footer_default_link_color']);
+        if ($footer_link_color) {
+            update_option('staircase_footer_default_link_color', $footer_link_color);
+        }
+        
+        // Save footer logo bg color
+        $footer_logo_bg_color = sanitize_hex_color($_POST['staircase_footer_logo_bg_color']);
+        if ($footer_logo_bg_color) {
+            update_option('staircase_footer_logo_bg_color', $footer_logo_bg_color);
+        }
+        
         // Handle logo upload
         if (!empty($_POST['header_logo_url'])) {
             update_option('staircase_header_logo', esc_url_raw($_POST['header_logo_url']));
@@ -3175,6 +3220,8 @@ function staircase_settings_page() {
     $header_logo = get_option('staircase_header_logo', '');
     $use_tpcom_nav_styles = get_option('staircase_use_tpcom_nav_styles', false);
     $cta_bg_color = get_option('staircase_cta_bg_color', '#23bb73'); // Default green color
+    $footer_link_color = get_option('staircase_footer_default_link_color', '#fdfdfd'); // Default light color
+    $footer_logo_bg_color = get_option('staircase_footer_logo_bg_color', '#fdfdfd'); // Default light gray background
     ?>
     <div class="wrap">
         <h1>Staircase Theme Settings</h1>
@@ -3291,6 +3338,31 @@ function staircase_settings_page() {
                                 <button type="button" id="reset_cta_color" class="button" style="margin-left: 10px;">Reset to Default</button>
                                 <p class="description">Set the background color for main CTA buttons (header phone, hero Call Us Now, CTA section, footer phone). Default: <code>#23bb73</code></p>
                                 <p class="description" style="margin-top: 5px;"><strong>Affected buttons:</strong> Header phone button, Hero "Call Us Now" button, CTA section button, Footer phone button</p>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="settings-section">
+                    <h2>Footer Settings</h2>
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row">Footer Link Color</th>
+                            <td>
+                                <input type="color" name="staircase_footer_default_link_color" id="staircase_footer_default_link_color" value="<?php echo esc_attr($footer_link_color); ?>" />
+                                <input type="text" id="staircase_footer_default_link_color_text" value="<?php echo esc_attr($footer_link_color); ?>" class="regular-text" style="margin-left: 10px;" readonly />
+                                <button type="button" id="reset_footer_link_color" class="button" style="margin-left: 10px;">Reset to Default</button>
+                                <p class="description">Set the default color for all links (&lt;a&gt; elements) in the footer. Default: <code>#fdfdfd</code></p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Footer Logo Background Color</th>
+                            <td>
+                                <input type="color" name="staircase_footer_logo_bg_color" id="staircase_footer_logo_bg_color" value="<?php echo esc_attr($footer_logo_bg_color); ?>" />
+                                <input type="text" id="staircase_footer_logo_bg_color_text" value="<?php echo esc_attr($footer_logo_bg_color); ?>" class="regular-text" style="margin-left: 10px;" readonly />
+                                <button type="button" id="reset_footer_logo_bg_color" class="button" style="margin-left: 10px;">Reset to Default</button>
+                                <p class="description">Set the background color behind the footer logo. Useful for logos with transparent backgrounds. Default: <code>#fdfdfd</code></p>
+                                <p class="description" style="margin-top: 5px;">Logo will have rounded corners (8px border radius) for a polished look.</p>
                             </td>
                         </tr>
                     </table>
@@ -3437,6 +3509,40 @@ function staircase_settings_page() {
         $('#reset_cta_color').on('click', function() {
             $('#staircase_cta_bg_color').val('#23bb73');
             $('#staircase_cta_bg_color_text').val('#23bb73');
+        });
+        
+        // Footer link color picker functionality
+        $('#staircase_footer_default_link_color').on('input', function() {
+            $('#staircase_footer_default_link_color_text').val($(this).val());
+        });
+        
+        $('#staircase_footer_default_link_color_text').on('input', function() {
+            var color = $(this).val();
+            if (/^#[0-9A-F]{6}$/i.test(color)) {
+                $('#staircase_footer_default_link_color').val(color);
+            }
+        });
+        
+        $('#reset_footer_link_color').on('click', function() {
+            $('#staircase_footer_default_link_color').val('#fdfdfd');
+            $('#staircase_footer_default_link_color_text').val('#fdfdfd');
+        });
+        
+        // Footer logo bg color picker functionality
+        $('#staircase_footer_logo_bg_color').on('input', function() {
+            $('#staircase_footer_logo_bg_color_text').val($(this).val());
+        });
+        
+        $('#staircase_footer_logo_bg_color_text').on('input', function() {
+            var color = $(this).val();
+            if (/^#[0-9A-F]{6}$/i.test(color)) {
+                $('#staircase_footer_logo_bg_color').val(color);
+            }
+        });
+        
+        $('#reset_footer_logo_bg_color').on('click', function() {
+            $('#staircase_footer_logo_bg_color').val('#fdfdfd');
+            $('#staircase_footer_logo_bg_color_text').val('#fdfdfd');
         });
     });
     </script>
@@ -3924,7 +4030,9 @@ function zaramax_render_custom_footer() {
                     <div class="footer-box footer-box-1">
                         <?php if (!empty($site_logo)): ?>
                             <div class="footer-logo">
-                                <img src="<?php echo esc_url($site_logo); ?>" alt="<?php bloginfo('name'); ?>" class="footer-logo-img">
+                                <div class="footer-logo-wrapper">
+                                    <img src="<?php echo esc_url($site_logo); ?>" alt="<?php bloginfo('name'); ?>" class="footer-logo-img">
+                                </div>
                             </div>
                         <?php else: ?>
                             <div class="footer-site-title">
