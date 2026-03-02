@@ -54,6 +54,16 @@ function staircase_enqueue_assets() {
     // Enqueue Dashicons for frontend use (for service icons)
     wp_enqueue_style('dashicons');
     
+    // Enqueue Silkweaver menu styles if system is enabled
+    if (function_exists('silkweaver_render_menu') && get_option('silkweaver_use_system', true)) {
+        wp_enqueue_style(
+            'staircase-silkweaver',
+            get_template_directory_uri() . '/css/silkweaver-core.css',
+            array('staircase-style'),
+            filemtime(get_template_directory() . '/css/silkweaver-core.css')
+        );
+    }
+    
     // Conditionally enqueue TPCom nav styles
     if (get_option('staircase_use_tpcom_nav_styles', false)) {
         wp_enqueue_style(
@@ -1802,6 +1812,9 @@ function staircase_render_cherry_full_template() {
     staircase_render_chen_cards_box();
     
     // Render content_bay_1 and content_bay_2 boxes
+    // Add Kristina CTA Box before content bays
+    staircase_render_kristina_cta_box();
+    
     staircase_render_content_bay_1_box();
     staircase_render_content_bay_2_box();
     

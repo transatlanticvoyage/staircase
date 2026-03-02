@@ -44,6 +44,10 @@
             this.elements.navigation = $('.sdhdr-navigation');
             this.elements.dropdownToggles = $('.sdhdr-dropdown-toggle');
             this.elements.menuItems = $('.sdhdr-has-children');
+            
+            // Also cache Silkweaver elements if present
+            this.elements.silkweaverToggles = $('.silkweaver-dropdown-toggle');
+            this.elements.silkweaverDropdowns = $('.silkweaver-dropdown');
         },
 
         // Bind events
@@ -62,6 +66,17 @@
                 e.stopPropagation();
                 self.toggleDropdown($(this).parent());
             });
+            
+            // Silkweaver dropdown toggles for mobile/tablet
+            if (this.elements.silkweaverToggles.length) {
+                this.elements.silkweaverToggles.on('click', function(e) {
+                    if (!self.isDesktop()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        self.toggleSilkweaverDropdown($(this).parent());
+                    }
+                });
+            }
 
             // Close menu on outside click
             $(document).on('click', function(e) {
@@ -151,10 +166,29 @@
                 $parent.addClass(this.config.openClass);
             }
         },
+        
+        // Toggle Silkweaver dropdown
+        toggleSilkweaverDropdown: function($parent) {
+            const isOpen = $parent.hasClass('open') || $parent.hasClass('is-open');
+            
+            // Close siblings
+            $parent.siblings('.silkweaver-dropdown').removeClass('open is-open');
+            
+            // Toggle current
+            if (isOpen) {
+                $parent.removeClass('open is-open');
+            } else {
+                $parent.addClass('open');
+            }
+        },
 
         // Close all dropdowns
         closeAllDropdowns: function() {
             this.elements.menuItems.removeClass(this.config.openClass);
+            // Also close Silkweaver dropdowns
+            if (this.elements.silkweaverDropdowns) {
+                this.elements.silkweaverDropdowns.removeClass('open is-open');
+            }
         },
 
         // Handle scroll event

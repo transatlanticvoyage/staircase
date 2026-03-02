@@ -75,13 +75,14 @@
     transform: scaleX(1);
 }
 
-/* Hide dropdown toggle on desktop */
-.sdhdr-menu > li > .sdhdr-dropdown-toggle {
-    display: none;
+/* Hide dropdown toggle on desktop - use hover instead */
+.sdhdr-dropdown-toggle {
+    display: none !important;
 }
 
 /* Desktop Dropdown Menus */
 .sdhdr-submenu {
+    display: none; /* Override base !important for desktop */
     position: absolute;
     top: 100%;
     left: 0;
@@ -97,7 +98,7 @@
 }
 
 .sdhdr-has-children:hover > .sdhdr-submenu {
-    display: block;
+    display: block !important;
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -131,7 +132,7 @@
 }
 
 .sdhdr-submenu .sdhdr-has-children:hover > .sdhdr-submenu {
-    display: block;
+    display: block !important;
 }
 
 /* Dropdown Arrow for Parents */
@@ -229,3 +230,8 @@ body.has-staircase-default-header {
         background-color: rgba(255, 255, 255, 0.98);
     }
 }
+
+/* ===================================
+   SILKWEAVER DESKTOP SUPPORT
+   =================================== */
+/* Silkweaver styles moved to /css/silkweaver-core.css */

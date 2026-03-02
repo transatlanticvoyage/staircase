@@ -12,15 +12,47 @@
 .sdhdr-inner {
     min-height: 55px;
     padding: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px; /* Small gap between items */
+}
+
+/* Logo Area - Allow shrinking */
+.sdhdr-logo-area {
+    flex: 1 1 auto; /* Can grow and shrink to fill available space */
+    min-width: 0; /* Allow shrinking below content size */
+    overflow: hidden;
+    max-width: 50%; /* Don't take more than half the width */
 }
 
 /* Logo Optimizations */
 .sdhdr-logo {
     max-height: 40px;
+    max-width: 100%; /* Prevent overflow */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Ensure branding stays compact */
+.sdhdr-branding {
+    max-width: 100%;
 }
 
 .sdhdr-site-title {
     font-size: 1.2rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Navigation Area - Keep items inline */
+.sdhdr-nav-area {
+    flex: 0 0 auto; /* Don't grow or shrink */
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Full Width Mobile Menu */
@@ -47,18 +79,29 @@
 
 /* Compact Phone Button */
 .sdhdr-phone {
-    display: flex;
-    order: -1; /* Move before menu toggle */
+    display: flex !important; /* Always show on mobile */
+    flex: 0 0 auto;
 }
 
 .sdhdr-phone-button {
-    padding: 8px 12px;
-    font-size: 0.85rem;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    gap: 6px;
+    white-space: nowrap;
+    min-width: 0;
+    display: flex;
+    align-items: center;
 }
 
 .sdhdr-phone-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.sdhdr-phone-number {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Hide phone number text on very small screens */
@@ -68,16 +111,24 @@
     }
     
     .sdhdr-phone-button {
-        padding: 8px;
-        width: 36px;
-        height: 36px;
+        padding: 6px;
+        min-width: 32px;
         justify-content: center;
     }
 }
 
-/* Menu Toggle Position */
+/* Menu Toggle - Compact */
 .sdhdr-menu-toggle {
-    margin-left: 10px;
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+}
+
+.sdhdr-toggle-line {
+    width: 20px;
+    height: 2px;
+    margin: 2px 0;
 }
 
 /* Scrolled State Adjustments */
@@ -95,8 +146,7 @@ body.has-staircase-default-header {
 }
 
 /* Touch-Friendly Tap Targets */
-.sdhdr-menu a,
-.sdhdr-dropdown-toggle {
+.sdhdr-menu a {
     min-height: 44px;
     display: flex;
     align-items: center;
@@ -106,6 +156,14 @@ body.has-staircase-default-header {
     width: 44px;
     height: 44px;
     right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Make sure parent items are clearly distinguished */
+.sdhdr-has-children > a {
+    font-weight: 500;
+    padding-right: 55px;
 }
 
 /* Smooth Scrolling for iOS */
@@ -113,3 +171,8 @@ body.has-staircase-default-header {
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
 }
+
+/* ===================================
+   SILKWEAVER MOBILE SUPPORT
+   =================================== */
+/* Silkweaver styles moved to /css/silkweaver-core.css */

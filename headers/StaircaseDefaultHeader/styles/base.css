@@ -129,6 +129,11 @@
     border-bottom: 1px solid #f0f0f0;
 }
 
+/* Adjust padding for parent items to make room for toggle */
+.sdhdr-has-children > a {
+    padding-right: 60px;
+}
+
 .sdhdr-menu a:hover {
     background-color: #f8f8f8;
     color: #23bb73;
@@ -143,7 +148,7 @@
 
 /* Submenu Styles */
 .sdhdr-submenu {
-    display: none;
+    display: none !important; /* Force hide by default on mobile/tablet */
     list-style: none;
     margin: 0;
     padding: 0;
@@ -151,7 +156,7 @@
 }
 
 .sdhdr-has-children.is-open > .sdhdr-submenu {
-    display: block;
+    display: block !important;
 }
 
 .sdhdr-submenu a {
@@ -165,25 +170,33 @@
 
 /* Dropdown Toggle Button */
 .sdhdr-dropdown-toggle {
+    display: flex !important; /* Always show on mobile/tablet */
+    align-items: center;
+    justify-content: center;
     position: absolute;
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
     background: none;
     border: none;
-    padding: 5px;
+    padding: 8px;
     cursor: pointer;
     color: #666;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
 }
 
 .sdhdr-dropdown-toggle:hover {
     color: #23bb73;
+    background: rgba(35, 187, 115, 0.1);
 }
 
 .sdhdr-dropdown-toggle svg {
     display: block;
     transition: transform 0.3s ease;
+    pointer-events: none;
 }
 
 .sdhdr-has-children.is-open > .sdhdr-dropdown-toggle svg {
