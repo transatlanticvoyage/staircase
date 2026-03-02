@@ -84,9 +84,9 @@
 }
 
 .sdhdr-phone-button {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    gap: 6px;
+    padding: 9px 15px; /* 150% of 6px 10px */
+    font-size: 1.2rem; /* 150% of 0.8rem */
+    gap: 9px; /* 150% of 6px */
     white-space: nowrap;
     min-width: 0;
     display: flex;
@@ -94,8 +94,8 @@
 }
 
 .sdhdr-phone-icon {
-    width: 14px;
-    height: 14px;
+    width: 21px; /* 150% of 14px */
+    height: 21px; /* 150% of 14px */
     flex-shrink: 0;
 }
 
@@ -111,8 +111,8 @@
     }
     
     .sdhdr-phone-button {
-        padding: 6px;
-        min-width: 32px;
+        padding: 9px; /* 150% of 6px */
+        min-width: 48px; /* 150% of 32px */
         justify-content: center;
     }
 }

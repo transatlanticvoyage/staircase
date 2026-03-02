@@ -4613,9 +4613,32 @@ function staircase_render_batman_hero_box() {
         padding-top: 0 !important;
     }
     
-    /* Ensure hero is flush with header */
+    /* Ensure hero is flush with header - pull up to compensate for body padding */
     .cherry-hero {
-        margin-top: 0 !important;
+        margin-top: -80px !important; /* Negative margin to offset body padding */
+        padding-top: calc(80px + 80px) !important; /* Header height + original padding */
+    }
+    
+    /* Responsive negative margins to match header heights */
+    @media (max-width: 480px) {
+        .cherry-hero {
+            margin-top: -63px !important;
+            padding-top: calc(63px + 60px) !important; /* Header + reduced mobile padding */
+        }
+    }
+    
+    @media (min-width: 481px) and (max-width: 768px) {
+        .cherry-hero {
+            margin-top: -75px !important;
+            padding-top: calc(75px + 60px) !important; /* Header + reduced tablet padding */
+        }
+    }
+    
+    @media (min-width: 769px) {
+        .cherry-hero {
+            margin-top: -85px !important;
+            padding-top: calc(85px + 80px) !important; /* Header + original padding */
+        }
     }
     </style>
     <?php
