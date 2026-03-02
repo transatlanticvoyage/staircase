@@ -877,7 +877,7 @@ body.header-scrolled {
 .footer-box-1 .footer-logo-img {
     height: 50px;
     width: auto;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
 }
 
 .footer-box-1 .footer-site-title h3 {

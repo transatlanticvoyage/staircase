@@ -1330,7 +1330,7 @@ function staircase_cherry_hero() {
     
     /* Paragon Card Styles - Our Services Section */
     .paragon-services-section {
-        padding: 80px 0;
+        padding: 40px 0;
         background: #ffffff;
         border-top: 1px solid #e9ecef;
     }
@@ -1440,7 +1440,7 @@ function staircase_cherry_hero() {
     
     @media (max-width: 768px) {
         .paragon-services-section {
-            padding: 60px 0;
+            padding: 30px 0;
         }
         
         .paragon-cards-grid {
@@ -1468,7 +1468,7 @@ function staircase_cherry_hero() {
     
     @media (max-width: 480px) {
         .paragon-services-section {
-            padding: 50px 0;
+            padding: 25px 0;
         }
         
         .paragon-section-title {
@@ -1996,7 +1996,7 @@ function staircase_osb_box_paragon_styles() {
     <style>
     /* Paragon Card Styles - Our Services Section */
     .paragon-services-section {
-        padding: 80px 0;
+        padding: 40px 0;
         background: #ffffff;
         border-top: 1px solid #e9ecef;
     }
@@ -2106,7 +2106,7 @@ function staircase_osb_box_paragon_styles() {
     
     @media (max-width: 768px) {
         .paragon-services-section {
-            padding: 60px 0;
+            padding: 30px 0;
         }
         
         .paragon-cards-grid {
@@ -2134,7 +2134,7 @@ function staircase_osb_box_paragon_styles() {
     
     @media (max-width: 480px) {
         .paragon-services-section {
-            padding: 50px 0;
+            padding: 25px 0;
         }
         
         .paragon-section-title {
@@ -2164,6 +2164,7 @@ function staircase_cta_button_dynamic_styles() {
     $cta_bg_color = get_option('staircase_cta_bg_color', '#23bb73');
     $footer_link_color = get_option('staircase_footer_default_link_color', '#fdfdfd');
     $footer_logo_bg_color = get_option('staircase_footer_logo_bg_color', '#fdfdfd');
+    $footer_logo_border_radius = get_option('staircase_footer_logo_border_radius', '8'); // Default 8px border radius
     ?>
     <style>
     /* Dynamic CTA Button Colors */
@@ -2215,10 +2216,15 @@ function staircase_cta_button_dynamic_styles() {
     }
     
     /* Footer Logo Wrapper Styles */
+    .footer-logo {
+        margin: 0; /* Remove any margin from container */
+        padding: 0;
+    }
+    
     .footer-logo-wrapper {
         display: inline-block;
         background-color: <?php echo esc_attr($footer_logo_bg_color); ?>;
-        border-radius: 8px;
+        border-radius: <?php echo intval($footer_logo_border_radius); ?>px;
         overflow: hidden;
         line-height: 0; /* Remove spacing below image */
     }
@@ -2227,7 +2233,8 @@ function staircase_cta_button_dynamic_styles() {
         display: block;
         max-width: 100%;
         height: auto;
-        border-radius: 8px; /* Apply to image as well for consistency */
+        margin: 0; /* Remove any margin */
+        border-radius: <?php echo intval($footer_logo_border_radius); ?>px; /* Apply to image as well for consistency */
     }
     </style>
     <?php
@@ -3201,6 +3208,12 @@ function staircase_settings_page() {
             update_option('staircase_footer_logo_bg_color', $footer_logo_bg_color);
         }
         
+        // Save footer logo border radius
+        $footer_logo_border_radius = intval($_POST['staircase_footer_logo_border_radius']);
+        if ($footer_logo_border_radius >= 0) {
+            update_option('staircase_footer_logo_border_radius', $footer_logo_border_radius);
+        }
+        
         // Handle logo upload
         if (!empty($_POST['header_logo_url'])) {
             update_option('staircase_header_logo', esc_url_raw($_POST['header_logo_url']));
@@ -3222,6 +3235,7 @@ function staircase_settings_page() {
     $cta_bg_color = get_option('staircase_cta_bg_color', '#23bb73'); // Default green color
     $footer_link_color = get_option('staircase_footer_default_link_color', '#fdfdfd'); // Default light color
     $footer_logo_bg_color = get_option('staircase_footer_logo_bg_color', '#fdfdfd'); // Default light gray background
+    $footer_logo_border_radius = get_option('staircase_footer_logo_border_radius', '8'); // Default 8px border radius
     ?>
     <div class="wrap">
         <h1>Staircase Theme Settings</h1>
@@ -3362,7 +3376,16 @@ function staircase_settings_page() {
                                 <input type="text" id="staircase_footer_logo_bg_color_text" value="<?php echo esc_attr($footer_logo_bg_color); ?>" class="regular-text" style="margin-left: 10px;" readonly />
                                 <button type="button" id="reset_footer_logo_bg_color" class="button" style="margin-left: 10px;">Reset to Default</button>
                                 <p class="description">Set the background color behind the footer logo. Useful for logos with transparent backgrounds. Default: <code>#fdfdfd</code></p>
-                                <p class="description" style="margin-top: 5px;">Logo will have rounded corners (8px border radius) for a polished look.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Footer Logo Border Radius</th>
+                            <td>
+                                <input type="number" name="staircase_footer_logo_border_radius" id="staircase_footer_logo_border_radius" value="<?php echo esc_attr($footer_logo_border_radius); ?>" min="0" max="50" class="small-text" />
+                                <span style="margin-left: 5px;">pixels</span>
+                                <button type="button" id="reset_footer_logo_border_radius" class="button" style="margin-left: 10px;">Reset to Default</button>
+                                <p class="description">Set the border radius for rounded corners on the footer logo. Default: <code>8</code> pixels</p>
+                                <p class="description" style="margin-top: 5px;">Use 0 for square corners, or increase for more rounded corners (max 50px).</p>
                             </td>
                         </tr>
                     </table>
@@ -3543,6 +3566,11 @@ function staircase_settings_page() {
         $('#reset_footer_logo_bg_color').on('click', function() {
             $('#staircase_footer_logo_bg_color').val('#fdfdfd');
             $('#staircase_footer_logo_bg_color_text').val('#fdfdfd');
+        });
+        
+        // Footer logo border radius reset
+        $('#reset_footer_logo_border_radius').on('click', function() {
+            $('#staircase_footer_logo_border_radius').val('8');
         });
     });
     </script>
