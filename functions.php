@@ -1748,6 +1748,7 @@ function staircase_render_cherry_full_template() {
                 'chen_cards_box' => 'staircase_render_chen_cards_box',
                 'plain_post_content' => 'staircase_render_plain_post_content',
                 'osb_box' => 'staircase_render_osb_box',
+                'reviewsbox' => 'staircase_render_reviewsbox',
                 'serena_faq_box' => 'staircase_render_serena_faq_box',
                 'nile_map_box' => 'staircase_render_nile_map_box',
                 'kristina_cta_box' => 'staircase_render_kristina_cta_box',
@@ -1827,6 +1828,9 @@ function staircase_render_cherry_full_template() {
     
     // Cherry template includes OSB box
     staircase_render_osb_box();
+    
+    // Cherry template includes reviewsbox before FAQ
+    staircase_render_reviewsbox();
     
     // Cherry template includes all the boxes at the end
     staircase_render_serena_faq_box();
@@ -5084,6 +5088,273 @@ function staircase_render_derek_blog_post_meta_box() {
     </style>
     
     <?php
+}
+
+/**
+ * Render Reviewsbox Section
+ */
+function staircase_render_reviewsbox() {
+    $current_post_id = get_the_ID();
+    global $wpdb;
+    
+    // Get reviews data from wp_pylons table for current post
+    $reviews_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT reviewsbox_heading, reviewsbox_subheading, reviewsbox_description,
+                reviewsbox_review1_stars, reviewsbox_review1_content, reviewsbox_review1_location, 
+                reviewsbox_review1_name, reviewsbox_review1_image_id, reviewsbox_review1_service, reviewsbox_review1_date,
+                reviewsbox_review2_stars, reviewsbox_review2_content, reviewsbox_review2_location,
+                reviewsbox_review2_name, reviewsbox_review2_image_id, reviewsbox_review2_service, reviewsbox_review2_date,
+                reviewsbox_review3_stars, reviewsbox_review3_content, reviewsbox_review3_location,
+                reviewsbox_review3_name, reviewsbox_review3_image_id, reviewsbox_review3_service, reviewsbox_review3_date,
+                reviewsbox_review4_stars, reviewsbox_review4_content, reviewsbox_review4_location,
+                reviewsbox_review4_name, reviewsbox_review4_image_id, reviewsbox_review4_service, reviewsbox_review4_date,
+                reviewsbox_review5_stars, reviewsbox_review5_content, reviewsbox_review5_location,
+                reviewsbox_review5_name, reviewsbox_review5_image_id, reviewsbox_review5_service, reviewsbox_review5_date
+         FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+        $current_post_id
+    ), ARRAY_A);
+    
+    // Check if any review content exists
+    $has_review_content = false;
+    if ($reviews_data) {
+        // Check if we have heading or any reviews
+        if (!empty($reviews_data['reviewsbox_heading']) || !empty($reviews_data['reviewsbox_subheading'])) {
+            $has_review_content = true;
+        } else {
+            // Check all review fields for content
+            for ($i = 1; $i <= 5; $i++) {
+                if (!empty($reviews_data["reviewsbox_review{$i}_content"]) || !empty($reviews_data["reviewsbox_review{$i}_name"])) {
+                    $has_review_content = true;
+                    break;
+                }
+            }
+        }
+    }
+    
+    // Only render the reviews box if content exists
+    if ($has_review_content) {
+    ?>
+    <!-- Reviewsbox Section -->
+    <section class="reviewsbox-section">
+        <div class="reviewsbox-container">
+            <?php if (!empty($reviews_data['reviewsbox_heading'])): ?>
+                <h2 class="reviewsbox-heading"><?php echo esc_html($reviews_data['reviewsbox_heading']); ?></h2>
+            <?php endif; ?>
+            
+            <?php if (!empty($reviews_data['reviewsbox_subheading'])): ?>
+                <p class="reviewsbox-subheading"><?php echo esc_html($reviews_data['reviewsbox_subheading']); ?></p>
+            <?php endif; ?>
+            
+            <?php if (!empty($reviews_data['reviewsbox_description'])): ?>
+                <div class="reviewsbox-description">
+                    <?php echo wp_kses_post(wpautop($reviews_data['reviewsbox_description'])); ?>
+                </div>
+            <?php endif; ?>
+            
+            <div class="reviewsbox-grid">
+                <?php
+                // Loop through reviews and display non-empty items
+                for ($i = 1; $i <= 5; $i++) {
+                    $review_stars = $reviews_data["reviewsbox_review{$i}_stars"] ?? 0;
+                    $review_content = $reviews_data["reviewsbox_review{$i}_content"] ?? '';
+                    $review_location = $reviews_data["reviewsbox_review{$i}_location"] ?? '';
+                    $review_name = $reviews_data["reviewsbox_review{$i}_name"] ?? '';
+                    $review_image_id = $reviews_data["reviewsbox_review{$i}_image_id"] ?? null;
+                    $review_service = $reviews_data["reviewsbox_review{$i}_service"] ?? '';
+                    $review_date = $reviews_data["reviewsbox_review{$i}_date"] ?? '';
+                    
+                    // Only display if review has content
+                    if (!empty(trim($review_content)) || !empty(trim($review_name))) {
+                ?>
+                    <div class="review-card">
+                        <?php if ($review_stars > 0): ?>
+                            <div class="review-stars">
+                                <?php 
+                                for ($star = 1; $star <= 5; $star++) {
+                                    echo $star <= $review_stars ? '★' : '☆';
+                                }
+                                ?>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($review_content)): ?>
+                            <div class="review-content">
+                                <p><?php echo esc_html($review_content); ?></p>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <div class="review-footer">
+                            <div class="review-author">
+                                <?php if ($review_image_id && $image_url = wp_get_attachment_image_url($review_image_id, 'thumbnail')): ?>
+                                    <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($review_name); ?>" class="review-author-image">
+                                <?php endif; ?>
+                                
+                                <div class="review-author-info">
+                                    <?php if (!empty($review_name)): ?>
+                                        <div class="review-author-name"><?php echo esc_html($review_name); ?></div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($review_location)): ?>
+                                        <div class="review-author-location"><?php echo esc_html($review_location); ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            
+                            <?php if (!empty($review_service) || !empty($review_date)): ?>
+                                <div class="review-meta">
+                                    <?php if (!empty($review_service)): ?>
+                                        <div class="review-service">Service: <?php echo esc_html($review_service); ?></div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($review_date)): ?>
+                                        <div class="review-date">
+                                            <?php echo date('M d, Y', strtotime($review_date)); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                <?php
+                    }
+                }
+                ?>
+            </div>
+        </div>
+        
+        <style>
+        .reviewsbox-section {
+            padding: 60px 0;
+            background: #f8f9fa;
+        }
+        
+        .reviewsbox-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .reviewsbox-heading {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .reviewsbox-subheading {
+            font-size: 1.25rem;
+            text-align: center;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .reviewsbox-description {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+            color: #555;
+        }
+        
+        .reviewsbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .review-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+        }
+        
+        .review-stars {
+            font-size: 1.25rem;
+            color: #ffc107;
+            margin-bottom: 1rem;
+        }
+        
+        .review-content {
+            margin-bottom: 1.5rem;
+        }
+        
+        .review-content p {
+            line-height: 1.6;
+            color: #333;
+            font-style: italic;
+        }
+        
+        .review-footer {
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+        }
+        
+        .review-author {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .review-author-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 12px;
+        }
+        
+        .review-author-info {
+            flex: 1;
+        }
+        
+        .review-author-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+        
+        .review-author-location {
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .review-meta {
+            font-size: 0.875rem;
+            color: #888;
+        }
+        
+        .review-service {
+            margin-bottom: 5px;
+        }
+        
+        .review-date {
+            font-style: italic;
+        }
+        
+        @media (max-width: 768px) {
+            .reviewsbox-heading {
+                font-size: 2rem;
+            }
+            
+            .reviewsbox-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .review-card {
+                padding: 20px;
+            }
+        }
+        </style>
+    </section>
+    <?php
+    } // End if ($has_review_content)
 }
 
 /**
