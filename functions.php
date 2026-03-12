@@ -1715,6 +1715,9 @@ function staircase_render_cherry_full_template() {
     // ALWAYS render batman_hero_box first - it's not subject to reordering
     staircase_render_batman_hero_box();
     
+    // ALWAYS render avg_rating_box second (after hero, before chen cards)
+    staircase_render_avg_rating_box();
+    
     // Check for custom box ordering for remaining boxes
     $box_orders_table = $wpdb->prefix . 'box_orders';
     error_log("DEBUG: Box orders table: {$box_orders_table}");
@@ -1774,9 +1777,14 @@ function staircase_render_cherry_full_template() {
             // Render boxes in custom order
             error_log("DEBUG: Starting custom box rendering");
             foreach ($box_order as $box_name => $order) {
-                // Skip batman_hero_box if it exists in the JSON (for backward compatibility)
+                // Skip batman_hero_box and avg_rating_box if they exist in the JSON (for backward compatibility)
+                // These boxes are always rendered at the top in fixed positions
                 if ($box_name === 'batman_hero_box') {
                     error_log("DEBUG: Skipping batman_hero_box (already rendered at top)");
+                    continue;
+                }
+                if ($box_name === 'avg_rating_box') {
+                    error_log("DEBUG: Skipping avg_rating_box (already rendered after hero)");
                     continue;
                 }
                 
@@ -1804,7 +1812,7 @@ function staircase_render_cherry_full_template() {
     
     // Use default hardcoded ordering if no custom order exists
     error_log("DEBUG: Using default hardcoded ordering");
-    // Batman hero box already rendered at the top
+    // Batman hero box and avg_rating_box already rendered at the top
     
     // Add blog post meta information for posts only
     staircase_render_derek_blog_post_meta_box();
@@ -4778,6 +4786,279 @@ function staircase_render_batman_hero_box() {
         .cherry-hero {
             margin-top: -85px !important;
             padding-top: calc(85px + 80px) !important; /* Header + original padding */
+        }
+    }
+    </style>
+    <?php
+}
+
+/**
+ * Render Average Rating Box Section
+ */
+function staircase_render_avg_rating_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // First check sitewide settings from zen_sitespren
+    $sitespren_table = $wpdb->prefix . 'zen_sitespren';
+    $sitespren_data = $wpdb->get_row("SELECT ratingvalue_for_schema, avg_rating_box_hide_sitewide FROM {$sitespren_table} LIMIT 1", ARRAY_A);
+    
+    // Check if sitewide hide is enabled
+    if ($sitespren_data && $sitespren_data['avg_rating_box_hide_sitewide']) {
+        return; // Don't render if sitewide hide is true
+    }
+    
+    // Get page-specific hide setting from wp_pylons
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $pylon_data = $wpdb->get_row($wpdb->prepare(
+        "SELECT avg_rating_box_hide FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post_id
+    ), ARRAY_A);
+    
+    // Check if page-specific hide is enabled (only if sitewide is not hiding)
+    if ($pylon_data && $pylon_data['avg_rating_box_hide']) {
+        return; // Don't render if page-specific hide is true
+    }
+    
+    // Get the rating value from sitespren (sitewide value)
+    $rating = ($sitespren_data && $sitespren_data['ratingvalue_for_schema']) ? floatval($sitespren_data['ratingvalue_for_schema']) : 0;
+    
+    // Only show the box if there's a rating
+    if ($rating <= 0) {
+        return;
+    }
+    
+    // Calculate star fills
+    $full_stars = floor($rating);
+    $partial_star = $rating - $full_stars;
+    ?>
+    
+    <section class="avg-rating-box-section">
+        <div class="avg-rating-container">
+            <div class="review-images">
+                <!-- Rating Display Element -->
+                <div class="avg-rating-display">
+                    <div class="avg-rating-label">Reviews:</div>
+                    <div class="avg-rating-score">
+                        <div class="star-rating">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <?php if ($i <= $full_stars): ?>
+                                    <span class="star filled">★</span>
+                                <?php elseif ($i == $full_stars + 1 && $partial_star > 0): ?>
+                                    <span class="star partial" style="--partial-fill: <?php echo $partial_star * 100; ?>%">★</span>
+                                <?php else: ?>
+                                    <span class="star empty">★</span>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                        </div>
+                        <span class="rating-text"><?php echo number_format($rating, 1); ?>/5</span>
+                    </div>
+                </div>
+                
+                <!-- Review Images -->
+                <img src="/wp-content/uploads/2026/03/review1.webp" />
+                <img src="/wp-content/uploads/2026/03/review2.webp" />
+                <img src="/wp-content/uploads/2026/03/review3.webp" />
+                <img src="/wp-content/uploads/2026/03/review4.webp" />
+                <img src="/wp-content/uploads/2026/03/review5.webp" />
+            </div>
+        </div>
+    </section>
+    
+    <style>
+    .avg-rating-box-section {
+        background: #f8f9fa;
+        padding: 0;
+        margin: 0;
+        border-bottom: 1px solid #d3d3d3;
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+    }
+    
+    .avg-rating-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .review-images {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 0;
+    }
+    
+    /* Rating Display Box Styling */
+    .avg-rating-display {
+        background: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        min-width: 150px;
+        height: 70px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .avg-rating-label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 6px;
+        font-weight: 600;
+    }
+    
+    .avg-rating-score {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .star-rating {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .star {
+        font-size: 20px;
+        line-height: 1;
+    }
+    
+    .star.filled {
+        color: #ffc107;
+    }
+    
+    .star.empty {
+        color: #ddd;
+    }
+    
+    .star.partial {
+        position: relative;
+        color: #ddd;
+    }
+    
+    .star.partial::before {
+        content: '★';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: var(--partial-fill);
+        overflow: hidden;
+        color: #ffc107;
+    }
+    
+    .rating-text {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    /* Review Images Styling */
+    .review-images img {
+        height: 70px;
+        width: auto;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        object-fit: cover;
+    }
+    
+    .review-images img:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* Add subtle animation on load */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .review-images > * {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .review-images > *:nth-child(1) { animation-delay: 0.1s; }
+    .review-images > *:nth-child(2) { animation-delay: 0.2s; }
+    .review-images > *:nth-child(3) { animation-delay: 0.3s; }
+    .review-images > *:nth-child(4) { animation-delay: 0.4s; }
+    .review-images > *:nth-child(5) { animation-delay: 0.5s; }
+    .review-images > *:nth-child(6) { animation-delay: 0.6s; }
+    
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .review-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 15px 10px;
+        }
+        
+        .avg-rating-display {
+            width: 100%;
+            text-align: left;
+            height: 60px;
+            padding: 8px 12px;
+        }
+        
+        .avg-rating-score {
+            justify-content: flex-start;
+            gap: 8px;
+        }
+        
+        .review-images img {
+            width: 100%;
+            height: 60px;
+            object-fit: cover;
+        }
+        
+        .star {
+            font-size: 18px;
+        }
+        
+        .rating-text {
+            font-size: 16px;
+        }
+        
+        .avg-rating-label {
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .review-images {
+            gap: 10px;
+            padding: 10px 5px;
+        }
+        
+        .review-images img {
+            height: 50px;
+        }
+        
+        .avg-rating-display {
+            height: 50px;
+            padding: 6px 10px;
+        }
+        
+        .star {
+            font-size: 16px;
+        }
+        
+        .rating-text {
+            font-size: 14px;
         }
     }
     </style>
