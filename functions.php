@@ -6,6 +6,7 @@
  */
 // Test comment for VSCode trigger - functions.php
 // TEST CHANGE - Verifying VSCode source control detects changes properly
+// TEST STAIRCASE - Git tracking verification - can be removed
 
 // Load the header system early
 require_once get_template_directory() . '/headers/header-loader.php';
