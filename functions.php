@@ -4,9 +4,6 @@
  * 
  * @package Staircase
  */
-// Test comment for VSCode trigger - functions.php
-// TEST CHANGE - Verifying VSCode source control detects changes properly
-// TEST STAIRCASE - Git tracking verification - can be removed
 
 // Load the header system early
 require_once get_template_directory() . '/headers/header-loader.php';
@@ -600,7 +597,6 @@ function staircase_frontend_jezel_widget() {
                     block: 'start'
                 });
             } else {
-                console.log('Jezel: Section not found - ' + selector);
             }
         };
         
@@ -1711,8 +1707,6 @@ function staircase_render_plain_post_content() {
 function staircase_render_cherry_full_template() {
     global $wpdb, $post;
     
-    // DEBUG: Log cherry template execution
-    error_log("=== CHERRY TEMPLATE DEBUG - Post ID: {$post->ID} ===");
     
     // Open semantic main element for accessibility and SEO
     ?>
@@ -1727,30 +1721,19 @@ function staircase_render_cherry_full_template() {
     
     // Check for custom box ordering for remaining boxes
     $box_orders_table = $wpdb->prefix . 'box_orders';
-    error_log("DEBUG: Box orders table: {$box_orders_table}");
     
     $custom_order = $wpdb->get_row($wpdb->prepare(
         "SELECT box_order_json FROM {$box_orders_table} WHERE rel_post_id = %d AND is_active = 1",
         $post->ID
     ));
     
-    error_log("DEBUG: Query executed: " . $wpdb->last_query);
-    error_log("DEBUG: Custom order result: " . ($custom_order ? 'FOUND' : 'NOT FOUND'));
-    if ($custom_order) {
-        error_log("DEBUG: box_order_json: " . $custom_order->box_order_json);
-    }
-    error_log("DEBUG: Last DB error: " . ($wpdb->last_error ?: 'None'));
     
     if ($custom_order && !empty($custom_order->box_order_json)) {
         // Use custom box ordering
-        error_log("DEBUG: Using custom box ordering");
         $box_order = json_decode($custom_order->box_order_json, true);
-        error_log("DEBUG: JSON decode result: " . (is_array($box_order) ? 'SUCCESS' : 'FAILED'));
         if ($box_order && is_array($box_order)) {
-            error_log("DEBUG: Box order before sorting: " . json_encode($box_order));
             // Sort boxes by their order value
             asort($box_order);
-            error_log("DEBUG: Box order after sorting: " . json_encode($box_order));
             
             // Define mapping from box names to functions (batman_hero_box and baynar boxes removed)
             $box_functions = array(
@@ -1782,33 +1765,25 @@ function staircase_render_cherry_full_template() {
             staircase_render_derek_blog_post_meta_box();
             
             // Render boxes in custom order
-            error_log("DEBUG: Starting custom box rendering");
             foreach ($box_order as $box_name => $order) {
                 // Skip batman_hero_box and avg_rating_box if they exist in the JSON (for backward compatibility)
                 // These boxes are always rendered at the top in fixed positions
                 if ($box_name === 'batman_hero_box') {
-                    error_log("DEBUG: Skipping batman_hero_box (already rendered at top)");
                     continue;
                 }
                 if ($box_name === 'avg_rating_box') {
-                    error_log("DEBUG: Skipping avg_rating_box (already rendered after hero)");
                     continue;
                 }
                 
-                error_log("DEBUG: Processing box: {$box_name} with order: {$order}");
                 if (isset($box_functions[$box_name]) && function_exists($box_functions[$box_name])) {
                     // Skip derek_blog_post_meta_box as it's already rendered
                     if ($box_name !== 'derek_blog_post_meta_box') {
-                        error_log("DEBUG: Rendering box: {$box_name}");
                         call_user_func($box_functions[$box_name]);
                     } else {
-                        error_log("DEBUG: Skipping derek_blog_post_meta_box (already rendered)");
                     }
                 } else {
-                    error_log("DEBUG: Box function not found or doesn't exist: {$box_name}");
                 }
             }
-            error_log("DEBUG: Custom box rendering complete - RETURNING");
             
             // Close semantic main element before returning
             ?>
@@ -1817,14 +1792,11 @@ function staircase_render_cherry_full_template() {
             
             return;
         } else {
-            error_log("DEBUG: JSON decode failed or not array");
         }
     } else {
-        error_log("DEBUG: No custom order found or empty JSON");
     }
     
     // Use default hardcoded ordering if no custom order exists
-    error_log("DEBUG: Using default hardcoded ordering");
     // Batman hero box and avg_rating_box already rendered at the top
     
     // Add blog post meta information for posts only
@@ -1973,9 +1945,8 @@ function staircase_get_current_template() {
         $post_id
     ));
     
-    // If no pylons entry exists, default to bilberry (bare bones)
+    // If no pylons entry exists, default to bilberry (minimal template)
     if (!$pylon_exists) {
-        error_log("STAIRCASE GET TEMPLATE: Post ID: $post_id, No pylons entry - defaulting to bilberry");
         return 'bilberry';
     }
     
@@ -1989,17 +1960,13 @@ function staircase_get_current_template() {
         $post_id
     ));
     
-    // Debug logging
-    error_log("STAIRCASE GET TEMPLATE: Post ID: $post_id, Pylon exists: yes, Pylon template: " . var_export($pylon_template, true));
-    
     if ($pylon_template) {
         // Normalize the template name to match available templates
         $normalized = staircase_normalize_template_name($pylon_template);
-        error_log("STAIRCASE GET TEMPLATE: Normalized: " . var_export($normalized, true));
         return $normalized;
     }
     
-    // If pylons entry exists but no template specified, return cherry as default
+    // If pylons entry exists but no template specified, return cherry as default (full-featured)
     return 'cherry';
 }
 
@@ -3213,8 +3180,6 @@ function staircase_admin_scripts($hook) {
         
         // Add inline script to test if media is loaded
         wp_add_inline_script('jquery', '
-            console.log("Media scripts loading for hook: ' . $hook . '");
-            console.log("wp.media available:", typeof wp !== "undefined" && typeof wp.media !== "undefined");
         ');
     }
 }
@@ -3487,8 +3452,6 @@ function staircase_settings_page() {
     
     <script type="text/javascript">
     jQuery(document).ready(function($) {
-        console.log('jQuery ready, checking for wp.media...');
-        console.log('wp.media available:', typeof wp !== 'undefined' && typeof wp.media !== 'undefined');
         
         var mediaUploader;
         
@@ -3517,7 +3480,6 @@ function staircase_settings_page() {
             
             mediaUploader.on('select', function() {
                 var attachment = mediaUploader.state().get('selection').first().toJSON();
-                console.log('Selected attachment:', attachment);
                 $('#header_logo_url').val(attachment.url);
                 
                 // Show immediate feedback
@@ -3533,7 +3495,6 @@ function staircase_settings_page() {
         
         $('#upload_logo_button').click(function(e) {
             e.preventDefault();
-            console.log('Upload button clicked');
             
             // Wait a moment for scripts to load if needed
             setTimeout(function() {
@@ -3550,10 +3511,8 @@ function staircase_settings_page() {
         
         // Wait for media scripts to load
         if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
-            console.log('Waiting for wp.media to load...');
             var checkMedia = setInterval(function() {
                 if (typeof wp !== 'undefined' && typeof wp.media !== 'undefined') {
-                    console.log('wp.media is now available');
                     clearInterval(checkMedia);
                 }
             }, 500);
@@ -5918,6 +5877,20 @@ function staircase_render_kristina_cta_box() {
  * Render Victoria Blog Box Section
  */
 function staircase_render_victoria_blog_box() {
+    global $wpdb;
+    $post_id = get_the_ID();
+    
+    // Check if blog box should be hidden
+    $hide_blog_box = $wpdb->get_var($wpdb->prepare(
+        "SELECT victoria_blog_box_hide FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+        $post_id
+    ));
+    
+    // If hide is TRUE (1), don't render the blog box
+    if ($hide_blog_box == 1 || $hide_blog_box === true || $hide_blog_box === 'true') {
+        return;
+    }
+    
     ?>
     <!-- Victoria Blog Box Section -->
     <section class="victoria-blog-box">
