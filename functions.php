@@ -1712,6 +1712,11 @@ function staircase_render_cherry_full_template() {
     // DEBUG: Log cherry template execution
     error_log("=== CHERRY TEMPLATE DEBUG - Post ID: {$post->ID} ===");
     
+    // Open semantic main element for accessibility and SEO
+    ?>
+    <main role="main">
+    <?php
+    
     // ALWAYS render batman_hero_box first - it's not subject to reordering
     staircase_render_batman_hero_box();
     
@@ -1802,6 +1807,12 @@ function staircase_render_cherry_full_template() {
                 }
             }
             error_log("DEBUG: Custom box rendering complete - RETURNING");
+            
+            // Close semantic main element before returning
+            ?>
+            </main>
+            <?php
+            
             return;
         } else {
             error_log("DEBUG: JSON decode failed or not array");
@@ -1831,8 +1842,8 @@ function staircase_render_cherry_full_template() {
     staircase_render_content_lake_box();
     staircase_render_content_sea_box();
     
-    // Render main content in container
-    staircase_render_plain_post_content();
+    // Cherry template doesn't need WordPress post_content (uses pylons content fields instead)
+    // staircase_render_plain_post_content(); // Removed - not needed for cherry template
     
     // Cherry template includes OSB box
     staircase_render_osb_box();
@@ -1856,6 +1867,11 @@ function staircase_render_cherry_full_template() {
     staircase_render_kendall_ourprocess_box();
     staircase_render_sara_customhtml_box();
     staircase_render_liz_pricing_box();
+    
+    // Close semantic main element
+    ?>
+    </main>
+    <?php
 }
 
 /**
@@ -1949,7 +1965,19 @@ function staircase_get_current_template() {
     global $wpdb;
     $post_id = get_the_ID();
     
-    // Get template from wp_pylons table only
+    // First check if a pylons entry exists for this post
+    $pylon_exists = $wpdb->get_var($wpdb->prepare(
+        "SELECT COUNT(*) FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d", 
+        $post_id
+    ));
+    
+    // If no pylons entry exists, default to bilberry (bare bones)
+    if (!$pylon_exists) {
+        error_log("STAIRCASE GET TEMPLATE: Post ID: $post_id, No pylons entry - defaulting to bilberry");
+        return 'bilberry';
+    }
+    
+    // Get template from wp_pylons table
     $pylon_template = $wpdb->get_var($wpdb->prepare(
         "SELECT staircase_page_template_desired 
          FROM {$wpdb->prefix}pylons 
@@ -1960,7 +1988,7 @@ function staircase_get_current_template() {
     ));
     
     // Debug logging
-    error_log("STAIRCASE GET TEMPLATE: Post ID: $post_id, Pylon template: " . var_export($pylon_template, true));
+    error_log("STAIRCASE GET TEMPLATE: Post ID: $post_id, Pylon exists: yes, Pylon template: " . var_export($pylon_template, true));
     
     if ($pylon_template) {
         // Normalize the template name to match available templates
@@ -1969,7 +1997,7 @@ function staircase_get_current_template() {
         return $normalized;
     }
     
-    // If no pylon template found, return cherry as default
+    // If pylons entry exists but no template specified, return cherry as default
     return 'cherry';
 }
 
@@ -4801,7 +4829,7 @@ function staircase_render_avg_rating_box() {
     
     // First check sitewide settings from zen_sitespren
     $sitespren_table = $wpdb->prefix . 'zen_sitespren';
-    $sitespren_data = $wpdb->get_row("SELECT ratingvalue_for_schema, avg_rating_box_hide_sitewide FROM {$sitespren_table} LIMIT 1", ARRAY_A);
+    $sitespren_data = $wpdb->get_row("SELECT ratingvalue_for_schema, reviewcount_for_schema, avg_rating_box_hide_sitewide FROM {$sitespren_table} LIMIT 1", ARRAY_A);
     
     // Check if sitewide hide is enabled
     if ($sitespren_data && $sitespren_data['avg_rating_box_hide_sitewide']) {
@@ -4823,6 +4851,9 @@ function staircase_render_avg_rating_box() {
     // Get the rating value from sitespren (sitewide value)
     $rating = ($sitespren_data && $sitespren_data['ratingvalue_for_schema']) ? floatval($sitespren_data['ratingvalue_for_schema']) : 0;
     
+    // Get the review count from sitespren (sitewide value)
+    $review_count = ($sitespren_data && $sitespren_data['reviewcount_for_schema']) ? intval($sitespren_data['reviewcount_for_schema']) : 0;
+    
     // Only show the box if there's a rating
     if ($rating <= 0) {
         return;
@@ -4838,7 +4869,7 @@ function staircase_render_avg_rating_box() {
             <div class="review-images">
                 <!-- Rating Display Element -->
                 <div class="avg-rating-display">
-                    <div class="avg-rating-label">Reviews:</div>
+                    <div class="avg-rating-label">Reviews<?php echo $review_count > 0 ? ' (' . $review_count . ')' : ''; ?>:</div>
                     <div class="avg-rating-score">
                         <div class="star-rating">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -4900,10 +4931,13 @@ function staircase_render_avg_rating_box() {
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         min-width: 150px;
+        max-width: 200px;
         height: 70px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
     }
     
     .avg-rating-label {
@@ -4916,16 +4950,18 @@ function staircase_render_avg_rating_box() {
     .avg-rating-score {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
+        overflow: hidden;
     }
     
     .star-rating {
         display: flex;
-        gap: 2px;
+        gap: 1px;
+        flex-shrink: 0;
     }
     
     .star {
-        font-size: 20px;
+        font-size: 18px;
         line-height: 1;
     }
     
@@ -4953,9 +4989,11 @@ function staircase_render_avg_rating_box() {
     }
     
     .rating-text {
-        font-size: 18px;
+        font-size: 16px;
         font-weight: bold;
         color: #333;
+        flex-shrink: 0;
+        white-space: nowrap;
     }
     
     /* Review Images Styling */
@@ -5990,6 +6028,21 @@ function staircase_render_ocean1_box() {
                     <?php echo wp_kses_post(wpautop($content)); ?>
                 </div>
             </div>
+            <style>
+                @media (max-width: 768px) {
+                    .ocean1-content-box {
+                        padding: 20px 0 !important;
+                    }
+                    .ocean1-content-box .container {
+                        margin: 0 !important;
+                        padding: 0 15px;
+                    }
+                    .ocean1-content-box .article-content {
+                        padding: 20px 15px !important;
+                        border-radius: 10px !important;
+                    }
+                }
+            </style>
         </section>
         <?php
     }
@@ -6019,6 +6072,21 @@ function staircase_render_ocean2_box() {
                     <?php echo wp_kses_post(wpautop($content)); ?>
                 </div>
             </div>
+            <style>
+                @media (max-width: 768px) {
+                    .ocean2-content-box {
+                        padding: 20px 0 !important;
+                    }
+                    .ocean2-content-box .container {
+                        margin: 0 !important;
+                        padding: 0 15px;
+                    }
+                    .ocean2-content-box .article-content {
+                        padding: 20px 15px !important;
+                        border-radius: 10px !important;
+                    }
+                }
+            </style>
         </section>
         <?php
     }
@@ -6048,6 +6116,21 @@ function staircase_render_ocean3_box() {
                     <?php echo wp_kses_post(wpautop($content)); ?>
                 </div>
             </div>
+            <style>
+                @media (max-width: 768px) {
+                    .ocean3-content-box {
+                        padding: 20px 0 !important;
+                    }
+                    .ocean3-content-box .container {
+                        margin: 0 !important;
+                        padding: 0 15px;
+                    }
+                    .ocean3-content-box .article-content {
+                        padding: 20px 15px !important;
+                        border-radius: 10px !important;
+                    }
+                }
+            </style>
         </section>
         <?php
     }
@@ -7109,6 +7192,21 @@ function staircase_render_content_lake_box() {
                     <?php echo wp_kses_post(wpautop($content)); ?>
                 </div>
             </div>
+            <style>
+                @media (max-width: 768px) {
+                    .content-lake-box {
+                        padding: 20px 0 !important;
+                    }
+                    .content-lake-box .container {
+                        margin: 0 !important;
+                        padding: 0 15px;
+                    }
+                    .content-lake-box .article-content {
+                        padding: 20px 15px !important;
+                        border-radius: 10px !important;
+                    }
+                }
+            </style>
         </section>
         <?php
     }
@@ -7138,6 +7236,21 @@ function staircase_render_content_sea_box() {
                     <?php echo wp_kses_post(wpautop($content)); ?>
                 </div>
             </div>
+            <style>
+                @media (max-width: 768px) {
+                    .content-sea-box {
+                        padding: 20px 0 !important;
+                    }
+                    .content-sea-box .container {
+                        margin: 0 !important;
+                        padding: 0 15px;
+                    }
+                    .content-sea-box .article-content {
+                        padding: 20px 15px !important;
+                        border-radius: 10px !important;
+                    }
+                }
+            </style>
         </section>
         <?php
     }
