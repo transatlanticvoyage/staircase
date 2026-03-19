@@ -917,41 +917,42 @@ function staircase_cherry_hero() {
                 
                 <div class="cherry-buttons-container">
                     <?php if ($cherry_button_left_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="batman-hero-button batman-hero-button-left">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="batman-hero-button batman-hero-button-left" aria-label="<?php echo esc_attr($cherry_button_left_text); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
                             </svg>
                             <span><?php echo esc_html($cherry_button_left_text); ?></span>
                         </a>
                     <?php else: ?>
-                        <span class="batman-hero-button batman-hero-button-left batman-hero-button-disabled">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <button class="batman-hero-button batman-hero-button-left batman-hero-button-disabled" disabled aria-label="<?php echo esc_attr($cherry_button_left_text); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
                             </svg>
                             <span><?php echo esc_html($cherry_button_left_text); ?></span>
-                        </span>
+                        </button>
                     <?php endif; ?>
                     
                     <?php if ($cherry_button_right_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right staircase_main_cta_button">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right staircase_main_cta_button" aria-label="<?php echo esc_attr($cherry_button_right_text); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                             </svg>
                             <span><?php echo esc_html($cherry_button_right_text); ?></span>
                         </a>
                     <?php else: ?>
-                        <span class="batman-hero-button batman-hero-button-right batman-hero-button-disabled staircase_main_cta_button">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <button class="batman-hero-button batman-hero-button-right batman-hero-button-disabled staircase_main_cta_button" disabled aria-label="<?php echo esc_attr($cherry_button_right_text); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                             </svg>
                             <span><?php echo esc_html($cherry_button_right_text); ?></span>
-                        </span>
+                        </button>
                     <?php endif; ?>
                 </div>
                 
                 <?php if ($cherry_phone_number_raw): ?>
                     <div class="phone_display_only_holder_div">
-                        <span class="phone-display-only">
+                        <span class="phone-display-only" aria-label="Phone number: <?php echo esc_attr($cherry_phone_number_formatted); ?>">
+                            <span class="screen-reader-text">Phone: </span>
                             <?php echo esc_html($cherry_phone_number_formatted); ?>
                         </span>
                     </div>
@@ -2687,6 +2688,16 @@ function staircase_add_admin_menu() {
         'zaramax_footer_mar',
         'zaramax_footer_management_page'
     );
+    
+    // Add Contact Forms submenu
+    add_submenu_page(
+        'staircase-theme',
+        'Contact Form Options',
+        'Contact Forms',
+        'manage_options',
+        'staircase-contact-forms',
+        'staircase_contact_form_options_page'
+    );
 }
 add_action('admin_menu', 'staircase_add_admin_menu');
 
@@ -4004,6 +4015,191 @@ function zaramax_footer_management_page() {
     <?php
 }
 
+/**
+ * Contact Form Options Page
+ * Allows switching between database and file-based contact forms
+ */
+function staircase_contact_form_options_page() {
+    // Aggressive notice suppression
+    ?>
+    <style>
+        .notice, .notice-error, .updated, .update-nag, .notice-warning, .notice-info, .notice-success,
+        #message, .no-js, .index-php, #wpfooter, .media-upload-form .notice,
+        .wrap > h2:first-child + .notice, .wrap > h1:first-child + .notice {
+            display: none !important;
+        }
+        .wrap {
+            margin-top: 20px;
+        }
+        .staircase-notice {
+            display: block !important;
+            background: #fff;
+            border-left: 4px solid #00a0d2;
+            box-shadow: 0 1px 1px 0 rgba(0,0,0,.1);
+            padding: 12px;
+            margin: 10px 0;
+        }
+        .form-table th {
+            width: 250px;
+        }
+        .form-table td {
+            vertical-align: top;
+        }
+        .description {
+            font-size: 13px;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        .status-table {
+            margin-top: 30px;
+            background: #fff;
+            border: 1px solid #ccd0d4;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 800px;
+        }
+        .status-table th,
+        .status-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e2e4e7;
+        }
+        .status-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+    
+    <div class="wrap">
+        <h1>Contact Form Options</h1>
+        
+        <?php if (isset($_GET['settings-updated'])): ?>
+            <div class="staircase-notice">
+                <p><strong>Settings saved successfully!</strong></p>
+            </div>
+        <?php endif; ?>
+        
+        <form method="post" action="options.php">
+            <?php 
+            settings_fields('staircase_contact_forms');
+            $current_source = get_option('staircase_contact_form_1_source', 'file');
+            ?>
+            
+            <table class="form-table">
+                <tr>
+                    <th scope="row">Contact Form Source</th>
+                    <td>
+                        <select name="staircase_contact_form_1_source" id="contact_form_source">
+                            <option value="file" <?php selected($current_source, 'file'); ?>>
+                                Theme Files (Recommended - Auto Updates)
+                            </option>
+                            <option value="database" <?php selected($current_source, 'database'); ?>>
+                                Database (Legacy - Manual Updates)
+                            </option>
+                        </select>
+                        <p class="description">
+                            <strong>Theme Files:</strong> Contact form updates automatically with theme updates.<br>
+                            <strong>Database:</strong> Uses existing database values (current method).
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            
+            <?php submit_button(); ?>
+        </form>
+        
+        <hr style="margin: 40px 0;">
+        
+        <h2>Current Configuration</h2>
+        <table class="status-table">
+            <tr>
+                <th>Setting</th>
+                <th>Value</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td><strong>Active Source</strong></td>
+                <td><?php echo $current_source === 'file' ? 'Theme Files' : 'Database'; ?></td>
+                <td>
+                    <span class="status-badge active">Active</span>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Theme Files Location</strong></td>
+                <td><code>/wp-content/themes/staircase/contact-forms/</code></td>
+                <td>
+                    <?php 
+                    $files_exist = file_exists(get_template_directory() . '/contact-forms/contact-form-1-main-code.php');
+                    ?>
+                    <span class="status-badge <?php echo $files_exist ? 'active' : 'inactive'; ?>">
+                        <?php echo $files_exist ? 'Files Found' : 'Files Missing'; ?>
+                    </span>
+                </td>
+            </tr>
+            <?php
+            // Check if database has form data and endpoint
+            global $wpdb;
+            $db_data = $wpdb->get_row("SELECT contact_form_1_main_code, contact_form_1_endpoint FROM {$wpdb->prefix}zen_sitespren LIMIT 1");
+            $has_db_form = !empty($db_data->contact_form_1_main_code);
+            $has_db_endpoint = !empty($db_data->contact_form_1_endpoint);
+            ?>
+            <tr>
+                <td><strong>Database Form Data</strong></td>
+                <td>wp_zen_sitespren.contact_form_1_main_code</td>
+                <td>
+                    <span class="status-badge <?php echo $has_db_form ? 'active' : 'inactive'; ?>">
+                        <?php echo $has_db_form ? 'Available' : 'Not Found'; ?>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Database Endpoint</strong></td>
+                <td>wp_zen_sitespren.contact_form_1_endpoint</td>
+                <td>
+                    <span class="status-badge <?php echo $has_db_endpoint ? 'active' : 'inactive'; ?>">
+                        <?php echo $has_db_endpoint ? 'Configured' : 'Not Set'; ?>
+                    </span>
+                </td>
+            </tr>
+        </table>
+        
+        <?php if ($current_source === 'file' && !$files_exist): ?>
+            <div class="notice notice-warning" style="display: block !important; margin-top: 20px;">
+                <p>
+                    <strong>Warning:</strong> Theme files are selected but not found. 
+                    The system will fall back to database values.
+                </p>
+            </div>
+        <?php endif; ?>
+    </div>
+    <?php
+}
+
+// Register settings for contact forms
+add_action('admin_init', function() {
+    register_setting('staircase_contact_forms', 'staircase_contact_form_1_source', [
+        'default' => 'file',
+        'sanitize_callback' => function($value) {
+            return in_array($value, ['file', 'database']) ? $value : 'file';
+        }
+    ]);
+});
+
 // TEMPORARY: Commented out database column creation for testing
 // TODO: Uncomment this when ready to use proper database storage
 /*
@@ -4463,41 +4659,42 @@ function staircase_render_batman_hero_box() {
                 
                 <div class="cherry-buttons-container">
                     <?php if ($cherry_button_left_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="batman-hero-button batman-hero-button-left">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <a href="<?php echo esc_url($cherry_button_left_url); ?>" class="batman-hero-button batman-hero-button-left" aria-label="<?php echo esc_attr($cherry_button_left_text); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
                             </svg>
                             <span><?php echo esc_html($cherry_button_left_text); ?></span>
                         </a>
                     <?php else: ?>
-                        <span class="batman-hero-button batman-hero-button-left batman-hero-button-disabled">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <button class="batman-hero-button batman-hero-button-left batman-hero-button-disabled" disabled aria-label="<?php echo esc_attr($cherry_button_left_text); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
                             </svg>
                             <span><?php echo esc_html($cherry_button_left_text); ?></span>
-                        </span>
+                        </button>
                     <?php endif; ?>
                     
                     <?php if ($cherry_button_right_url): ?>
-                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right staircase_main_cta_button">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <a href="<?php echo esc_url($cherry_button_right_url); ?>" class="batman-hero-button batman-hero-button-right staircase_main_cta_button" aria-label="<?php echo esc_attr($cherry_button_right_text); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                             </svg>
                             <span><?php echo esc_html($cherry_button_right_text); ?></span>
                         </a>
                     <?php else: ?>
-                        <span class="batman-hero-button batman-hero-button-right batman-hero-button-disabled staircase_main_cta_button">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <button class="batman-hero-button batman-hero-button-right batman-hero-button-disabled staircase_main_cta_button" disabled aria-label="<?php echo esc_attr($cherry_button_right_text); ?>">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                 <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                             </svg>
                             <span><?php echo esc_html($cherry_button_right_text); ?></span>
-                        </span>
+                        </button>
                     <?php endif; ?>
                 </div>
                 
                 <?php if ($cherry_phone_number_raw): ?>
                     <div class="phone_display_only_holder_div">
-                        <span class="phone-display-only">
+                        <span class="phone-display-only" aria-label="Phone number: <?php echo esc_attr($cherry_phone_number_formatted); ?>">
+                            <span class="screen-reader-text">Phone: </span>
                             <?php echo esc_html($cherry_phone_number_formatted); ?>
                         </span>
                     </div>
@@ -7238,12 +7435,11 @@ function staircase_render_content_sea_box() {
 function staircase_render_monica_contact_box() {
     global $wpdb;
     
-    // Get data from wp_zen_sitespren table
+    // Get data from wp_zen_sitespren table (always needed for map info)
     $brand_name = $wpdb->get_var("SELECT driggs_brand_name FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
     $city = $wpdb->get_var("SELECT driggs_city FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
     $state_code = $wpdb->get_var("SELECT driggs_state_code FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
     $phone = $wpdb->get_var("SELECT driggs_phone_1 FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
-    $contact_form_code = $wpdb->get_var("SELECT contact_form_1_main_code FROM {$wpdb->prefix}zen_sitespren LIMIT 1") ?: '';
     
     // Format the phone number for display
     $phone_formatted = $phone ? staircase_format_phone_number($phone) : '';
@@ -7303,7 +7499,54 @@ function staircase_render_monica_contact_box() {
             <!-- Right Side - Contact Form -->
             <div class="monica-right-section">
                 <div class="monica-form-container">
-                    <?php echo do_shortcode($contact_form_code); ?>
+                    <?php 
+                    // Check contact form source setting
+                    $source = get_option('staircase_contact_form_1_source', 'file');
+                    $template_path = get_template_directory() . '/contact-forms/';
+                    
+                    if ($source === 'file' && file_exists($template_path . 'contact-form-1-main-code.php')) {
+                        // Load from theme files
+                        
+                        // Enqueue CSS file
+                        wp_enqueue_style('weasel-contact-form', 
+                            get_template_directory_uri() . '/contact-forms/weasel_header_code_for_contact_form.css',
+                            [], 
+                            filemtime($template_path . 'weasel_header_code_for_contact_form.css')
+                        );
+                        
+                        // Enqueue JS file
+                        wp_enqueue_script('weasel-contact-form',
+                            get_template_directory_uri() . '/contact-forms/weasel_footer_code_for_contact_form.js',
+                            [], 
+                            filemtime($template_path . 'weasel_footer_code_for_contact_form.js'),
+                            true // Load in footer
+                        );
+                        
+                        // Include the PHP template
+                        include $template_path . 'contact-form-1-main-code.php';
+                        
+                    } else {
+                        // Legacy: Load from database
+                        $site_data = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}zen_sitespren LIMIT 1");
+                        
+                        if ($site_data) {
+                            // Add header CSS inline
+                            if (!empty($site_data->weasel_header_code_for_contact_form)) {
+                                echo '<style>' . $site_data->weasel_header_code_for_contact_form . '</style>';
+                            }
+                            
+                            // Render form HTML
+                            if (!empty($site_data->contact_form_1_main_code)) {
+                                echo do_shortcode($site_data->contact_form_1_main_code);
+                            }
+                            
+                            // Add footer JS inline
+                            if (!empty($site_data->weasel_footer_code_for_contact_form)) {
+                                echo '<script>' . $site_data->weasel_footer_code_for_contact_form . '</script>';
+                            }
+                        }
+                    }
+                    ?>
                 </div>
             </div>
         </div>

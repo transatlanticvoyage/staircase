@@ -12,7 +12,7 @@ if ($use_zaramax_footer && function_exists('zaramax_render_custom_footer')) {
     echo "<!-- Using Default WordPress Footer -->\n";
     // Default footer system
     ?>
-    <footer class="site-footer">
+    <footer class="site-footer" role="contentinfo">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-branding">
@@ -21,7 +21,7 @@ if ($use_zaramax_footer && function_exists('zaramax_render_custom_footer')) {
                 </div>
                 
                 <?php if (has_nav_menu('footer')): ?>
-                    <nav class="footer-navigation">
+                    <nav class="footer-navigation" aria-label="Footer navigation">
                         <?php
                         wp_nav_menu(array(
                             'theme_location' => 'footer',

@@ -9,6 +9,7 @@
 get_header();
 ?>
 
+<main id="main" role="main">
 <?php
 $current_template = staircase_get_current_template();
 
@@ -23,7 +24,7 @@ if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
 } else {
     // Other templates use standard container layout
     ?>
-    <main class="site-content">
+    <div class="site-content">
         <div class="container">
             <?php
             // If this is a static page
@@ -89,10 +90,11 @@ if ($current_template === 'cherry' || $current_template === 'homepage-cherry') {
             endif;
             ?>
         </div>
-    </main>
+    </div>
     <?php
 }
 ?>
+</main>
 
 <style>
 /* Homepage specific styles */

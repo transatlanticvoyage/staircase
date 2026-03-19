@@ -8,6 +8,9 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 
+<!-- Skip to main content link for keyboard navigation -->
+<a class="skip-link screen-reader-text" href="#main">Skip to main content</a>
+
 <?php
 // The header loader should already be initialized via functions.php
 // Just render the header
