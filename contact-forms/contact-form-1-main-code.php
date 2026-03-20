@@ -55,7 +55,7 @@ $site_domain = $_SERVER['HTTP_HOST'] ?? '';
                     <div id="status-help" class="est-help">This helps prioritize your request.</div>
                     <div class="est-chip-row" role="radiogroup" aria-label="Project status">
                         <label class="est-chip">
-                            <input type="radio" name="project_status" value="Ready to Hire" required>
+                            <input type="radio" name="project_status" value="Ready to Hire" required tabindex="0">
                             <span>Ready to Hire</span>
                         </label>
                         <label class="est-chip">
@@ -70,7 +70,7 @@ $site_domain = $_SERVER['HTTP_HOST'] ?? '';
                     <div id="timeline-help" class="est-help">An estimate window is fine.</div>
                     <div class="est-chip-grid" role="radiogroup" aria-label="Project timeline">
                         <label class="est-chip">
-                            <input type="radio" name="timeline" value="Timing is Flexible" required>
+                            <input type="radio" name="timeline" value="Timing is Flexible" required tabindex="0">
                             <span>Timing is Flexible</span>
                         </label>
                         <label class="est-chip">
@@ -92,7 +92,7 @@ $site_domain = $_SERVER['HTTP_HOST'] ?? '';
                     <legend>Are you currently the owner of this home?</legend>
                     <div class="est-chip-col" role="radiogroup" aria-label="Property owner">
                         <label class="est-chip">
-                            <input type="radio" name="property_owner" value="Yes" required>
+                            <input type="radio" name="property_owner" value="Yes" required tabindex="0">
                             <span>Yes</span>
                         </label>
                         <label class="est-chip">
