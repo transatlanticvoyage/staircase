@@ -3816,6 +3816,8 @@ function staircase_components_page() {
 
 // Zaramax Footer Management page
 function zaramax_footer_management_page() {
+    global $wpdb;
+    
     // Handle form submission
     if (isset($_POST['submit']) && check_admin_referer('zaramax_footer', 'zaramax_footer_nonce')) {
         // Save footer system choice
@@ -3830,7 +3832,7 @@ function zaramax_footer_management_page() {
             update_option('zaramax_temp_footer_blurb', $footer_blurb);
         }
         
-        // Save other footer settings
+        // Save legacy footer settings (WordPress Options)
         // Use wp_unslash to preserve shortcodes without adding backslashes
         update_option('zaramax_footer_box2_content', wp_unslash($_POST['footer_box2_content']));
         update_option('zaramax_footer_box3_content', wp_unslash($_POST['footer_box3_content']));
@@ -3841,10 +3843,36 @@ function zaramax_footer_management_page() {
         update_option('zaramax_footer_disclaimer', wp_unslash($_POST['footer_disclaimer']));
         update_option('zaramax_footer_legal_links', wp_unslash($_POST['footer_legal_links']));
         
+        // Save new system footer settings (wp_zen_sitespren table)
+        $zen_table = $wpdb->prefix . 'zen_sitespren';
+        
+        // Check if table exists and has our new columns
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$zen_table}'");
+        if ($table_exists) {
+            // Check if row with wppma_id=1 exists
+            $row_exists = $wpdb->get_var("SELECT COUNT(*) FROM {$zen_table} WHERE wppma_id = 1");
+            
+            if ($row_exists) {
+                // Update the row
+                $update_data = array(
+                    'footer_disclaimer' => wp_unslash($_POST['new_footer_disclaimer']),
+                    'hide_footer_disclaimer' => isset($_POST['new_hide_footer_disclaimer']) ? 1 : 0,
+                    'footer_legal_links' => wp_unslash($_POST['new_footer_legal_links']),
+                    'hide_footer_legal_links' => isset($_POST['new_hide_footer_legal_links']) ? 1 : 0
+                );
+                
+                $wpdb->update(
+                    $zen_table,
+                    $update_data,
+                    array('wppma_id' => 1)
+                );
+            }
+        }
+        
         echo '<div class="notice notice-success"><p>Footer settings saved successfully!</p></div>';
     }
     
-    // Get current settings
+    // Get current legacy settings (WordPress Options)
     $use_custom_footer = get_option('zaramax_use_custom_footer', false);
     $footer_box2_content = get_option('zaramax_footer_box2_content', '');
     $footer_box3_content = get_option('zaramax_footer_box3_content', '');
@@ -3857,6 +3885,24 @@ function zaramax_footer_management_page() {
     // TEMPORARY: Get footer blurb from WordPress options for testing
     // TODO: Remove this when proper database column is created
     $footer_blurb = get_option('zaramax_temp_footer_blurb', '');
+    
+    // Get new system settings from wp_zen_sitespren
+    $zen_table = $wpdb->prefix . 'zen_sitespren';
+    $new_footer_disclaimer = '';
+    $new_hide_footer_disclaimer = 0;
+    $new_footer_legal_links = '';
+    $new_hide_footer_legal_links = 0;
+    
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$zen_table}'");
+    if ($table_exists) {
+        $zen_data = $wpdb->get_row("SELECT footer_disclaimer, hide_footer_disclaimer, footer_legal_links, hide_footer_legal_links FROM {$zen_table} WHERE wppma_id = 1", ARRAY_A);
+        if ($zen_data) {
+            $new_footer_disclaimer = $zen_data['footer_disclaimer'] ?? '';
+            $new_hide_footer_disclaimer = $zen_data['hide_footer_disclaimer'] ?? 0;
+            $new_footer_legal_links = $zen_data['footer_legal_links'] ?? '';
+            $new_hide_footer_legal_links = $zen_data['hide_footer_legal_links'] ?? 0;
+        }
+    }
     ?>
     <div class="wrap">
         <h1>Zaramax Footer Management</h1>
@@ -3939,13 +3985,62 @@ function zaramax_footer_management_page() {
                     </div>
                 </div>
                 
-                <div class="footer-bottom-section">
-                    <h2>Footer Bottom Section</h2>
+                <!-- NEW SYSTEM - Footer Bottom Section -->
+                <div class="footer-bottom-section" style="border: 3px solid #28a745; background: #f0fff4; padding: 20px; margin-bottom: 30px; border-radius: 8px;">
+                    <h2 style="color: #28a745;">Footer Bottom Section (new system)</h2>
+                    <p style="color: #666; font-style: italic;">These settings are stored in the wp_zen_sitespren database table and can sync with external systems.</p>
                     <div style="max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 30px;">
                         
-                        <!-- Disclaimer Area -->
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
-                            <h3 style="margin-top: 0;">Disclaimer Area</h3>
+                        <!-- New System - Disclaimer Area -->
+                        <div style="background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #28a745;">
+                            <h3 style="margin-top: 0; color: #28a745;">Disclaimer Area (New System)</h3>
+                            <p style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">
+                                DB Columns: <code style="background: #f4f4f4; padding: 2px 6px;">footer_disclaimer</code>, <code style="background: #f4f4f4; padding: 2px 6px;">hide_footer_disclaimer</code>
+                            </p>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="new_hide_footer_disclaimer" name="new_hide_footer_disclaimer" value="1" <?php checked($new_hide_footer_disclaimer, 1); ?> style="margin-right: 8px;">
+                                    <strong>Hide disclaimer (do not output in the footer)</strong>
+                                </label>
+                                <small style="color: #666; display: block; margin-top: 5px;">When checked, the disclaimer will not be displayed in the footer at all.</small>
+                            </div>
+                            <label for="new_footer_disclaimer"><strong>Disclaimer Content (HTML allowed):</strong></label>
+                            <textarea id="new_footer_disclaimer" name="new_footer_disclaimer" rows="6" style="width: 100%; margin-top: 5px; font-family: monospace; font-size: 12px;" placeholder="Enter disclaimer HTML..."><?php echo esc_textarea($new_footer_disclaimer); ?></textarea>
+                            <small style="color: #666;">HTML allowed. Line breaks preserved automatically.</small>
+                        </div>
+                        
+                        <!-- New System - Footer Legal Links Area -->
+                        <div style="background: #fff; padding: 20px; border-radius: 8px; border: 2px solid #28a745;">
+                            <h3 style="margin-top: 0; color: #28a745;">Footer Legal Links Area (New System)</h3>
+                            <p style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">
+                                DB Columns: <code style="background: #f4f4f4; padding: 2px 6px;">footer_legal_links</code>, <code style="background: #f4f4f4; padding: 2px 6px;">hide_footer_legal_links</code>
+                            </p>
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="checkbox" id="new_hide_footer_legal_links" name="new_hide_footer_legal_links" value="1" <?php checked($new_hide_footer_legal_links, 1); ?> style="margin-right: 8px;">
+                                    <strong>Hide legal links (do not output in the footer)</strong>
+                                </label>
+                                <small style="color: #666; display: block; margin-top: 5px;">When checked, the legal links will not be displayed in the footer at all.</small>
+                            </div>
+                            <label for="new_footer_legal_links"><strong>Legal Links Content (HTML allowed):</strong></label>
+                            <textarea id="new_footer_legal_links" name="new_footer_legal_links" rows="6" style="width: 100%; margin-top: 5px; font-family: monospace; font-size: 12px;" placeholder="Enter legal links HTML..."><?php echo esc_textarea($new_footer_legal_links); ?></textarea>
+                            <small style="color: #666;">HTML allowed. Line breaks preserved automatically.</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- LEGACY SYSTEM - Footer Bottom Section -->
+                <div class="footer-bottom-section" style="border: 3px solid #6c757d; background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                    <h2 style="color: #6c757d;">Footer Bottom Section (legacy)</h2>
+                    <p style="color: #666; font-style: italic;">These settings are stored in WordPress Options table using the get_option() / update_option() system.</p>
+                    <div style="max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 1fr; gap: 30px;">
+                        
+                        <!-- Legacy - Disclaimer Area -->
+                        <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+                            <h3 style="margin-top: 0; color: #6c757d;">Disclaimer Area (Legacy)</h3>
+                            <p style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">
+                                WP Options Keys: <code style="background: #f4f4f4; padding: 2px 6px;">zaramax_footer_disclaimer</code>, <code style="background: #f4f4f4; padding: 2px 6px;">zaramax_footer_hide_disclaimer</code>
+                            </p>
                             <div style="margin-bottom: 15px;">
                                 <label style="display: flex; align-items: center; cursor: pointer;">
                                     <input type="checkbox" id="footer_hide_disclaimer" name="footer_hide_disclaimer" value="1" <?php checked($footer_hide_disclaimer, '1'); ?> style="margin-right: 8px;">
@@ -3958,9 +4053,12 @@ function zaramax_footer_management_page() {
                             <small style="color: #666;">HTML allowed. Line breaks preserved automatically.</small>
                         </div>
                         
-                        <!-- Footer Legal Links Area -->
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
-                            <h3 style="margin-top: 0;">Footer Legal Links Area</h3>
+                        <!-- Legacy - Footer Legal Links Area -->
+                        <div style="background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd;">
+                            <h3 style="margin-top: 0; color: #6c757d;">Footer Legal Links Area (Legacy)</h3>
+                            <p style="font-size: 16px; font-weight: bold; margin-bottom: 15px;">
+                                WP Options Keys: <code style="background: #f4f4f4; padding: 2px 6px;">zaramax_footer_legal_links</code>
+                            </p>
                             <label for="footer_legal_links"><strong>Legal Links Content (HTML allowed):</strong></label>
                             <textarea id="footer_legal_links" name="footer_legal_links" rows="6" style="width: 100%; margin-top: 5px; font-family: monospace; font-size: 12px;" placeholder="Enter legal links HTML..."><?php echo esc_textarea($footer_legal_links); ?></textarea>
                             <small style="color: #666;">HTML allowed. Line breaks preserved automatically.</small>
@@ -4227,14 +4325,54 @@ add_action('admin_init', 'zaramax_add_footer_blurb_column');
 
 // Render Zaramax custom footer
 function zaramax_render_custom_footer() {
-    // Get all footer settings
+    global $wpdb;
+    
+    // Get all legacy footer settings (WordPress Options)
     $footer_box2_content = get_option('zaramax_footer_box2_content', '');
     $footer_box3_content = get_option('zaramax_footer_box3_content', '');
     $footer_map_heading = get_option('zaramax_footer_map_heading', '');
     $footer_map_location = get_option('zaramax_footer_map_location', '');
-    $footer_hide_disclaimer = get_option('zaramax_footer_hide_disclaimer', '0');
-    $footer_disclaimer = get_option('zaramax_footer_disclaimer', '');
-    $footer_legal_links = get_option('zaramax_footer_legal_links', '');
+    $legacy_hide_disclaimer = get_option('zaramax_footer_hide_disclaimer', '0');
+    $legacy_footer_disclaimer = get_option('zaramax_footer_disclaimer', '');
+    $legacy_footer_legal_links = get_option('zaramax_footer_legal_links', '');
+    
+    // Get new system settings from wp_zen_sitespren
+    $zen_table = $wpdb->prefix . 'zen_sitespren';
+    $new_footer_disclaimer = '';
+    $new_hide_footer_disclaimer = 0;
+    $new_footer_legal_links = '';
+    $new_hide_footer_legal_links = 0;
+    
+    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$zen_table}'");
+    if ($table_exists) {
+        $zen_data = $wpdb->get_row("SELECT footer_disclaimer, hide_footer_disclaimer, footer_legal_links, hide_footer_legal_links FROM {$zen_table} WHERE wppma_id = 1", ARRAY_A);
+        if ($zen_data) {
+            $new_footer_disclaimer = $zen_data['footer_disclaimer'] ?? '';
+            $new_hide_footer_disclaimer = $zen_data['hide_footer_disclaimer'] ?? 0;
+            $new_footer_legal_links = $zen_data['footer_legal_links'] ?? '';
+            $new_hide_footer_legal_links = $zen_data['hide_footer_legal_links'] ?? 0;
+        }
+    }
+    
+    // Determine which values to use (new system takes priority if it has content)
+    // For content fields: use new if not empty
+    $footer_disclaimer = !empty($new_footer_disclaimer) ? $new_footer_disclaimer : $legacy_footer_disclaimer;
+    $footer_legal_links = !empty($new_footer_legal_links) ? $new_footer_legal_links : $legacy_footer_legal_links;
+    
+    // For hide fields: if new system has content, use its hide settings; otherwise use legacy
+    // This ensures hide settings are properly paired with their content
+    if (!empty($new_footer_disclaimer)) {
+        $footer_hide_disclaimer = $new_hide_footer_disclaimer;
+    } else {
+        $footer_hide_disclaimer = $legacy_hide_disclaimer;
+    }
+    
+    if (!empty($new_footer_legal_links)) {
+        $footer_hide_legal_links = $new_hide_footer_legal_links;
+    } else {
+        // Legacy system doesn't have hide_footer_legal_links, so default to not hiding
+        $footer_hide_legal_links = 0;
+    }
     
     // TEMPORARY: Get footer blurb from WordPress options for testing
     // TODO: Remove this when proper database column is created  
@@ -4322,32 +4460,51 @@ function zaramax_render_custom_footer() {
         <div class="zaramax-footer-bottom">
             <div class="footer-bottom-container">
                 <div class="footer-bottom-grid">
-                    <?php if ($footer_hide_disclaimer !== '1'): ?>
+                    <?php 
+                    // Show disclaimer only if NOT hidden
+                    // Check for both string '1' (legacy) and boolean/integer 1 (new system)
+                    if (!($footer_hide_disclaimer == '1' || $footer_hide_disclaimer == 1)): 
+                    ?>
                         <!-- Disclaimer Area -->
                         <div class="footer-disclaimer">
-                            <?php echo wpautop(do_shortcode($footer_disclaimer)); ?>
+                            <?php 
+                            // Debug: Show which system is being used and hide status
+                            echo '<!-- Footer Disclaimer: Using ' . (!empty($new_footer_disclaimer) ? 'NEW SYSTEM' : 'LEGACY SYSTEM') . ', hide=' . var_export($footer_hide_disclaimer, true) . ' -->';
+                            echo wpautop(do_shortcode($footer_disclaimer)); 
+                            ?>
                         </div>
+                    <?php else: ?>
+                        <!-- Footer Disclaimer: Hidden (hide_footer_disclaimer = <?php echo var_export($footer_hide_disclaimer, true); ?>) -->
                     <?php endif; ?>
                     
-                    <!-- Legal Links Area -->
-                    <div class="footer-legal-links">
-                        <?php 
-                        // Debug: Show legal links variable status
-                        echo '<!-- Legal Links Debug: footer_legal_links = "' . esc_attr($footer_legal_links) . '", length = ' . strlen($footer_legal_links) . ' -->';
-                        
-                        if (!empty($footer_legal_links)) {
-                            // Process shortcodes and preserve multiple spaces
-                            $legal_links_html = do_shortcode($footer_legal_links);
-                            // Simple replacement of multiple spaces with non-breaking spaces
-                            $legal_links_html = str_replace('    ', '&nbsp;&nbsp;&nbsp;&nbsp;', $legal_links_html); // 4 spaces
-                            $legal_links_html = str_replace('   ', '&nbsp;&nbsp;&nbsp;', $legal_links_html); // 3 spaces  
-                            $legal_links_html = str_replace('  ', '&nbsp;&nbsp;', $legal_links_html); // 2 spaces
-                            echo wpautop($legal_links_html); 
-                        } else {
-                            echo '<!-- No legal links content -->';
-                        }
-                        ?>
-                    </div>
+                    <?php 
+                    // Show legal links only if NOT hidden
+                    // Check for both string '1' (legacy) and boolean/integer 1 (new system)
+                    if (!($footer_hide_legal_links == '1' || $footer_hide_legal_links == 1)): 
+                    ?>
+                        <!-- Legal Links Area -->
+                        <div class="footer-legal-links">
+                            <?php 
+                            // Debug: Show which system is being used and hide status
+                            echo '<!-- Footer Legal Links: Using ' . (!empty($new_footer_legal_links) ? 'NEW SYSTEM' : 'LEGACY SYSTEM') . ', hide=' . var_export($footer_hide_legal_links, true) . ' -->';
+                            echo '<!-- Legal Links Debug: footer_legal_links = "' . esc_attr($footer_legal_links) . '", length = ' . strlen($footer_legal_links) . ' -->';
+                            
+                            if (!empty($footer_legal_links)) {
+                                // Process shortcodes and preserve multiple spaces
+                                $legal_links_html = do_shortcode($footer_legal_links);
+                                // Simple replacement of multiple spaces with non-breaking spaces
+                                $legal_links_html = str_replace('    ', '&nbsp;&nbsp;&nbsp;&nbsp;', $legal_links_html); // 4 spaces
+                                $legal_links_html = str_replace('   ', '&nbsp;&nbsp;&nbsp;', $legal_links_html); // 3 spaces  
+                                $legal_links_html = str_replace('  ', '&nbsp;&nbsp;', $legal_links_html); // 2 spaces
+                                echo wpautop($legal_links_html); 
+                            } else {
+                                echo '<!-- No legal links content -->';
+                            }
+                            ?>
+                        </div>
+                    <?php else: ?>
+                        <!-- Footer Legal Links: Hidden (hide_footer_legal_links = <?php echo var_export($footer_hide_legal_links, true); ?>) -->
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
