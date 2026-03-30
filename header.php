@@ -12,9 +12,10 @@
 <a class="skip-link screen-reader-text" href="#main">Skip to main content</a>
 
 <?php
-// The header loader should already be initialized via functions.php
-// Just render the header
-staircase_render_header();
+// Use the centralized template selector for ALL pages
+// This checks wp_pylons.header_desired first, then wp_zen_sitespren.site_default_header, 
+// then falls back to homeservice_header_1
+staircase_render_selected_header();
 ?>
 
 <?php

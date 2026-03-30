@@ -8,6 +8,9 @@
 // Load the header system early
 require_once get_template_directory() . '/headers/header-loader.php';
 
+// Load the centralized template selector system
+require_once get_template_directory() . '/inc/template-selector.php';
+
 // Theme Setup
 function staircase_theme_setup() {
     // Add theme support for various features
@@ -1604,6 +1607,10 @@ function staircase_render_template() {
             staircase_render_cherry_full_template();
             break;
             
+        case 'vibrantcashew':
+            get_template_part('page-templates/vibrantcashew');
+            break;
+            
         case 'content-only':
         default:
             staircase_render_default_template();
@@ -2294,7 +2301,8 @@ function staircase_get_page_templates() {
         'bilberry' => 'bilberry (bare bones)',
         'sarsaparilla' => 'sarsaparilla',
         'gooseberry' => 'gooseberry',
-        'vibrantberry' => 'Vibrantberry (Custom HTML)'
+        'vibrantberry' => 'Vibrantberry (Custom HTML)',
+        'vibrantcashew' => 'Vibrantcashew (Full HTML Expanse)'
     );
 }
 
@@ -2416,6 +2424,57 @@ function staircase_page_options_meta_box_callback($post) {
                 <strong>Note:</strong> This HTML will replace the entire content area between the header and footer. 
                 Commonly used for rendering "vibe coded" pages from external tools.
             </p>
+        </div>
+    <?php endif; ?>
+    
+    <?php if ($selected_template === 'vibrantcashew'): ?>
+        <div style="margin-top: 20px; padding: 20px; border: 2px solid #8B4513; border-radius: 8px; background: #FFF8F0;">
+            <h4 style="margin: 0 0 15px 0; color: #8B4513; font-weight: bold; font-size: 18px;">
+                🥜 Vibrantcashew Template - Full HTML Expanse
+            </h4>
+            
+            <div style="margin-bottom: 15px;">
+                <label for="cashew_html_expanse" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">
+                    HTML Content (cashew_html_expanse):
+                </label>
+                <?php 
+                    // Get existing content from pylons table
+                    global $wpdb;
+                    $cashew_content = $wpdb->get_var($wpdb->prepare(
+                        "SELECT cashew_html_expanse FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+                        $post->ID
+                    ));
+                ?>
+                <textarea id="cashew_html_expanse" name="cashew_html_expanse" 
+                          style="width: 100%; height: 300px; font-family: 'Courier New', monospace; background-color: #2d3748; color: #e2e8f0; padding: 15px; border: 1px solid #4a5568; border-radius: 4px; line-height: 1.5;"
+                          placeholder="Enter your full HTML content here..."><?php echo esc_textarea($cashew_content); ?></textarea>
+            </div>
+            
+            <p style="font-size: 13px; color: #666; margin-top: 10px; padding: 10px; background: #fff; border-left: 3px solid #8B4513;">
+                <strong>Note:</strong> This HTML replaces everything between header and footer. 
+                Perfect for custom landing pages, full-width designs, or embedded content.
+                <br><span style="color: #999;">Script tags will be removed for security.</span>
+            </p>
+            
+            <!-- Character counter -->
+            <div style="margin-top: 10px; color: #666; font-size: 12px;">
+                <span id="cashew_char_count">0</span> characters
+            </div>
+            
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const textarea = document.getElementById('cashew_html_expanse');
+                    const counter = document.getElementById('cashew_char_count');
+                    
+                    if (textarea && counter) {
+                        function updateCount() {
+                            counter.textContent = textarea.value.length.toLocaleString();
+                        }
+                        textarea.addEventListener('input', updateCount);
+                        updateCount();
+                    }
+                });
+            </script>
         </div>
     <?php endif; ?>
     
@@ -2567,6 +2626,42 @@ function staircase_save_page_options_meta($post_id) {
         update_post_meta($post_id, 'vibrantberry_content_ocean_1', $custom_html);
         
         error_log("STAIRCASE SAVE: Saved vibrantberry_content_ocean_1 for post {$post_id}");
+    }
+    
+    // Save Vibrantcashew HTML field to pylons table
+    if (isset($_POST['cashew_html_expanse'])) {
+        global $wpdb;
+        
+        // Get the content and strip script tags for security
+        $cashew_html = $_POST['cashew_html_expanse'];
+        $cashew_html = preg_replace('/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/mi', '', $cashew_html);
+        
+        // Check if pylons entry exists
+        $pylon_exists = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+            $post_id
+        ));
+        
+        if ($pylon_exists) {
+            // Update existing pylons entry with cashew content
+            $result = $wpdb->update(
+                $wpdb->prefix . 'pylons',
+                array('cashew_html_expanse' => $cashew_html),
+                array('rel_wp_post_id' => $post_id),
+                array('%s'),
+                array('%d')
+            );
+            
+            if ($result !== false) {
+                error_log("STAIRCASE SAVE: Updated cashew_html_expanse for post {$post_id}");
+            } else {
+                error_log("STAIRCASE SAVE ERROR: Failed to update cashew_html_expanse for post {$post_id}: " . $wpdb->last_error);
+            }
+        } else {
+            // If no pylons entry exists yet, log a warning
+            // The main staircase save should have created it already
+            error_log("STAIRCASE SAVE WARNING: No pylons entry found for post {$post_id} when saving cashew_html_expanse");
+        }
     }
 }
 add_action('save_post', 'staircase_save_page_options_meta');
