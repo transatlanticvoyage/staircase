@@ -1513,13 +1513,25 @@ function staircase_bilberry_template() {
     global $wpdb;
     
     $pylon_data = $wpdb->get_row($wpdb->prepare(
-        "SELECT pylon_archetype FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+        "SELECT pylon_archetype, enable_nectar_blog_feed, nectar_blog_feed_items_qty 
+         FROM {$wpdb->prefix}pylons 
+         WHERE rel_wp_post_id = %d",
         $current_post_id
     ), ARRAY_A);
     
     // If this is a contactpage archetype, render the monica contact box
     if ($pylon_data && $pylon_data['pylon_archetype'] === 'contactpage') {
         staircase_render_monica_contact_box();
+    }
+    
+    // Check if nectar blog feed is enabled for this page
+    if ($pylon_data && isset($pylon_data['enable_nectar_blog_feed']) && $pylon_data['enable_nectar_blog_feed'] == 1) {
+        // Get number of items to display (default to 6 if null)
+        $items_qty = !empty($pylon_data['nectar_blog_feed_items_qty']) ? 
+                     intval($pylon_data['nectar_blog_feed_items_qty']) : 6;
+        
+        // Render the nectar blog feed
+        staircase_render_nectar_blog_feed($items_qty);
     }
     ?>
     
@@ -7937,6 +7949,198 @@ function staircase_render_monica_contact_box() {
     }
     </style>
     <?php
+}
+
+/**
+ * Render Nectar Blog Feed
+ * Custom blog feed display independent of WordPress blog page settings
+ * 
+ * @param int $items_qty Number of blog posts to display (default 6)
+ */
+function staircase_render_nectar_blog_feed($items_qty = 6) {
+    // Query for recent blog posts
+    $blog_query = new WP_Query(array(
+        'post_type' => 'post',
+        'posts_per_page' => $items_qty,
+        'post_status' => 'publish',
+        'orderby' => 'date',
+        'order' => 'DESC',
+        'ignore_sticky_posts' => true
+    ));
+    
+    if ($blog_query->have_posts()) {
+        ?>
+        <section class="nectar-blog-feed">
+            <div class="nectar-blog-container">
+                <h2 class="nectar-blog-title">Latest Blog Posts</h2>
+                <div class="nectar-blog-grid">
+                    <?php
+                    while ($blog_query->have_posts()) {
+                        $blog_query->the_post();
+                        ?>
+                        <article class="nectar-blog-item">
+                            <?php if (has_post_thumbnail()) : ?>
+                                <div class="nectar-blog-thumbnail">
+                                    <a href="<?php the_permalink(); ?>">
+                                        <?php the_post_thumbnail('medium'); ?>
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <div class="nectar-blog-content">
+                                <h3 class="nectar-blog-item-title">
+                                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                                </h3>
+                                
+                                <div class="nectar-blog-meta">
+                                    <span class="nectar-blog-date"><?php echo get_the_date(); ?></span>
+                                    <?php
+                                    $categories = get_the_category();
+                                    if (!empty($categories)) {
+                                        echo '<span class="nectar-blog-category">' . esc_html($categories[0]->name) . '</span>';
+                                    }
+                                    ?>
+                                </div>
+                                
+                                <div class="nectar-blog-excerpt">
+                                    <?php echo wp_trim_words(get_the_excerpt(), 20, '...'); ?>
+                                </div>
+                                
+                                <a href="<?php the_permalink(); ?>" class="nectar-blog-read-more">
+                                    Read More →
+                                </a>
+                            </div>
+                        </article>
+                        <?php
+                    }
+                    ?>
+                </div>
+            </div>
+        </section>
+        
+        <style>
+        .nectar-blog-feed {
+            margin-top: 4rem;
+            padding: 3rem 0;
+            background: #f8f9fa;
+        }
+        
+        .nectar-blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        .nectar-blog-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #222;
+        }
+        
+        .nectar-blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .nectar-blog-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .nectar-blog-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .nectar-blog-thumbnail {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .nectar-blog-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .nectar-blog-item:hover .nectar-blog-thumbnail img {
+            transform: scale(1.05);
+        }
+        
+        .nectar-blog-content {
+            padding: 1.5rem;
+        }
+        
+        .nectar-blog-item-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        
+        .nectar-blog-item-title a {
+            color: #222;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .nectar-blog-item-title a:hover {
+            color: #0066cc;
+        }
+        
+        .nectar-blog-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            color: #666;
+        }
+        
+        .nectar-blog-category {
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .nectar-blog-excerpt {
+            margin-bottom: 1rem;
+            color: #444;
+            line-height: 1.6;
+        }
+        
+        .nectar-blog-read-more {
+            color: #0066cc;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .nectar-blog-read-more:hover {
+            color: #0052a3;
+        }
+        
+        @media (max-width: 768px) {
+            .nectar-blog-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nectar-blog-title {
+                font-size: 1.5rem;
+            }
+        }
+        </style>
+        <?php
+    }
+    
+    // Reset post data
+    wp_reset_postdata();
 }
 
 // Add body class for TPCom nav styles

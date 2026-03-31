@@ -1,0 +1,155 @@
+/**
+ * Homeservice Footer 2 Styles
+ * A1 Chimney style footer CSS
+ */
+
+.homeservice_header_2_elementor-footer-section {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 60px 0 0;
+    margin-top: 60px;
+}
+
+.homeservice_header_2_footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.homeservice_header_2_footer-column {
+    flex: 1;
+    min-width: 250px;
+}
+
+.homeservice_header_2_footer-heading {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.homeservice_header_2_footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.homeservice_header_2_footer-links li {
+    margin-bottom: 12px;
+}
+
+.homeservice_header_2_footer-links a {
+    color: #cccccc;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.homeservice_header_2_footer-links a:hover {
+    color: #ffffff;
+}
+
+.homeservice_header_2_footer-contact {
+    color: #cccccc;
+}
+
+.homeservice_header_2_footer-phone {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.homeservice_header_2_footer-phone a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.homeservice_header_2_footer-hours {
+    line-height: 1.8;
+}
+
+.homeservice_header_2_footer-cta-text {
+    color: #cccccc;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.homeservice_header_2_footer-cta-button {
+    display: inline-block;
+    background-color: #e74c3c;
+    color: #ffffff;
+    padding: 12px 30px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.homeservice_header_2_footer-cta-button:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.homeservice_header_2_footer-copyright {
+    background-color: #0f0f0f;
+    padding: 20px 0;
+}
+
+.homeservice_header_2_copyright-text {
+    text-align: center;
+    color: #999999;
+    margin: 0;
+    font-size: 14px;
+}
+
+.homeservice_header_2_copyright-text a {
+    color: #999999;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.homeservice_header_2_copyright-text a:hover {
+    color: #ffffff;
+}
+
+.homeservice_header_2_footer-separator {
+    margin: 0 10px;
+    color: #666666;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .homeservice_header_2_footer-content {
+        gap: 30px;
+    }
+    
+    .homeservice_header_2_footer-column {
+        min-width: calc(50% - 20px);
+    }
+}
+
+@media (max-width: 768px) {
+    .homeservice_header_2_elementor-footer-section {
+        padding: 40px 0 0;
+    }
+    
+    .homeservice_header_2_footer-content {
+        flex-direction: column;
+    }
+    
+    .homeservice_header_2_footer-column {
+        min-width: 100%;
+        margin-bottom: 30px;
+    }
+    
+    .homeservice_header_2_copyright-text {
+        font-size: 12px;
+        padding: 0 20px;
+    }
+}
