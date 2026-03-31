@@ -1513,7 +1513,7 @@ function staircase_bilberry_template() {
     global $wpdb;
     
     $pylon_data = $wpdb->get_row($wpdb->prepare(
-        "SELECT pylon_archetype, enable_nectar_blog_feed, nectar_blog_feed_items_qty 
+        "SELECT pylon_archetype, enable_nectar_blog_feed, nectar_blog_feed_items_qty, nectar_blog_is_excerpt 
          FROM {$wpdb->prefix}pylons 
          WHERE rel_wp_post_id = %d",
         $current_post_id
@@ -1530,8 +1530,12 @@ function staircase_bilberry_template() {
         $items_qty = !empty($pylon_data['nectar_blog_feed_items_qty']) ? 
                      intval($pylon_data['nectar_blog_feed_items_qty']) : 6;
         
+        // Get excerpt flag (default to true if not set)
+        $use_excerpt = isset($pylon_data['nectar_blog_is_excerpt']) ? 
+                       (bool)$pylon_data['nectar_blog_is_excerpt'] : true;
+        
         // Render the nectar blog feed
-        staircase_render_nectar_blog_feed($items_qty);
+        staircase_render_nectar_blog_feed($items_qty, $use_excerpt);
     }
     ?>
     
@@ -7956,8 +7960,9 @@ function staircase_render_monica_contact_box() {
  * Custom blog feed display independent of WordPress blog page settings
  * 
  * @param int $items_qty Number of blog posts to display (default 6)
+ * @param bool $use_excerpt Whether to show excerpt (true) or full content (false) - default true
  */
-function staircase_render_nectar_blog_feed($items_qty = 6) {
+function staircase_render_nectar_blog_feed($items_qty = 6, $use_excerpt = true) {
     // Query for recent blog posts
     $blog_query = new WP_Query(array(
         'post_type' => 'post',
@@ -8002,13 +8007,23 @@ function staircase_render_nectar_blog_feed($items_qty = 6) {
                                     ?>
                                 </div>
                                 
-                                <div class="nectar-blog-excerpt">
-                                    <?php echo wp_trim_words(get_the_excerpt(), 20, '...'); ?>
+                                <div class="nectar-blog-post-content">
+                                    <?php 
+                                    if ($use_excerpt) {
+                                        // Show excerpt when nectar_blog_is_excerpt is TRUE
+                                        echo wp_trim_words(get_the_excerpt(), 20, '...');
+                                    } else {
+                                        // Show full content when nectar_blog_is_excerpt is FALSE
+                                        the_content();
+                                    }
+                                    ?>
                                 </div>
                                 
-                                <a href="<?php the_permalink(); ?>" class="nectar-blog-read-more">
-                                    Read More →
-                                </a>
+                                <?php if ($use_excerpt) : ?>
+                                    <a href="<?php the_permalink(); ?>" class="nectar-blog-read-more">
+                                        Read More →
+                                    </a>
+                                <?php endif; ?>
                             </div>
                         </article>
                         <?php
@@ -8109,10 +8124,34 @@ function staircase_render_nectar_blog_feed($items_qty = 6) {
             border-radius: 4px;
         }
         
-        .nectar-blog-excerpt {
+        .nectar-blog-post-content {
             margin-bottom: 1rem;
             color: #444;
             line-height: 1.6;
+        }
+        
+        /* Style for full content display */
+        .nectar-blog-post-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .nectar-blog-post-content img {
+            max-width: 100%;
+            height: auto;
+            margin: 1rem 0;
+        }
+        
+        .nectar-blog-post-content h2,
+        .nectar-blog-post-content h3,
+        .nectar-blog-post-content h4 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .nectar-blog-post-content ul,
+        .nectar-blog-post-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
         }
         
         .nectar-blog-read-more {
