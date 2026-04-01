@@ -1,6 +1,7 @@
 /**
- * Homeservice Header 2 - Simplified Styles
+ * Header 2 - Pure Visual Styles (Refactored)
  * Clean, minimal CSS for A1 Chimney style header
+ * JavaScript functionality moved to shared header logic system
  */
 
 /* ==========================================================================
@@ -355,4 +356,32 @@ body.hs2-active {
 @keyframes hs2-fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+/* ==========================================================================
+   Enhanced Interaction States
+   ========================================================================== */
+
+/* Hover state for menu items */
+.hs2-menu-item.hs2-hover .hs2-menu-link {
+    color: #FFD700;
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+/* Focus state for accessibility */
+.hs2-menu-item.hs2-focused .hs2-menu-link {
+    outline: 2px solid #FFD700;
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+/* Enhanced phone button interaction */
+.hs2-phone-button:focus {
+    outline: 2px solid #333333;
+    outline-offset: 3px;
+}
+
+.hs2-phone-button:active {
+    transform: translateY(-1px);
 }

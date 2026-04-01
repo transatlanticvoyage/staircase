@@ -1,9 +1,8 @@
 <?php
 /**
- * Header 2
+ * Header 2 - Refactored to use Shared Logic System
  * A1 Chimney style header with brick background
- * Features: Sticky header, dropdown menus, mobile responsive
- * (Previously homeservice_header_2 - simplified version)
+ * Now uses Ruplin shared header logic for consistent functionality
  */
 
 // Prevent direct access
@@ -12,9 +11,28 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Render header 2
+ * Render header 2 using shared logic system
  */
 function render_header2() {
+    // Load shared header system
+    if (class_exists('Ruplin_Shared_Header_Loader')) {
+        $shared_loader = Ruplin_Shared_Header_Loader::getInstance();
+        
+        if ($shared_loader && $shared_loader->is_fully_loaded()) {
+            // Use shared header system
+            echo $shared_loader->render_header('header2');
+            return;
+        }
+    }
+    
+    // Fallback to legacy system if shared logic not available
+    render_header2_fallback();
+}
+
+/**
+ * Fallback header rendering for backward compatibility
+ */
+function render_header2_fallback() {
     // Add body class for CSS targeting
     add_filter('body_class', function($classes) {
         $classes[] = 'hs2-active';
@@ -52,56 +70,59 @@ function render_header2() {
         $header_html = str_replace('{{LOGO_PLACEHOLDER}}', $logo_html, $header_html);
         
         // Generate navigation menu
-        $nav_html = '';
-        if (function_exists('silkweaver_render_menu') && get_option('silkweaver_use_system', true)) {
-            // Use Silkweaver menu system with custom wrapper
-            $silkweaver_menu = silkweaver_render_menu();
-            // Transform silkweaver menu to our header 2 structure
-            $nav_html = header2_transform_menu($silkweaver_menu);
-        } else {
-            // Fallback to WordPress menu
-            ob_start();
-            wp_nav_menu(array(
-                'theme_location' => 'primary',
-                'menu_class' => 'hs2-menu',
-                'container' => false,
-                'walker' => new Header2_Walker_Nav_Menu(),
-                'fallback_cb' => 'header2_fallback_menu'
-            ));
-            $nav_html = ob_get_clean();
-        }
-        
-        // Replace menu placeholder
+        $nav_html = header2_get_fallback_menu();
         $header_html = str_replace('{{MENU_PLACEHOLDER}}', $nav_html, $header_html);
         
         // Replace phone number if available
-        $phone_html = '';
-        if (function_exists('staircase_get_formatted_phone')) {
-            $phone_raw = staircase_get_header_phone();
-            $phone_formatted = staircase_get_formatted_phone();
-            if (!empty($phone_raw)) {
-                $phone_html = '<a href="tel:' . esc_attr(preg_replace('/[^0-9+]/', '', $phone_raw)) . '" class="hs2-phone-button"><svg class="hs2-phone-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>' . esc_html($phone_formatted) . '</a>';
-            }
-        }
-        
+        $phone_html = header2_get_fallback_phone();
         $header_html = str_replace('{{PHONE_PLACEHOLDER}}', $phone_html, $header_html);
         $header_html = str_replace('{{HOME_URL}}', esc_url(home_url('/')), $header_html);
         
         echo $header_html;
     } else {
-        // Fallback header
-        ?>
-        <header class="site-header header2">
-            <div class="container">
-                <p style="padding: 20px; text-align: center;">Header files not found. Please check installation.</p>
-            </div>
-        </header>
-        <?php
+        // Final fallback header
+        echo '<header class="hs2-header"><div class="hs2-container"><p>Header template not found.</p></div></header>';
     }
 }
 
 /**
- * Transform Silkweaver menu HTML to simplified header2 structure
+ * Get fallback menu for header2 (legacy compatibility)
+ */
+function header2_get_fallback_menu() {
+    // Try Silkweaver first
+    if (function_exists('silkweaver_render_menu') && get_option('silkweaver_use_system', true)) {
+        $silkweaver_menu = silkweaver_render_menu();
+        return header2_transform_menu($silkweaver_menu);
+    }
+    
+    // Fallback to WordPress menu
+    ob_start();
+    wp_nav_menu(array(
+        'theme_location' => 'primary',
+        'menu_class' => 'hs2-menu',
+        'container' => false,
+        'walker' => new Header2_Walker_Nav_Menu(),
+        'fallback_cb' => 'header2_fallback_menu'
+    ));
+    return ob_get_clean();
+}
+
+/**
+ * Get fallback phone HTML for header2
+ */
+function header2_get_fallback_phone() {
+    if (function_exists('staircase_get_formatted_phone')) {
+        $phone_raw = staircase_get_header_phone();
+        $phone_formatted = staircase_get_formatted_phone();
+        if (!empty($phone_raw)) {
+            return '<a href="tel:' . esc_attr(preg_replace('/[^0-9+]/', '', $phone_raw)) . '" class="hs2-phone-button"><svg class="hs2-phone-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>' . esc_html($phone_formatted) . '</a>';
+        }
+    }
+    return '';
+}
+
+/**
+ * Transform Silkweaver menu HTML to simplified header2 structure (legacy)
  */
 function header2_transform_menu($silkweaver_html) {
     if (empty($silkweaver_html)) {
