@@ -9,18 +9,18 @@
    ========================================================================== */
 
 /* Override body padding for this header */
-body.hs2-active {
+body.zx_hd2_active {
     margin-top: 0 !important;
     padding-top: 0 !important;
     overflow-x: hidden;
 }
 
-.admin-bar body.hs2-active {
+.admin-bar body.zx_hd2_active {
     padding-top: 0 !important;
 }
 
 /* Main header element */
-.hs2-header {
+.zx_hd2_header {
     position: relative;
     width: 100%;
     background-image: url('../images/brick-background.png');
@@ -35,7 +35,7 @@ body.hs2-active {
 }
 
 /* Black overlay for brick background */
-.hs2-header::before {
+.zx_hd2_header::before {
     content: '';
     position: absolute;
     top: 0;
@@ -48,7 +48,7 @@ body.hs2-active {
 }
 
 /* Container */
-.hs2-container {
+.zx_hd2_container {
     position: relative;
     z-index: 2;
     max-width: 1320px;
@@ -64,22 +64,22 @@ body.hs2-active {
    Logo Section
    ========================================================================== */
 
-.hs2-logo {
+.zx_hd2_logo {
     flex: 0 0 20%;
     max-width: 20%;
 }
 
-.hs2-logo-link {
+.zx_hd2_logo_link {
     display: inline-block;
 }
 
-.hs2-logo img {
+.zx_hd2_logo img {
     max-height: 60px;
     width: auto;
     display: block;
 }
 
-.hs2-site-title {
+.zx_hd2_site_title {
     font-size: 24px;
     font-weight: 700;
     color: #ffffff;
@@ -91,19 +91,19 @@ body.hs2-active {
    Navigation Section
    ========================================================================== */
 
-.hs2-nav {
+.zx_hd2_nav {
     flex: 0 0 60%;
     max-width: 60%;
     display: flex;
     justify-content: center;
 }
 
-.hs2-menu-wrapper {
+.zx_hd2_menu_wrapper {
     width: 100%;
 }
 
 /* Main menu list */
-.hs2-menu {
+.zx_hd2_menu {
     display: flex;
     list-style: none;
     margin: 0;
@@ -113,12 +113,12 @@ body.hs2-active {
     justify-content: center;
 }
 
-.hs2-menu-item {
+.zx_hd2_menu_item {
     position: relative;
 }
 
 /* Menu links */
-.hs2-menu-link {
+.zx_hd2_menu_link {
     display: flex;
     align-items: center;
     padding: 10px 15px;
@@ -130,12 +130,12 @@ body.hs2-active {
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
-.hs2-menu-link:hover {
+.zx_hd2_menu_link:hover {
     color: #FFD700;
 }
 
 /* Dropdown icon */
-.hs2-dropdown-icon {
+.zx_hd2_dropdown_icon {
     background: none;
     border: none;
     padding: 5px;
@@ -144,12 +144,12 @@ body.hs2-active {
     transition: color 0.3s ease;
 }
 
-.hs2-dropdown-icon:hover {
+.zx_hd2_dropdown_icon:hover {
     color: #FFD700;
 }
 
 /* Dropdown menu */
-.hs2-dropdown {
+.zx_hd2_dropdown {
     position: absolute;
     top: 100%;
     left: 50%;
@@ -165,19 +165,19 @@ body.hs2-active {
     margin-top: 10px;
 }
 
-.hs2-menu-item:hover .hs2-dropdown {
+.zx_hd2_menu_item:hover .zx_hd2_dropdown {
     opacity: 1;
     visibility: visible;
     margin-top: 0;
 }
 
-.hs2-dropdown ul {
+.zx_hd2_dropdown ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.hs2-dropdown a {
+.zx_hd2_dropdown a {
     color: #666;
     text-decoration: none;
     font-size: 14px;
@@ -186,12 +186,12 @@ body.hs2-active {
     transition: color 0.3s ease;
 }
 
-.hs2-dropdown a:hover {
+.zx_hd2_dropdown a:hover {
     color: #e74c3c;
 }
 
 /* Mobile menu toggle (hidden on desktop) */
-.hs2-mobile-toggle {
+.zx_hd2_mobile_toggle {
     display: none;
     background: none;
     border: none;
@@ -201,7 +201,7 @@ body.hs2-active {
     gap: 4px;
 }
 
-.hs2-toggle-bar {
+.zx_hd2_toggle_bar {
     display: block;
     width: 25px;
     height: 3px;
@@ -213,7 +213,7 @@ body.hs2-active {
    Phone CTA Section
    ========================================================================== */
 
-.hs2-cta {
+.zx_hd2_cta {
     flex: 0 0 20%;
     max-width: 20%;
     display: flex;
@@ -221,7 +221,7 @@ body.hs2-active {
     white-space: nowrap;
 }
 
-.hs2-phone-button {
+.zx_hd2_phone_button {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -237,14 +237,14 @@ body.hs2-active {
     white-space: nowrap;
 }
 
-.hs2-phone-icon {
+.zx_hd2_phone_icon {
     width: 18px;
     height: 18px;
     fill: #333333;
     flex-shrink: 0;
 }
 
-.hs2-phone-button:hover {
+.zx_hd2_phone_button:hover {
     background: #FFC700;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
@@ -254,11 +254,11 @@ body.hs2-active {
    Sticky Header Behavior
    ========================================================================== */
 
-.hs2-header[data-sticky="true"] {
+.zx_hd2_header[data-sticky="true"] {
     transition: none; /* Prevent jankiness */
 }
 
-.hs2-header.hs2-sticky-active {
+.zx_hd2_header.zx_hd2_sticky_active {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
@@ -272,32 +272,32 @@ body.hs2-active {
    ========================================================================== */
 
 @media (max-width: 1024px) {
-    .hs2-container {
+    .zx_hd2_container {
         flex-wrap: wrap;
     }
     
-    .hs2-logo {
+    .zx_hd2_logo {
         flex: 0 0 30%;
         max-width: 30%;
     }
     
-    .hs2-nav {
+    .zx_hd2_nav {
         flex: 0 0 40%;
         max-width: 40%;
         order: 3;
         width: 100%;
     }
     
-    .hs2-cta {
+    .zx_hd2_cta {
         flex: 0 0 30%;
         max-width: 30%;
     }
     
-    .hs2-mobile-toggle {
+    .zx_hd2_mobile_toggle {
         display: flex;
     }
     
-    .hs2-menu-wrapper {
+    .zx_hd2_menu_wrapper {
         display: none;
         position: fixed;
         top: 90px;
@@ -309,16 +309,16 @@ body.hs2-active {
         padding: 20px;
     }
     
-    .hs2-menu-wrapper.active {
+    .zx_hd2_menu_wrapper.active {
         display: block;
     }
     
-    .hs2-menu {
+    .zx_hd2_menu {
         flex-direction: column;
         align-items: stretch;
     }
     
-    .hs2-dropdown {
+    .zx_hd2_dropdown {
         position: static;
         transform: none;
         box-shadow: none;
@@ -328,17 +328,17 @@ body.hs2-active {
         visibility: visible;
     }
     
-    .hs2-cta {
+    .zx_hd2_cta {
         display: none;
     }
 }
 
 @media (max-width: 768px) {
-    .hs2-container {
+    .zx_hd2_container {
         padding: 10px;
     }
     
-    .hs2-logo img {
+    .zx_hd2_logo img {
         max-height: 50px;
     }
 }
@@ -347,13 +347,13 @@ body.hs2-active {
    Animation Classes
    ========================================================================== */
 
-.hs2-header.hs2-invisible {
+.zx_hd2_header.zx_hd2_invisible {
     opacity: 0;
-    animation: hs2-fadeIn 0.5s ease forwards;
+    animation: zx_hd2_fadeIn 0.5s ease forwards;
     animation-delay: 0.3s;
 }
 
-@keyframes hs2-fadeIn {
+@keyframes zx_hd2_fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
@@ -363,25 +363,25 @@ body.hs2-active {
    ========================================================================== */
 
 /* Hover state for menu items */
-.hs2-menu-item.hs2-hover .hs2-menu-link {
+.zx_hd2_menu_item.zx_hd2_hover .zx_hd2_menu_link {
     color: #FFD700;
     transform: translateY(-1px);
     transition: all 0.3s ease;
 }
 
 /* Focus state for accessibility */
-.hs2-menu-item.hs2-focused .hs2-menu-link {
+.zx_hd2_menu_item.zx_hd2_focused .zx_hd2_menu_link {
     outline: 2px solid #FFD700;
     outline-offset: 2px;
     border-radius: 3px;
 }
 
 /* Enhanced phone button interaction */
-.hs2-phone-button:focus {
+.zx_hd2_phone_button:focus {
     outline: 2px solid #333333;
     outline-offset: 3px;
 }
 
-.hs2-phone-button:active {
+.zx_hd2_phone_button:active {
     transform: translateY(-1px);
 }
