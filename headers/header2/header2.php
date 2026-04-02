@@ -35,7 +35,7 @@ function render_header2() {
 function render_header2_fallback() {
     // Add body class for CSS targeting
     add_filter('body_class', function($classes) {
-        $classes[] = 'hs2-active';
+        $classes[] = 'zx_hd2_active';
         return $classes;
     });
     

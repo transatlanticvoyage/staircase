@@ -1726,6 +1726,15 @@ function staircase_render_plain_post_content() {
 }
 
 /**
+ * Render Polyansk Service Categories Tiles box
+ */
+function staircase_render_polyansk_tiles_box() {
+    if (class_exists('Polyansk_Service_Categories_Tiles')) {
+        echo Polyansk_Service_Categories_Tiles::get_instance()->render();
+    }
+}
+
+/**
  * Render Cherry Full Template
  */
 function staircase_render_cherry_full_template() {
@@ -1782,7 +1791,8 @@ function staircase_render_cherry_full_template() {
                 'ava_whychooseus_box' => 'staircase_render_ava_whychooseus_box',
                 'kendall_ourprocess_box' => 'staircase_render_kendall_ourprocess_box',
                 'sara_customhtml_box' => 'staircase_render_sara_customhtml_box',
-                'liz_pricing_box' => 'staircase_render_liz_pricing_box'
+                'liz_pricing_box' => 'staircase_render_liz_pricing_box',
+                'polyansk_tiles_box' => 'staircase_render_polyansk_tiles_box'
             );
             
             // Always render derek_blog_post_meta_box first (after hero)
@@ -1828,7 +1838,10 @@ function staircase_render_cherry_full_template() {
     
     // Cherry template includes chen cards before content
     staircase_render_chen_cards_box();
-    
+
+    // Polyansk service categories tiles (shown if pylon flag is true)
+    staircase_render_polyansk_tiles_box();
+
     // Render content_bay_1 and content_bay_2 boxes
     // Add Kristina CTA Box before content bays
     staircase_render_kristina_cta_box();

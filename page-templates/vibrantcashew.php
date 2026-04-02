@@ -17,7 +17,7 @@ $post_id = get_the_ID();
 // Fetch cashew_html_expanse and expanse_width from wp_pylons
 $pylons_table = $wpdb->prefix . 'pylons';
 $pylon_data = $wpdb->get_row($wpdb->prepare(
-    "SELECT cashew_html_expanse, expanse_width FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+    "SELECT cashew_html_expanse, expanse_width, show_polyansk_custom_page_section FROM {$pylons_table} WHERE rel_wp_post_id = %d",
     $post_id
 ), ARRAY_A);
 
@@ -88,6 +88,13 @@ if (empty($cashew_content)) {
         }
     <?php endif; ?>
 </style>
+
+<?php
+// Polyansk service categories tiles (shown if pylon flag is true)
+if (!empty($pylon_data['show_polyansk_custom_page_section']) && class_exists('Polyansk_Service_Categories_Tiles')) {
+    echo Polyansk_Service_Categories_Tiles::get_instance()->render($post_id);
+}
+?>
 
 <div class="vibrantcashew-wrapper">
     <?php 
