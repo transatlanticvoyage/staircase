@@ -1739,35 +1739,105 @@ function staircase_render_polyansk_tiles_box() {
  */
 function staircase_render_cherry_full_template() {
     global $wpdb, $post;
-    
-    
+
+    // Fetch box_hide flags from wp_pylons for the current post (single query)
+    $pylons_table = $wpdb->prefix . 'pylons';
+    $box_hide_flags = $wpdb->get_row($wpdb->prepare(
+        "SELECT
+            batman_hero_box_hide,
+            avg_rating_box_hide,
+            derek_blog_post_meta_box_hide,
+            chen_cards_box_hide,
+            polyansk_tiles_box_hide,
+            kristina_cta_box_instance_1_hide,
+            content_bay_1_box_hide,
+            content_bay_2_box_hide,
+            content_lake_box_hide,
+            content_sea_box_hide,
+            osb_box_hide,
+            reviews_box_hide,
+            serena_faq_box_hide,
+            nile_map_box_hide,
+            kristina_cta_box_instance_2_hide,
+            victoria_blog_box_hide,
+            ocean_1_box_hide,
+            ocean_2_box_hide,
+            ocean_3_box_hide,
+            brook_video_box_hide,
+            olivia_auth_links_box_hide,
+            ava_why_choose_us_box_hide,
+            kendall_our_process_box_hide,
+            sara_custom_html_box_hide,
+            liz_pricing_box_hide
+        FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+        $post->ID
+    ), ARRAY_A);
+
+    // Helper: check if a box_hide flag is true (defaults to false if data missing)
+    $is_hidden = function($flag_name) use ($box_hide_flags) {
+        return !empty($box_hide_flags) && !empty($box_hide_flags[$flag_name]);
+    };
+
+    // Map box names (used in custom order JSON) to their hide flag column names
+    // kristina_cta_box uses instance_1 hide in the custom order path (appears once there)
+    $box_hide_map = array(
+        'batman_hero_box'          => 'batman_hero_box_hide',
+        'avg_rating_box'           => 'avg_rating_box_hide',
+        'derek_blog_post_meta_box' => 'derek_blog_post_meta_box_hide',
+        'chen_cards_box'           => 'chen_cards_box_hide',
+        'polyansk_tiles_box'       => 'polyansk_tiles_box_hide',
+        'kristina_cta_box'         => 'kristina_cta_box_instance_1_hide',
+        'content_bay_1_box'        => 'content_bay_1_box_hide',
+        'content_bay_2_box'        => 'content_bay_2_box_hide',
+        'content_lake_box'         => 'content_lake_box_hide',
+        'content_sea_box'          => 'content_sea_box_hide',
+        'osb_box'                  => 'osb_box_hide',
+        'reviewsbox'               => 'reviews_box_hide',
+        'serena_faq_box'           => 'serena_faq_box_hide',
+        'nile_map_box'             => 'nile_map_box_hide',
+        'victoria_blog_box'        => 'victoria_blog_box_hide',
+        'ocean1_box'               => 'ocean_1_box_hide',
+        'ocean2_box'               => 'ocean_2_box_hide',
+        'ocean3_box'               => 'ocean_3_box_hide',
+        'brook_video_box'          => 'brook_video_box_hide',
+        'olivia_authlinks_box'     => 'olivia_auth_links_box_hide',
+        'ava_whychooseus_box'      => 'ava_why_choose_us_box_hide',
+        'kendall_ourprocess_box'   => 'kendall_our_process_box_hide',
+        'sara_customhtml_box'      => 'sara_custom_html_box_hide',
+        'liz_pricing_box'          => 'liz_pricing_box_hide',
+    );
+
     // Open semantic main element for accessibility and SEO
     ?>
     <main role="main">
     <?php
-    
+
     // ALWAYS render batman_hero_box first - it's not subject to reordering
-    staircase_render_batman_hero_box();
-    
+    if (!$is_hidden('batman_hero_box_hide')) {
+        staircase_render_batman_hero_box();
+    }
+
     // ALWAYS render avg_rating_box second (after hero, before chen cards)
-    staircase_render_avg_rating_box();
-    
+    if (!$is_hidden('avg_rating_box_hide')) {
+        staircase_render_avg_rating_box();
+    }
+
     // Check for custom box ordering for remaining boxes
     $box_orders_table = $wpdb->prefix . 'box_orders';
-    
+
     $custom_order = $wpdb->get_row($wpdb->prepare(
         "SELECT box_order_json FROM {$box_orders_table} WHERE rel_post_id = %d AND is_active = 1",
         $post->ID
     ));
-    
-    
+
+
     if ($custom_order && !empty($custom_order->box_order_json)) {
         // Use custom box ordering
         $box_order = json_decode($custom_order->box_order_json, true);
         if ($box_order && is_array($box_order)) {
             // Sort boxes by their order value
             asort($box_order);
-            
+
             // Define mapping from box names to functions (batman_hero_box and baynar boxes removed)
             $box_functions = array(
                 'derek_blog_post_meta_box' => 'staircase_render_derek_blog_post_meta_box',
@@ -1794,10 +1864,12 @@ function staircase_render_cherry_full_template() {
                 'liz_pricing_box' => 'staircase_render_liz_pricing_box',
                 'polyansk_tiles_box' => 'staircase_render_polyansk_tiles_box'
             );
-            
-            // Always render derek_blog_post_meta_box first (after hero)
-            staircase_render_derek_blog_post_meta_box();
-            
+
+            // Always render derek_blog_post_meta_box first (after hero) — unless hidden
+            if (!$is_hidden('derek_blog_post_meta_box_hide')) {
+                staircase_render_derek_blog_post_meta_box();
+            }
+
             // Render boxes in custom order
             foreach ($box_order as $box_name => $order) {
                 // Skip batman_hero_box and avg_rating_box if they exist in the JSON (for backward compatibility)
@@ -1808,77 +1880,128 @@ function staircase_render_cherry_full_template() {
                 if ($box_name === 'avg_rating_box') {
                     continue;
                 }
-                
+
                 if (isset($box_functions[$box_name]) && function_exists($box_functions[$box_name])) {
                     // Skip derek_blog_post_meta_box as it's already rendered
                     if ($box_name !== 'derek_blog_post_meta_box') {
+                        // Check box_hide flag before rendering
+                        $hide_flag = isset($box_hide_map[$box_name]) ? $box_hide_map[$box_name] : null;
+                        if ($hide_flag && $is_hidden($hide_flag)) {
+                            continue;
+                        }
                         call_user_func($box_functions[$box_name]);
                     } else {
                     }
                 } else {
                 }
             }
-            
+
             // Close semantic main element before returning
             ?>
             </main>
             <?php
-            
+
             return;
         } else {
         }
     } else {
     }
-    
+
     // Use default hardcoded ordering if no custom order exists
     // Batman hero box and avg_rating_box already rendered at the top
-    
+
     // Add blog post meta information for posts only
-    staircase_render_derek_blog_post_meta_box();
-    
+    if (!$is_hidden('derek_blog_post_meta_box_hide')) {
+        staircase_render_derek_blog_post_meta_box();
+    }
+
     // Cherry template includes chen cards before content
-    staircase_render_chen_cards_box();
+    if (!$is_hidden('chen_cards_box_hide')) {
+        staircase_render_chen_cards_box();
+    }
 
     // Polyansk service categories tiles (shown if pylon flag is true)
-    staircase_render_polyansk_tiles_box();
+    if (!$is_hidden('polyansk_tiles_box_hide')) {
+        staircase_render_polyansk_tiles_box();
+    }
 
-    // Render content_bay_1 and content_bay_2 boxes
-    // Add Kristina CTA Box before content bays
-    staircase_render_kristina_cta_box();
-    
-    staircase_render_content_bay_1_box();
-    staircase_render_content_bay_2_box();
-    
+    // Kristina CTA Box instance 1 (before content bays)
+    if (!$is_hidden('kristina_cta_box_instance_1_hide')) {
+        staircase_render_kristina_cta_box();
+    }
+
+    if (!$is_hidden('content_bay_1_box_hide')) {
+        staircase_render_content_bay_1_box();
+    }
+    if (!$is_hidden('content_bay_2_box_hide')) {
+        staircase_render_content_bay_2_box();
+    }
+
     // Render content_lake and content_sea boxes after bay boxes
-    staircase_render_content_lake_box();
-    staircase_render_content_sea_box();
-    
+    if (!$is_hidden('content_lake_box_hide')) {
+        staircase_render_content_lake_box();
+    }
+    if (!$is_hidden('content_sea_box_hide')) {
+        staircase_render_content_sea_box();
+    }
+
     // Cherry template doesn't need WordPress post_content (uses pylons content fields instead)
     // staircase_render_plain_post_content(); // Removed - not needed for cherry template
-    
+
     // Cherry template includes OSB box
-    staircase_render_osb_box();
-    
+    if (!$is_hidden('osb_box_hide')) {
+        staircase_render_osb_box();
+    }
+
     // Cherry template includes reviewsbox before FAQ
-    staircase_render_reviewsbox();
-    
+    if (!$is_hidden('reviews_box_hide')) {
+        staircase_render_reviewsbox();
+    }
+
     // Cherry template includes all the boxes at the end
-    staircase_render_serena_faq_box();
-    staircase_render_nile_map_box();
-    staircase_render_kristina_cta_box();
-    staircase_render_victoria_blog_box();
-    
+    if (!$is_hidden('serena_faq_box_hide')) {
+        staircase_render_serena_faq_box();
+    }
+    if (!$is_hidden('nile_map_box_hide')) {
+        staircase_render_nile_map_box();
+    }
+    // Kristina CTA Box instance 2
+    if (!$is_hidden('kristina_cta_box_instance_2_hide')) {
+        staircase_render_kristina_cta_box();
+    }
+    if (!$is_hidden('victoria_blog_box_hide')) {
+        staircase_render_victoria_blog_box();
+    }
+
     // Additional ocean and new box functions
-    staircase_render_ocean1_box();
-    staircase_render_ocean2_box();
-    staircase_render_ocean3_box();
-    staircase_render_brook_video_box();
-    staircase_render_olivia_authlinks_box();
-    staircase_render_ava_whychooseus_box();
-    staircase_render_kendall_ourprocess_box();
-    staircase_render_sara_customhtml_box();
-    staircase_render_liz_pricing_box();
-    
+    if (!$is_hidden('ocean_1_box_hide')) {
+        staircase_render_ocean1_box();
+    }
+    if (!$is_hidden('ocean_2_box_hide')) {
+        staircase_render_ocean2_box();
+    }
+    if (!$is_hidden('ocean_3_box_hide')) {
+        staircase_render_ocean3_box();
+    }
+    if (!$is_hidden('brook_video_box_hide')) {
+        staircase_render_brook_video_box();
+    }
+    if (!$is_hidden('olivia_auth_links_box_hide')) {
+        staircase_render_olivia_authlinks_box();
+    }
+    if (!$is_hidden('ava_why_choose_us_box_hide')) {
+        staircase_render_ava_whychooseus_box();
+    }
+    if (!$is_hidden('kendall_our_process_box_hide')) {
+        staircase_render_kendall_ourprocess_box();
+    }
+    if (!$is_hidden('sara_custom_html_box_hide')) {
+        staircase_render_sara_customhtml_box();
+    }
+    if (!$is_hidden('liz_pricing_box_hide')) {
+        staircase_render_liz_pricing_box();
+    }
+
     // Close semantic main element
     ?>
     </main>
