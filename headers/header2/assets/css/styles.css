@@ -190,6 +190,99 @@ body.zx_hd2_active {
     color: #e74c3c;
 }
 
+/* ==========================================================================
+   Silkweaver Menu Classes (shared with header1, scoped to header2)
+   ========================================================================== */
+
+.zx_hd2_header .silkweaver-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.zx_hd2_header .silkweaver-menu > li {
+    position: relative;
+}
+
+.zx_hd2_header .silkweaver-menu > li > a {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+    transition: color 0.3s ease;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.zx_hd2_header .silkweaver-menu > li > a:hover {
+    color: #FFD700;
+}
+
+.zx_hd2_header .silkweaver-parent-button {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #ffffff;
+    background: none;
+    border: none;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.zx_hd2_header .silkweaver-parent-button:hover {
+    color: #FFD700;
+}
+
+.zx_hd2_header .silkweaver-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    list-style: none;
+    z-index: 100;
+}
+
+.zx_hd2_header .silkweaver-dropdown:hover .silkweaver-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    margin-top: 0;
+}
+
+.zx_hd2_header .silkweaver-dropdown-menu li {
+    list-style: none;
+}
+
+.zx_hd2_header .silkweaver-dropdown-menu a {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 0;
+    display: block;
+    transition: color 0.3s ease;
+}
+
+.zx_hd2_header .silkweaver-dropdown-menu a:hover {
+    color: #e74c3c;
+}
+
 /* Mobile menu toggle (hidden on desktop) */
 .zx_hd2_mobile_toggle {
     display: none;
@@ -265,6 +358,16 @@ body.zx_hd2_active {
     right: 0 !important;
     width: 100% !important;
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.admin-bar .zx_hd2_header.zx_hd2_sticky_active {
+    top: 32px !important;
+}
+
+@media screen and (max-width: 782px) {
+    .admin-bar .zx_hd2_header.zx_hd2_sticky_active {
+        top: 46px !important;
+    }
 }
 
 /* ==========================================================================

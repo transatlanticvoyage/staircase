@@ -89,10 +89,9 @@ function render_header2_fallback() {
  * Get fallback menu for header2 (legacy compatibility)
  */
 function header2_get_fallback_menu() {
-    // Try Silkweaver first
+    // Try Silkweaver first — return output directly, no transformation
     if (function_exists('silkweaver_render_menu') && get_option('silkweaver_use_system', true)) {
-        $silkweaver_menu = silkweaver_render_menu();
-        return header2_transform_menu($silkweaver_menu);
+        return silkweaver_render_menu();
     }
     
     // Fallback to WordPress menu

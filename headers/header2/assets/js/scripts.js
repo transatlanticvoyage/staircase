@@ -9,23 +9,40 @@ jQuery(document).ready(function($) {
     // Sticky header functionality - Header2 specific implementation
     var header = $('.zx_hd2_header[data-sticky="true"]');
     if (header.length) {
-        var headerOffset;
         var isSticky = false;
-        
-        // Initialize on load
-        $(window).on('load', function() {
-            headerOffset = header.offset().top;
-        });
-        
-        // Simple scroll handler with header2-specific classes
+        var placeholder = null;
+
+        function getAdminBarHeight() {
+            var ab = document.getElementById('wpadminbar');
+            return ab ? ab.offsetHeight : 0;
+        }
+
+        function getHeaderOffset() {
+            // When sticky, placeholder holds the original position
+            if (placeholder && placeholder.is(':visible')) {
+                return placeholder.offset().top - getAdminBarHeight();
+            }
+            return header.offset().top - getAdminBarHeight();
+        }
+
         $(window).on('scroll', function() {
             var scrollTop = $(window).scrollTop();
-            
-            if (scrollTop > headerOffset && !isSticky) {
+            var offset = getHeaderOffset();
+
+            if (scrollTop > offset && !isSticky) {
+                // Insert a placeholder to prevent content jump
+                if (!placeholder) {
+                    placeholder = $('<div class="zx_hd2_sticky_placeholder"></div>');
+                }
+                placeholder.css('height', header.outerHeight() + 'px');
+                header.before(placeholder);
                 header.addClass('zx_hd2_sticky_active');
                 isSticky = true;
-            } else if (scrollTop <= headerOffset && isSticky) {
+            } else if (scrollTop <= offset && isSticky) {
                 header.removeClass('zx_hd2_sticky_active');
+                if (placeholder) {
+                    placeholder.detach();
+                }
                 isSticky = false;
             }
         });
