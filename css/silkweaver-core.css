@@ -356,6 +356,34 @@
     .silkweaver-dropdown.is-open .silkweaver-dropdown-toggle::after {
         transform: translateY(-50%) rotate(180deg);
     }
+
+    /* Robust child area — mobile */
+    .silkweaver-robust-child-area {
+        position: static !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 10px 10px 10px !important;
+        display: none;
+    }
+
+    .silkweaver-robust-dropdown.is-open > .silkweaver-robust-child-area {
+        display: block !important;
+    }
+
+    .silkweaver-robust-tiles-wrapper {
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+    }
+
+    .silkweaver-robust-tile {
+        flex: 0 0 100% !important;
+        width: 100% !important;
+    }
+
+    .silkweaver-robust-tile-image {
+        height: 80px !important;
+    }
 }
 
 /* ===================================
@@ -435,6 +463,167 @@
     .silkweaver-dropdown.is-open .silkweaver-dropdown-toggle::after {
         transform: translateY(-50%) rotate(180deg);
     }
+
+    /* Robust child area — tablet */
+    .silkweaver-robust-child-area {
+        position: static !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 15px 12px 15px !important;
+        display: none;
+    }
+
+    .silkweaver-robust-dropdown.is-open > .silkweaver-robust-child-area {
+        display: block !important;
+    }
+
+    .silkweaver-robust-tiles-wrapper {
+        flex-wrap: wrap !important;
+        gap: 12px !important;
+    }
+
+    .silkweaver-robust-tile {
+        flex: 0 0 calc(50% - 6px) !important;
+        width: calc(50% - 6px) !important;
+    }
+}
+
+/* ===================================
+   ROBUST CHILD AREA — tile-based mega dropdown
+   Used by: pull_all_service_pages_dynamically_with_robust_child_area
+            pull_all_location_pages_dynamically_with_robust_child_area
+   =================================== */
+
+.silkweaver-robust-dropdown {
+    position: relative;
+}
+
+.silkweaver-robust-child-area {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0; /* JS will override this to viewport-center the panel */
+    width: max-content;
+    background: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    z-index: 9999;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.silkweaver-robust-dropdown:hover .silkweaver-robust-child-area,
+.silkweaver-robust-dropdown:focus-within .silkweaver-robust-child-area {
+    display: block;
+}
+
+.silkweaver-robust-tiles-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    justify-content: center;
+}
+
+.silkweaver-robust-tile {
+    flex: 0 0 200px;
+    box-sizing: border-box;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #fafafa;
+}
+
+/* Fixed-size image area — always present, never resizes */
+.silkweaver-robust-tile-image {
+    width: 100%;
+    height: 120px;
+    background: #e8e8e8;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.silkweaver-robust-tile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.silkweaver-robust-tile-body {
+    padding: 10px 12px;
+}
+
+.silkweaver-robust-tile-name {
+    display: block;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    margin-bottom: 6px !important;
+    color: #111 !important;
+}
+
+/* Child pages — always visible, no hover interaction */
+.silkweaver-robust-child-pages {
+    display: block;
+    list-style: none !important;
+    /* Bleed left and right past tile-body padding so rows touch tile edges */
+    margin: 8px -12px 0 -12px !important;
+    padding: 0 !important;
+}
+
+.silkweaver-robust-child-pages li {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    width: 100% !important;
+    font-size: inherit !important;
+    height: auto !important;
+    list-style: none !important;
+}
+
+/* Full-width row wrapper — carries the oscillating bg and bullet */
+.silkweaver-robust-moniker-row {
+    display: flex !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 4px 12px !important;
+}
+
+/* Bullet span — hidden by default, shown when ul has --has-bullet modifier */
+.silkweaver-robust-moniker-bullet {
+    display: none !important;
+    flex-shrink: 0 !important;
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: currentColor !important;
+    margin-right: 7px !important;
+    margin-top: 5px !important; /* optical alignment with first-line cap-height at line-height 1.4 / font-size 12px */
+}
+
+.silkweaver-robust-child-pages--has-bullet .silkweaver-robust-moniker-bullet {
+    display: inline-block !important;
+}
+
+.silkweaver-robust-child-pages a {
+    display: block !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+    color: #444 !important;
+    text-decoration: none !important;
+    border: none !important;
+    width: auto !important;
+    line-height: 1.4 !important;
+    flex: 1 !important;
+}
+
+.silkweaver-robust-child-pages a:hover {
+    text-decoration: underline !important;
+    color: #000 !important;
+    background: none !important;
+    opacity: 1 !important;
 }
 
 /* ===================================
