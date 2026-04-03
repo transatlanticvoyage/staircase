@@ -211,7 +211,7 @@ body.zx_hd2_active {
 .zx_hd2_header .silkweaver-menu > li > a {
     display: flex;
     align-items: center;
-    padding: 10px 15px;
+    padding: 10px 8px;
     color: #ffffff;
     text-decoration: none;
     font-weight: 700;
@@ -227,7 +227,7 @@ body.zx_hd2_active {
 .zx_hd2_header .silkweaver-parent-button {
     display: flex;
     align-items: center;
-    padding: 10px 15px;
+    padding: 10px 8px;
     color: #ffffff;
     background: none;
     border: none;
