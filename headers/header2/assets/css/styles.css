@@ -375,31 +375,51 @@ body.zx_hd2_active {
    ========================================================================== */
 
 @media (max-width: 1024px) {
+
+    /* ---- Header bar: single row [LOGO] [HAMBURGER] [PHONE] ---- */
+
     .zx_hd2_container {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 15px;
     }
-    
+
     .zx_hd2_logo {
-        flex: 0 0 30%;
-        max-width: 30%;
+        flex: 0 0 auto;
+        max-width: none;
     }
-    
+
+    /* Nav shrinks to fit toggle button only; stays in natural DOM order (middle) */
     .zx_hd2_nav {
-        flex: 0 0 40%;
-        max-width: 40%;
-        order: 3;
-        width: 100%;
+        flex: 0 0 auto;
+        max-width: none;
+        width: auto;
+        order: 0;
+        display: flex;
+        align-items: center;
     }
-    
-    .zx_hd2_cta {
-        flex: 0 0 30%;
-        max-width: 30%;
-    }
-    
+
+    /* Hamburger: visible, white bars */
     .zx_hd2_mobile_toggle {
         display: flex;
     }
-    
+
+    /* Phone CTA: visible and compact on right */
+    .zx_hd2_cta {
+        flex: 0 0 auto;
+        max-width: none;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .zx_hd2_phone_button {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    /* ---- Menu panel (opens when hamburger clicked) ---- */
+
     .zx_hd2_menu_wrapper {
         display: none;
         position: fixed;
@@ -407,42 +427,234 @@ body.zx_hd2_active {
         left: 0;
         right: 0;
         bottom: 0;
-        background: #fff;
+        background: #000;
         overflow-y: auto;
-        padding: 20px;
+        padding: 8px;
+        z-index: 9998;
     }
-    
+
     .zx_hd2_menu_wrapper.active {
         display: block;
     }
-    
+
+    /* ---- Top-level nav items: vertical list ---- */
+
     .zx_hd2_menu {
         flex-direction: column;
         align-items: stretch;
+        padding: 0;
+        margin: 0;
     }
-    
+
+    /* Each top-level item: black bg, full border box, gap below */
+    .zx_hd2_menu_item {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        background: #000;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+    }
+
+    .zx_hd2_menu_link {
+        flex: 1;
+        padding: 15px 16px;
+        color: #fff;
+        font-size: 16px;
+        text-shadow: none;
+    }
+
+    .zx_hd2_menu_link:hover {
+        color: #FFD700;
+    }
+
+    /* Expand icon: LEFT of text, white */
+    .zx_hd2_dropdown_icon {
+        order: -1;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: #fff;
+        padding: 0;
+    }
+
+    .zx_hd2_dropdown_icon svg {
+        transition: transform 0.25s ease;
+    }
+
+    .zx_hd2_has_dropdown.active .zx_hd2_dropdown_icon svg {
+        transform: rotate(180deg);
+    }
+
+    /* ---- Child items (zx_hd2): black bg, bordered, indented ---- */
+
     .zx_hd2_dropdown {
+        display: none; /* JS slideToggle controls visibility */
         position: static;
         transform: none;
         box-shadow: none;
-        border: 1px solid #e0e0e0;
-        margin: 10px 0;
+        border: none;
+        margin: 0;
+        opacity: 1;
+        visibility: visible;
+        width: 100%;
+        flex-basis: 100%;
+        padding: 4px 4px 0 4px;
+        background: #000;
+    }
+
+    .zx_hd2_dropdown ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    .zx_hd2_dropdown li {
+        margin-bottom: 4px;
+    }
+
+    .zx_hd2_dropdown a {
+        display: block;
+        padding: 13px 16px 13px 20px;
+        color: #fff;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        text-decoration: none;
+        background: #000;
+    }
+
+    .zx_hd2_dropdown a:hover {
+        color: #FFD700;
+    }
+
+    /* ---- Silkweaver menu: same accordion pattern ---- */
+
+    .zx_hd2_header .silkweaver-menu {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Non-parent silkweaver items: black bg, full border box */
+    .zx_hd2_header .silkweaver-menu > li {
+        background: #000;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+    }
+
+    .zx_hd2_header .silkweaver-menu > li > a {
+        display: block;
+        padding: 15px 16px;
+        color: #fff;
+        font-size: 16px;
+        text-shadow: none;
+        text-decoration: none;
+    }
+
+    .zx_hd2_header .silkweaver-menu > li > a:hover {
+        color: #FFD700;
+    }
+
+    /* Parent silkweaver items: flex row, black bg, full border box */
+    .zx_hd2_header .silkweaver-dropdown {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        background: #000;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+    }
+
+    .zx_hd2_header .silkweaver-parent-button {
+        order: 0;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        padding: 15px 16px 15px 0;
+        color: #fff;
+        font-size: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        text-shadow: none;
+    }
+
+    /* Chevron on LEFT of silkweaver parent text — white */
+    .zx_hd2_header .silkweaver-parent-button::before {
+        content: '▶';
+        display: inline-block;
+        width: 48px;
+        text-align: center;
+        font-size: 10px;
+        color: #fff;
+        flex-shrink: 0;
+        transition: transform 0.25s ease;
+    }
+
+    .zx_hd2_header .silkweaver-dropdown.active .silkweaver-parent-button::before {
+        transform: rotate(90deg);
+    }
+
+    /* Silkweaver child list: black bg, bordered items */
+    .zx_hd2_header .silkweaver-dropdown-menu {
+        display: none; /* JS slideToggle controls visibility */
+        position: static;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        margin: 0;
+        opacity: 1;
+        visibility: visible;
+        width: 100%;
+        flex-basis: 100%;
+        padding: 4px 4px 0 4px;
+        background: #000;
+        list-style: none;
+    }
+
+    /* Disable desktop hover-open on mobile */
+    .zx_hd2_header .silkweaver-dropdown:hover .silkweaver-dropdown-menu {
         opacity: 1;
         visibility: visible;
     }
-    
-    .zx_hd2_cta {
-        display: none;
+
+    .zx_hd2_header .silkweaver-dropdown-menu li {
+        list-style: none;
+        margin-bottom: 4px;
+    }
+
+    .zx_hd2_header .silkweaver-dropdown-menu a {
+        display: block;
+        padding: 13px 16px 13px 20px;
+        color: #fff;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        text-decoration: none;
+        background: #000;
+    }
+
+    .zx_hd2_header .silkweaver-dropdown-menu a:hover {
+        color: #FFD700;
     }
 }
 
 @media (max-width: 768px) {
     .zx_hd2_container {
-        padding: 10px;
+        padding: 8px 12px;
     }
-    
+
     .zx_hd2_logo img {
-        max-height: 50px;
+        max-height: 44px;
+    }
+
+    .zx_hd2_phone_button {
+        padding: 8px 12px;
+        font-size: 13px;
     }
 }
 

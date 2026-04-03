@@ -1768,7 +1768,10 @@ function staircase_render_cherry_full_template() {
             ava_why_choose_us_box_hide,
             kendall_our_process_box_hide,
             sara_custom_html_box_hide,
-            liz_pricing_box_hide
+            liz_pricing_box_hide,
+            chenblock_card1_title,
+            chenblock_card2_title,
+            chenblock_card3_title
         FROM {$pylons_table} WHERE rel_wp_post_id = %d",
         $post->ID
     ), ARRAY_A);
@@ -1926,7 +1929,12 @@ function staircase_render_cherry_full_template() {
     }
 
     // Kristina CTA Box instance 1 (before content bays)
-    if (!$is_hidden('kristina_cta_box_instance_1_hide')) {
+    // Only show if chen cards are also showing (not hidden and has content)
+    $chen_cards_will_show = !$is_hidden('chen_cards_box_hide')
+        && (!empty($box_hide_flags['chenblock_card1_title'])
+            || !empty($box_hide_flags['chenblock_card2_title'])
+            || !empty($box_hide_flags['chenblock_card3_title']));
+    if (!$is_hidden('kristina_cta_box_instance_1_hide') && $chen_cards_will_show) {
         staircase_render_kristina_cta_box();
     }
 

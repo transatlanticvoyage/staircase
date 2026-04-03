@@ -5,7 +5,70 @@
  */
 
 jQuery(document).ready(function($) {
-    
+
+    // -------------------------------------------------------------------------
+    // Mobile hamburger toggle
+    // -------------------------------------------------------------------------
+    var $toggle  = $('.zx_hd2_mobile_toggle');
+    var $wrapper = $('.zx_hd2_menu_wrapper');
+
+    // Open / close panel
+    $toggle.on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var isOpen = $wrapper.hasClass('active');
+        $toggle.toggleClass('active').attr('aria-expanded', !isOpen);
+        $wrapper.toggleClass('active');
+        $('body').toggleClass('mobile-menu-open');
+    });
+
+    // Close when clicking outside the panel or toggle
+    $(document).on('click', function(e) {
+        if ($wrapper.hasClass('active') &&
+            !$(e.target).closest('.zx_hd2_mobile_toggle, .zx_hd2_menu_wrapper').length) {
+            $toggle.removeClass('active').attr('aria-expanded', false);
+            $wrapper.removeClass('active');
+            $('body').removeClass('mobile-menu-open');
+        }
+    });
+
+    // Close on Escape key
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && $wrapper.hasClass('active')) {
+            $toggle.removeClass('active').attr('aria-expanded', false);
+            $wrapper.removeClass('active');
+            $('body').removeClass('mobile-menu-open');
+            $toggle.focus();
+        }
+    });
+
+    // zx_hd2 dropdown icon: expand child items on mobile
+    $(document).on('click', '.zx_hd2_dropdown_icon', function(e) {
+        if ($(window).width() > 1024) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var $item     = $(this).closest('.zx_hd2_has_dropdown');
+        var $dropdown = $item.find('.zx_hd2_dropdown').first();
+        $item.toggleClass('active');
+        $dropdown.slideToggle(250);
+    });
+
+    // Reset mobile state on resize to desktop
+    var resizeTimer;
+    $(window).on('resize', function() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            if ($(window).width() > 1024) {
+                $toggle.removeClass('active').attr('aria-expanded', false);
+                $wrapper.removeClass('active');
+                $('body').removeClass('mobile-menu-open');
+                $('.zx_hd2_has_dropdown').removeClass('active');
+                $('.zx_hd2_dropdown').removeAttr('style');
+            }
+        }, 250);
+    });
+
+    // -------------------------------------------------------------------------
     // Sticky header functionality - Header2 specific implementation
     var header = $('.zx_hd2_header[data-sticky="true"]');
     if (header.length) {
@@ -84,5 +147,25 @@ jQuery(document).ready(function($) {
         $(this).closest('.zx_hd2_menu_item').addClass('zx_hd2_focused');
     }).on('blur', function() {
         $(this).closest('.zx_hd2_menu_item').removeClass('zx_hd2_focused');
+    });
+
+    // Silkweaver mobile accordion (header2-specific, only active on mobile widths)
+    $('.zx_hd2_header .silkweaver-parent-button').on('click', function(e) {
+        if ($(window).width() <= 1024) {
+            e.preventDefault();
+            e.stopPropagation();
+            var parentLi = $(this).closest('.silkweaver-dropdown');
+            var submenu = parentLi.find('.silkweaver-dropdown-menu').first();
+            parentLi.toggleClass('active');
+            submenu.slideToggle(300);
+        }
+    });
+
+    // Reset silkweaver submenus when resizing back to desktop
+    $(window).on('resize', function() {
+        if ($(window).width() > 1024) {
+            $('.zx_hd2_header .silkweaver-dropdown').removeClass('active');
+            $('.zx_hd2_header .silkweaver-dropdown-menu').removeAttr('style');
+        }
     });
 });
