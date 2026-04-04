@@ -1498,12 +1498,22 @@ function staircase_cherry_hero() {
 function staircase_bilberry_template() {
     ?>
     <article class="bilberry-article">
-        <header class="bilberry-header">
-            <h1 class="bilberry-title"><?php the_title(); ?></h1>
-        </header>
-        
-        <div class="bilberry-content">
-            <?php the_content(); ?>
+        <div class="bilberry-inner">
+            <?php if (get_post_type() === 'post' && has_post_thumbnail()): ?>
+                <div class="bilberry-featured-image">
+                    <?php the_post_thumbnail('large', array('alt' => esc_attr(get_the_title()), 'loading' => 'eager')); ?>
+                </div>
+            <?php endif; ?>
+
+            <div class="bilberry-inner-body">
+                <header class="bilberry-header">
+                    <h1 class="bilberry-title"><?php the_title(); ?></h1>
+                </header>
+
+                <div class="bilberry-content">
+                    <?php the_content(); ?>
+                </div>
+            </div>
         </div>
     </article>
     
@@ -1548,7 +1558,30 @@ function staircase_bilberry_template() {
         line-height: 1.6;
         color: #333;
     }
-    
+
+    .bilberry-inner {
+        border: 1px solid #d0d0d0;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+
+    .bilberry-inner-body {
+        padding: 2rem;
+    }
+
+    .bilberry-featured-image {
+        /* border-radius handled by overflow:hidden on .bilberry-inner */
+        max-height: 480px;
+        overflow: hidden;
+    }
+
+    .bilberry-featured-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
     .bilberry-header {
         margin-bottom: 2rem;
     }
