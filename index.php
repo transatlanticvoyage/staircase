@@ -24,14 +24,21 @@ get_header();
                     <?php
                     // Start the Loop for blog cards
                     while (have_posts()): the_post();
-                        $author_id = get_the_author_meta('ID');
-                        $author_name = get_the_author();
-                        $post_date = get_the_date('M j, Y');
-                        $post_title = get_the_title();
+                        $author_name  = get_the_author();
+                        $post_date    = get_the_date('M j, Y');
+                        $post_title   = get_the_title();
                         $post_excerpt = has_excerpt() ? get_the_excerpt() : wp_trim_words(get_the_content(), 20, '...');
-                        $post_link = get_permalink();
+                        $post_link    = get_permalink();
+                        $has_thumb    = has_post_thumbnail();
                         ?>
-                        <div class="blog-post-card">
+                        <div class="blog-post-card<?php echo $has_thumb ? ' blog-post-card--has-image' : ''; ?>">
+                            <?php if ($has_thumb): ?>
+                                <div class="blog-post-card-thumbnail">
+                                    <a href="<?php echo esc_url($post_link); ?>" tabindex="-1" aria-hidden="true">
+                                        <?php the_post_thumbnail('medium_large', array('alt' => esc_attr($post_title), 'loading' => 'lazy')); ?>
+                                    </a>
+                                </div>
+                            <?php endif; ?>
                             <div class="post-meta">
                                 <span class="post-date"><?php echo esc_html($post_date); ?></span>
                                 <span class="post-author">By <?php echo esc_html($author_name); ?></span>
