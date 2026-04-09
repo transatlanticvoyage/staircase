@@ -104,9 +104,3 @@ if (!empty($pylon_data['show_polyansk_custom_page_section']) && class_exists('Po
     ?>
 </div>
 
-<script>
-    // Add body class for CSS targeting
-    document.addEventListener('DOMContentLoaded', function() {
-        document.body.classList.add('vibrantcashew-template');
-    });
-</script>

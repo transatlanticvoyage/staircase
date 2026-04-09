@@ -505,6 +505,8 @@
     top: 100%;
     left: 0; /* JS will override this to viewport-center the panel */
     width: max-content;
+    max-height: calc(100vh - 120px); /* cap height so panel never extends below viewport; 120px accounts for nav bar height */
+    overflow-y: auto;
     background: #fff;
     border: 1px solid #ddd;
     box-shadow: 0 4px 16px rgba(0,0,0,0.12);
@@ -516,6 +518,18 @@
 .silkweaver-robust-dropdown:hover .silkweaver-robust-child-area,
 .silkweaver-robust-dropdown:focus-within .silkweaver-robust-child-area {
     display: block;
+}
+
+/* On mobile/tablet (≤1024px), suppress hover/focus-within CSS expansion.
+   Child area only opens via JS adding .is-open class (click/tap only). */
+@media (max-width: 1024px) {
+    .silkweaver-robust-dropdown:hover .silkweaver-robust-child-area,
+    .silkweaver-robust-dropdown:focus-within .silkweaver-robust-child-area {
+        display: none !important;
+    }
+    .silkweaver-robust-dropdown.is-open > .silkweaver-robust-child-area {
+        display: block !important;
+    }
 }
 
 .silkweaver-robust-tiles-wrapper {
@@ -609,14 +623,13 @@
 
 .silkweaver-robust-child-pages a {
     display: block !important;
+    width: 100% !important;
     padding: 0 !important;
     font-size: 12px !important;
     color: #444 !important;
     text-decoration: none !important;
     border: none !important;
-    width: auto !important;
     line-height: 1.4 !important;
-    flex: 1 !important;
 }
 
 .silkweaver-robust-child-pages a:hover {

@@ -168,4 +168,32 @@ jQuery(document).ready(function($) {
             $('.zx_hd2_header .silkweaver-dropdown-menu').removeAttr('style');
         }
     });
+
+    // -------------------------------------------------------------------------
+    // Mobile sticky call banner — show after user begins scrolling, mobile only
+    // -------------------------------------------------------------------------
+    var $callBanner = $('.zx_hd2_call_banner');
+    if ($callBanner.length) {
+        // Sync the tel: href from the phone button so banner always dials same number
+        var phoneHref = $('.zx_hd2_phone_button').attr('href');
+        if (phoneHref) {
+            $callBanner.attr('href', phoneHref);
+        }
+
+        function updateCallBanner() {
+            if ($(window).width() > 1024) {
+                $callBanner.removeClass('zx_hd2_call_banner_visible');
+                return;
+            }
+            if ($(window).scrollTop() > 0) {
+                $callBanner.addClass('zx_hd2_call_banner_visible');
+            } else {
+                $callBanner.removeClass('zx_hd2_call_banner_visible');
+            }
+        }
+
+        $(window).on('scroll', updateCallBanner);
+        $(window).on('resize', updateCallBanner);
+        updateCallBanner();
+    }
 });

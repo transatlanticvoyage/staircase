@@ -700,3 +700,43 @@ body.zx_hd2_active {
 .zx_hd2_phone_button:active {
     transform: translateY(-1px);
 }
+
+/* ==========================================================================
+   Mobile Sticky Call Banner
+   Appears at bottom of screen after user begins scrolling. Mobile only.
+   ========================================================================== */
+
+.zx_hd2_call_banner {
+    display: none; /* hidden on desktop and before scroll */
+}
+
+@media (max-width: 1024px) {
+    .zx_hd2_call_banner {
+        display: none; /* JS adds .zx_hd2_call_banner_visible to show */
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 28px;
+        z-index: 99999;
+        background: #FFD700;
+        color: #333333;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border-top: 1px solid #E6C200;
+    }
+
+    .zx_hd2_call_banner.zx_hd2_call_banner_visible {
+        display: flex;
+    }
+
+    .zx_hd2_call_banner_icon {
+        fill: #333333;
+        flex-shrink: 0;
+    }
+}

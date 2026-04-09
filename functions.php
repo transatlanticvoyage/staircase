@@ -76,6 +76,18 @@ function staircase_enqueue_assets() {
         );
     }
     
+    // Enqueue header2 styles early to prevent FOUC — must be here (wp_enqueue_scripts)
+    // so the <link> tag lands in <head> when wp_head() fires, not after body render
+    $header2_css_path = get_template_directory() . '/headers/header2/assets/css/styles.css';
+    if (file_exists($header2_css_path)) {
+        wp_enqueue_style(
+            'header2-styles',
+            get_template_directory_uri() . '/headers/header2/assets/css/styles.css',
+            array(),
+            filemtime($header2_css_path)
+        );
+    }
+
     // Enqueue navigation script for mobile menu
     wp_enqueue_script(
         'staircase-navigation',
@@ -330,6 +342,25 @@ function staircase_enqueue_assets() {
     ');
 }
 add_action('wp_enqueue_scripts', 'staircase_enqueue_assets');
+
+// Add vibrantcashew-template body class server-side to prevent FOUC.
+// Must hook to 'wp' (after WP knows the current page) so the filter runs
+// before body_class() is called in the <body> tag.
+add_action('wp', function() {
+    $post_id = get_queried_object_id();
+    if (!$post_id) return;
+    global $wpdb;
+    $template = $wpdb->get_var($wpdb->prepare(
+        "SELECT staircase_page_template_desired FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
+        $post_id
+    ));
+    if ($template === 'vibrantcashew') {
+        add_filter('body_class', function($classes) {
+            $classes[] = 'vibrantcashew-template';
+            return $classes;
+        });
+    }
+});
 
 // Frontend Jezel Widget for Admin Users
 function staircase_frontend_jezel_widget() {
