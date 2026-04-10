@@ -1,155 +1,236 @@
 /**
- * Homeservice Footer 2 Styles
- * A1 Chimney style footer CSS
+ * Footer 2 Styles
+ * All selectors prefixed with zh_ft2_ for complete style isolation
  */
 
-.homeservice_header_2_elementor-footer-section {
-    background-color: #1a1a1a;
-    color: #ffffff;
-    padding: 60px 0 0;
+/* ── Main Footer ── */
+.zh_ft2_footer {
+    background-color: #1b2a3d;
+    color: #d0d8e0;
+    font-family: inherit;
     margin-top: 60px;
 }
 
-.homeservice_header_2_footer-content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 40px;
-    padding-bottom: 40px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.zh_ft2_main {
+    padding: 50px 0 40px;
 }
 
-.homeservice_header_2_footer-column {
-    flex: 1;
-    min-width: 250px;
+.zh_ft2_container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
 }
 
-.homeservice_header_2_footer-heading {
+/* ── 4-Column Grid ── */
+.zh_ft2_grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+/* ── Boxes (shared) ── */
+.zh_ft2_box {
+    padding: 10px 0;
+}
+
+.zh_ft2_box h3,
+.zh_ft2_box h4 {
     color: #ffffff;
-    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 14px;
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 }
 
-.homeservice_header_2_footer-links {
+.zh_ft2_box p {
+    color: #b0bcc8;
+    line-height: 1.7;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.zh_ft2_box a {
+    color: #7eb8e0;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.zh_ft2_box a:hover {
+    color: #ffffff;
+}
+
+.zh_ft2_box ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.homeservice_header_2_footer-links li {
-    margin-bottom: 12px;
-}
-
-.homeservice_header_2_footer-links a {
-    color: #cccccc;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.homeservice_header_2_footer-links a:hover {
-    color: #ffffff;
-}
-
-.homeservice_header_2_footer-contact {
-    color: #cccccc;
-}
-
-.homeservice_header_2_footer-phone {
-    font-size: 18px;
-    margin-bottom: 20px;
-}
-
-.homeservice_header_2_footer-phone a {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.homeservice_header_2_footer-hours {
-    line-height: 1.8;
-}
-
-.homeservice_header_2_footer-cta-text {
-    color: #cccccc;
-    margin-bottom: 20px;
-    line-height: 1.6;
-}
-
-.homeservice_header_2_footer-cta-button {
-    display: inline-block;
-    background-color: #e74c3c;
-    color: #ffffff;
-    padding: 12px 30px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.homeservice_header_2_footer-cta-button:hover {
-    background-color: #c0392b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.homeservice_header_2_footer-copyright {
-    background-color: #0f0f0f;
-    padding: 20px 0;
-}
-
-.homeservice_header_2_copyright-text {
-    text-align: center;
-    color: #999999;
-    margin: 0;
+.zh_ft2_box ul li {
+    margin-bottom: 8px;
     font-size: 14px;
 }
 
-.homeservice_header_2_copyright-text a {
-    color: #999999;
-    text-decoration: none;
-    transition: color 0.3s ease;
+/* ── Box 1: Logo & Contact ── */
+.zh_ft2_logo {
+    margin-bottom: 18px;
 }
 
-.homeservice_header_2_copyright-text a:hover {
+.zh_ft2_logo_wrapper {
+    max-width: 180px;
+}
+
+.zh_ft2_logo_img {
+    width: 100%;
+    height: auto;
+    max-height: 50px;
+    object-fit: contain;
+    display: block;
+}
+
+.zh_ft2_site_title h3 {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+}
+
+.zh_ft2_blurb p {
+    color: #99a8b6;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.zh_ft2_phone {
+    margin-top: 18px;
+}
+
+.zh_ft2_phone_button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #b1250d;
+    color: #ffffff !important;
+    padding: 10px 22px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none !important;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.zh_ft2_phone_button:hover {
+    background-color: #8e1d0a;
+    transform: translateY(-1px);
+}
+
+.zh_ft2_phone_icon {
+    flex-shrink: 0;
+}
+
+/* ── Box 4: Google Maps ── */
+.zh_ft2_map_heading {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+}
+
+.zh_ft2_map {
+    border-radius: 6px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.zh_ft2_map iframe {
+    border-radius: 6px;
+}
+
+/* ── Footer Bottom ── */
+.zh_ft2_bottom {
+    background-color: #141f2d;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 24px 0;
+}
+
+.zh_ft2_bottom_container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+.zh_ft2_bottom_grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ── Disclaimer ── */
+.zh_ft2_disclaimer {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #7a8a98;
+}
+
+.zh_ft2_disclaimer p {
+    margin: 0 0 6px 0;
+    font-size: 12px;
+    color: #7a8a98;
+}
+
+/* ── Legal Links ── */
+.zh_ft2_legal_links {
+    font-size: 13px;
+    color: #8a9aaa;
+    text-align: center;
+}
+
+.zh_ft2_legal_links p {
+    margin: 0;
+    font-size: 13px;
+    color: #8a9aaa;
+}
+
+.zh_ft2_legal_links a {
+    color: #7eb8e0;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.zh_ft2_legal_links a:hover {
     color: #ffffff;
 }
 
-.homeservice_header_2_footer-separator {
-    margin: 0 10px;
-    color: #666666;
-}
-
-/* Responsive Design */
+/* ── Responsive ── */
 @media (max-width: 1024px) {
-    .homeservice_header_2_footer-content {
+    .zh_ft2_grid {
+        grid-template-columns: repeat(2, 1fr);
         gap: 30px;
-    }
-    
-    .homeservice_header_2_footer-column {
-        min-width: calc(50% - 20px);
     }
 }
 
 @media (max-width: 768px) {
-    .homeservice_header_2_elementor-footer-section {
-        padding: 40px 0 0;
+    .zh_ft2_main {
+        padding: 35px 0 25px;
     }
-    
-    .homeservice_header_2_footer-content {
-        flex-direction: column;
-    }
-    
-    .homeservice_header_2_footer-column {
-        min-width: 100%;
-        margin-bottom: 30px;
-    }
-    
-    .homeservice_header_2_copyright-text {
-        font-size: 12px;
+
+    .zh_ft2_container,
+    .zh_ft2_bottom_container {
         padding: 0 20px;
+    }
+
+    .zh_ft2_grid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .zh_ft2_disclaimer,
+    .zh_ft2_disclaimer p {
+        font-size: 11px;
+    }
+
+    .zh_ft2_legal_links,
+    .zh_ft2_legal_links p {
+        font-size: 12px;
     }
 }

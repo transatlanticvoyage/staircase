@@ -47,6 +47,19 @@ body.zx_hd2_active {
     z-index: 1;
 }
 
+/* Gradient overlay: 50% black at right fading to transparent at left */
+.zx_hd2_header::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.5) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
 /* Container */
 .zx_hd2_container {
     position: relative;
