@@ -126,6 +126,12 @@ if (empty(trim($final_output))) {
             padding: 0 !important;
             margin: 0 !important;
         }
+
+        /* Remove gap between cashew content and footer */
+        body.vibrantcashew-template main#main {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
     <?php endif; ?>
 </style>
 

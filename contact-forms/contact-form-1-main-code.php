@@ -20,7 +20,7 @@ $site_url = home_url();
 $site_domain = $_SERVER['HTTP_HOST'] ?? '';
 ?>
 
-<section class="est-wrap" id="estimate-widget">
+<section class="est-wrap clastic-form" id="estimate-widget">
     <!-- live region for screen readers -->
     <div class="sr-only" aria-live="polite" aria-atomic="true" id="est-aria-live"></div>
     

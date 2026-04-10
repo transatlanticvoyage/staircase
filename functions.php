@@ -8164,9 +8164,56 @@ function staircase_render_monica_contact_box() {
 }
 
 /**
+ * Render the clastic form standalone (contact form without monica wrapper)
+ * Used by [staircase_clastic_form] shortcode
+ */
+function staircase_render_clastic_form() {
+    global $wpdb;
+
+    $source = get_option('staircase_contact_form_1_source', 'file');
+    $template_path = get_template_directory() . '/contact-forms/';
+
+    ob_start();
+
+    if ($source === 'file' && file_exists($template_path . 'contact-form-1-main-code.php')) {
+        wp_enqueue_style('weasel-contact-form',
+            get_template_directory_uri() . '/contact-forms/weasel_header_code_for_contact_form.css',
+            [],
+            filemtime($template_path . 'weasel_header_code_for_contact_form.css')
+        );
+
+        wp_enqueue_script('weasel-contact-form',
+            get_template_directory_uri() . '/contact-forms/weasel_footer_code_for_contact_form.js',
+            [],
+            filemtime($template_path . 'weasel_footer_code_for_contact_form.js'),
+            true
+        );
+
+        include $template_path . 'contact-form-1-main-code.php';
+    } else {
+        $site_data = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}zen_sitespren LIMIT 1");
+
+        if ($site_data) {
+            if (!empty($site_data->weasel_header_code_for_contact_form)) {
+                echo '<style>' . $site_data->weasel_header_code_for_contact_form . '</style>';
+            }
+            if (!empty($site_data->contact_form_1_main_code)) {
+                echo '<div class="clastic-form">' . do_shortcode($site_data->contact_form_1_main_code) . '</div>';
+            }
+            if (!empty($site_data->weasel_footer_code_for_contact_form)) {
+                echo '<script>' . $site_data->weasel_footer_code_for_contact_form . '</script>';
+            }
+        }
+    }
+
+    return ob_get_clean();
+}
+add_shortcode('staircase_clastic_form', 'staircase_render_clastic_form');
+
+/**
  * Render Nectar Blog Feed
  * Custom blog feed display independent of WordPress blog page settings
- * 
+ *
  * @param int $items_qty Number of blog posts to display (default 6)
  * @param bool $use_excerpt Whether to show excerpt (true) or full content (false) - default true
  */
@@ -8398,3 +8445,17 @@ function staircase_add_tpcom_nav_body_class($classes) {
     return $classes;
 }
 add_filter("body_class", "staircase_add_tpcom_nav_body_class");
+
+// ============================================================
+// Sitewide config injection — makes wp_zen_sitespren values
+// available to all frontend JS via window.siteConfig
+// ============================================================
+function staircase_inject_site_config() {
+    global $wpdb;
+    $endpoint = $wpdb->get_var( "SELECT contact_form_1_endpoint FROM {$wpdb->prefix}zen_sitespren LIMIT 1" );
+    if ( empty( $endpoint ) ) {
+        return;
+    }
+    echo '<script>window.siteConfig = window.siteConfig || {}; window.siteConfig.formEndpoint = ' . json_encode( esc_url_raw( $endpoint ) ) . ';</script>' . "\n";
+}
+add_action( 'wp_head', 'staircase_inject_site_config', 5 );
