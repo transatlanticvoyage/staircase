@@ -150,12 +150,15 @@ jQuery(document).ready(function($) {
     });
 
     // Silkweaver mobile accordion (header2-specific, only active on mobile widths)
+    // Handles both standard dropdowns (.silkweaver-dropdown-menu) and robust
+    // child area panels (.silkweaver-robust-child-area).
     $('.zx_hd2_header .silkweaver-parent-button').on('click', function(e) {
         if ($(window).width() <= 1024) {
             e.preventDefault();
             e.stopPropagation();
             var parentLi = $(this).closest('.silkweaver-dropdown');
-            var submenu = parentLi.find('.silkweaver-dropdown-menu').first();
+            // Standard dropdown uses <ul>, robust uses <div>
+            var submenu = parentLi.find('.silkweaver-dropdown-menu, .silkweaver-robust-child-area').first();
             parentLi.toggleClass('active');
             submenu.slideToggle(300);
         }
@@ -165,7 +168,7 @@ jQuery(document).ready(function($) {
     $(window).on('resize', function() {
         if ($(window).width() > 1024) {
             $('.zx_hd2_header .silkweaver-dropdown').removeClass('active');
-            $('.zx_hd2_header .silkweaver-dropdown-menu').removeAttr('style');
+            $('.zx_hd2_header .silkweaver-dropdown-menu, .zx_hd2_header .silkweaver-robust-child-area').removeAttr('style');
         }
     });
 

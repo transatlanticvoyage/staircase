@@ -654,6 +654,90 @@ body.zx_hd2_active {
     .zx_hd2_header .silkweaver-dropdown-menu a:hover {
         color: #FFD700;
     }
+
+    /* ---- Silkweaver robust child area: mobile accordion ---- */
+
+    .zx_hd2_header .silkweaver-robust-dropdown {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        background: #000;
+        border: 1px solid #ccc;
+        margin-bottom: 4px;
+    }
+
+    .zx_hd2_header .silkweaver-robust-child-area {
+        display: none; /* JS slideToggle controls visibility */
+        position: static;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        margin: 0;
+        min-width: 0;
+        width: 100%;
+        flex-basis: 100%;
+        padding: 4px 4px 0 4px;
+        background: #000;
+        z-index: auto;
+    }
+
+    /* Disable desktop hover-open on mobile */
+    .zx_hd2_header .silkweaver-robust-dropdown:hover .silkweaver-robust-child-area,
+    .zx_hd2_header .silkweaver-robust-dropdown:focus-within .silkweaver-robust-child-area {
+        display: none;
+    }
+
+    .zx_hd2_header .silkweaver-robust-dropdown.active .silkweaver-robust-child-area {
+        display: block;
+    }
+
+    /* Chevron rotation for robust items */
+    .zx_hd2_header .silkweaver-robust-dropdown.active .silkweaver-parent-button::before {
+        transform: rotate(90deg);
+    }
+
+    /* Tiles stack single-column on mobile */
+    .zx_hd2_header .silkweaver-robust-tiles-wrapper {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .zx_hd2_header .silkweaver-robust-tile {
+        flex: 0 0 100%;
+        border-color: #ccc;
+        background: #000;
+    }
+
+    /* Hide category images and custom HTML snippets on mobile */
+    .zx_hd2_header .silkweaver-robust-tile-image,
+    .zx_hd2_header .silkweaver-robust-locations-custom-html-snippet-1 {
+        display: none;
+    }
+
+    .zx_hd2_header .silkweaver-robust-tile-name {
+        color: #fff;
+    }
+
+    /* Always show child pages on mobile (no hover gating) */
+    .zx_hd2_header .silkweaver-robust-child-pages {
+        display: block;
+        border-top-color: #555;
+    }
+
+    .zx_hd2_header .silkweaver-robust-child-pages a {
+        display: block;
+        padding: 13px 16px 13px 20px;
+        color: #fff;
+        font-size: 15px;
+        border: 1px solid #ccc;
+        text-decoration: none;
+        background: #000;
+        margin-bottom: 4px;
+    }
+
+    .zx_hd2_header .silkweaver-robust-child-pages a:hover {
+        color: #FFD700;
+    }
 }
 
 @media (max-width: 768px) {
