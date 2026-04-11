@@ -184,13 +184,19 @@ jQuery(document).ready(function($) {
     // -------------------------------------------------------------------------
     var $callBanner = $('.zx_hd2_call_banner');
     if ($callBanner.length) {
-        // Sync tel: href and display number from the header phone button
+        // Sync tel: href and display number from the header phone button.
+        // Shared system uses .zx_hd2_phone_button; fallback uses .hs2-phone-button.
         var $phoneBtn = $('.zx_hd2_phone_button');
+        if (!$phoneBtn.length) {
+            $phoneBtn = $('.hs2-phone-button');
+        }
         var phoneHref = $phoneBtn.attr('href');
         if (phoneHref) {
             $callBanner.attr('href', phoneHref);
             // Get the visible phone number text (skip the SVG icon)
-            var phoneText = $phoneBtn.clone().children('svg').remove().end().text().trim();
+            var $clone = $phoneBtn.clone();
+            $clone.find('svg').remove();
+            var phoneText = $clone.text().trim();
             if (phoneText) {
                 $callBanner.find('.zx_hd2_call_banner_number').text(phoneText);
             }
