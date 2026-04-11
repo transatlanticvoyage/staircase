@@ -395,12 +395,14 @@ body.zx_hd2_active {
         flex-wrap: nowrap;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 15px;
+        padding: 12px 15px;
     }
 
     .zx_hd2_logo {
         flex: 0 0 auto;
         max-width: none;
+        display: flex;
+        align-items: center;
     }
 
     /* Nav shrinks to fit toggle button only; stays in natural DOM order (middle) */
@@ -416,6 +418,7 @@ body.zx_hd2_active {
     /* Hamburger: visible, white bars */
     .zx_hd2_mobile_toggle {
         display: flex;
+        align-items: center;
     }
 
     /* Phone CTA: visible and compact on right */
@@ -423,6 +426,7 @@ body.zx_hd2_active {
         flex: 0 0 auto;
         max-width: none;
         display: flex;
+        align-items: center;
         justify-content: flex-end;
     }
 
@@ -742,7 +746,7 @@ body.zx_hd2_active {
 
 @media (max-width: 768px) {
     .zx_hd2_container {
-        padding: 8px 12px;
+        padding: 12px 12px;
     }
 
     .zx_hd2_logo img {
@@ -814,13 +818,13 @@ body.zx_hd2_active {
         bottom: 0;
         left: 0;
         right: 0;
-        height: 28px;
+        height: 56px;
         z-index: 99999;
         background: #FFD700;
         color: #333333;
         text-decoration: none;
         font-weight: 700;
-        font-size: 12px;
+        font-size: 16px;
         letter-spacing: 0.08em;
         align-items: center;
         justify-content: center;
