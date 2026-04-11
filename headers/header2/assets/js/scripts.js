@@ -150,17 +150,24 @@ jQuery(document).ready(function($) {
     });
 
     // Silkweaver mobile accordion (header2-specific, only active on mobile widths)
-    // Handles both standard dropdowns (.silkweaver-dropdown-menu) and robust
-    // child area panels (.silkweaver-robust-child-area).
+    // Standard dropdowns use slideToggle; robust items use class-based toggle
+    // to avoid conflicts with the plugin's :hover CSS rules on touch devices.
     $('.zx_hd2_header .silkweaver-parent-button').on('click', function(e) {
         if ($(window).width() <= 1024) {
             e.preventDefault();
             e.stopPropagation();
             var parentLi = $(this).closest('.silkweaver-dropdown');
-            // Standard dropdown uses <ul>, robust uses <div>
-            var submenu = parentLi.find('.silkweaver-dropdown-menu, .silkweaver-robust-child-area').first();
-            parentLi.toggleClass('active');
-            submenu.slideToggle(300);
+            var isRobust = parentLi.hasClass('silkweaver-robust-dropdown');
+
+            if (isRobust) {
+                // Pure class toggle — no inline styles to fight CSS
+                parentLi.toggleClass('active');
+            } else {
+                // Standard dropdown: slideToggle is fine here
+                var submenu = parentLi.find('.silkweaver-dropdown-menu').first();
+                parentLi.toggleClass('active');
+                submenu.slideToggle(300);
+            }
         }
     });
 
@@ -168,7 +175,7 @@ jQuery(document).ready(function($) {
     $(window).on('resize', function() {
         if ($(window).width() > 1024) {
             $('.zx_hd2_header .silkweaver-dropdown').removeClass('active');
-            $('.zx_hd2_header .silkweaver-dropdown-menu, .zx_hd2_header .silkweaver-robust-child-area').removeAttr('style');
+            $('.zx_hd2_header .silkweaver-dropdown-menu').removeAttr('style');
         }
     });
 
@@ -177,10 +184,16 @@ jQuery(document).ready(function($) {
     // -------------------------------------------------------------------------
     var $callBanner = $('.zx_hd2_call_banner');
     if ($callBanner.length) {
-        // Sync the tel: href from the phone button so banner always dials same number
-        var phoneHref = $('.zx_hd2_phone_button').attr('href');
+        // Sync tel: href and display number from the header phone button
+        var $phoneBtn = $('.zx_hd2_phone_button');
+        var phoneHref = $phoneBtn.attr('href');
         if (phoneHref) {
             $callBanner.attr('href', phoneHref);
+            // Get the visible phone number text (skip the SVG icon)
+            var phoneText = $phoneBtn.clone().children('svg').remove().end().text().trim();
+            if (phoneText) {
+                $callBanner.find('.zx_hd2_call_banner_number').text(phoneText);
+            }
         }
 
         function updateCallBanner() {

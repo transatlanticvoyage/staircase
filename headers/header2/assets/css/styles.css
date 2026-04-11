@@ -670,8 +670,10 @@ body.zx_hd2_active {
         margin-bottom: 4px;
     }
 
+    /* Robust child area: class-only toggle, no inline styles involved.
+       Hidden by default. !important overrides plugin :hover rule on touch. */
     .zx_hd2_header .silkweaver-robust-child-area {
-        display: none; /* JS slideToggle controls visibility */
+        display: none !important;
         position: static;
         transform: none;
         box-shadow: none;
@@ -685,14 +687,9 @@ body.zx_hd2_active {
         z-index: auto;
     }
 
-    /* Disable desktop hover-open on mobile */
-    .zx_hd2_header .silkweaver-robust-dropdown:hover .silkweaver-robust-child-area,
-    .zx_hd2_header .silkweaver-robust-dropdown:focus-within .silkweaver-robust-child-area {
-        display: none;
-    }
-
-    .zx_hd2_header .silkweaver-robust-dropdown.active .silkweaver-robust-child-area {
-        display: block;
+    /* .active is toggled by header2 JS — this is the sole way to show it */
+    .zx_hd2_header .silkweaver-robust-dropdown.active > .silkweaver-robust-child-area {
+        display: block !important;
     }
 
     /* Chevron rotation for robust items */
