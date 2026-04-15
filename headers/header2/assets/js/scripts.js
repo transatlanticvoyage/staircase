@@ -1,3 +1,4 @@
+// TEST COMMENT — modified by chat session 2026-04-15
 /**
  * Header 2 - Header-Specific JavaScript (Refactored)
  * Minimal scripts for header2-specific functionality only

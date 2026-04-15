@@ -1,4 +1,5 @@
 <?php
+// TEST COMMENT — modified by chat session 2026-04-15
 /**
  * Footer 2
  * Alternative footer design with same data sources as footer1

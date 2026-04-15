@@ -1,3 +1,4 @@
+// TEST COMMENT — modified by chat session 2026-04-15
 /**
  * StaircaseDefaultHeader - Navigation JavaScript
  * Handles menu interactions, mobile toggle, dropdowns, and scroll effects
