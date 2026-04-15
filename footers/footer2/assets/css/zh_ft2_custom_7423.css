@@ -36,29 +36,22 @@
 }
 
 /* ── 5. Tame Box 3 legacy inline-styled table ── */
-.zh_ft2_box_3 table {
+/* ── Box 3: company info table (now uses zh_agnostic_cit_ classes) ──
+   Old inline-style overrides removed — dynamic bg color is owned by
+   zh_agnostic_company_info_table.css + wp_add_inline_style().
+   Only layout/border tweaks live here now. */
+.zh_ft2_box_3 .zh_agnostic_cit_table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
 }
 
-.zh_ft2_box_3 table td {
-    padding: 8px 10px;
-    border-color: #253649 !important;
-    color: #d0d8e0;
+.zh_ft2_box_3 .zh_agnostic_cit_content_cell {
+    border-color: #253649;
 }
 
-/* Alternating header rows (dark bg) */
-.zh_ft2_box_3 table td[style*="background-color:#101722"],
-.zh_ft2_box_3 table td[style*="background-color: #101722"] {
-    background-color: #253649 !important;
-    color: #ffffff;
-}
-
-.zh_ft2_box_3 table tr:first-child td {
-    background-color: #253649 !important;
-    color: #ffffff;
-    font-size: 14px;
+.zh_ft2_box_3 .zh_agnostic_cit_label_cell {
+    border-color: #253649;
 }
 
 /* ── 6. Box 2: Quick Links ── */
