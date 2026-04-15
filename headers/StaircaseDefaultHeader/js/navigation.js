@@ -28,9 +28,16 @@
 
         // Initialize
         init: function() {
+            // Option A guard: if header2 is active on this page, do not initialize.
+            // header2 has its own sticky/scroll system (zx_hd2_header/scripts.js).
+            // Running StaircaseDefaultHeader scroll logic alongside it causes body
+            // padding jumps and sticky positioning conflicts on scroll.
+            if ($('.zx_hd2_header').length) return;
+
             this.cacheElements();
-            
-            if (!this.elements.header) return;
+
+            // Fix: empty jQuery objects are truthy — check .length, not truthiness
+            if (!this.elements.header.length) return;
             
             this.bindEvents();
             this.handleInitialScroll();
@@ -338,7 +345,9 @@
     });
 
     // Re-initialize after AJAX operations (for compatibility)
+    // Guard: skip if header2 is active (same reason as init guard above)
     $(document).on('ajaxComplete', function() {
+        if ($('.zx_hd2_header').length) return;
         StaircaseHeaderNav.init();
     });
 
