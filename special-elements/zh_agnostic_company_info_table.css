@@ -1,0 +1,52 @@
+/**
+ * zh_agnostic_company_info_table.css
+ * Company Info Table — reusable component, footer-agnostic
+ * All selectors prefixed: zh_agnostic_cit_
+ *
+ * Dynamic label cell bg-color is injected via wp_add_inline_style()
+ * using WP option: zh_agnostic_cit_label_bg_color (default: #101722)
+ *
+ * Place this component in any footer or page element by using:
+ *   <table class="zh_agnostic_cit_table">
+ *   <td class="zh_agnostic_cit_label_cell"> (rows 1, 3, 5 — label rows)
+ *   <td class="zh_agnostic_cit_content_cell"> (rows 2, 4, 6 — content rows)
+ */
+
+/* ── Table wrapper ── */
+.zh_agnostic_cit_table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+/* ── Label cells (rows 1, 3, 5) ── */
+/* Background color injected dynamically via wp_add_inline_style() */
+.zh_agnostic_cit_label_cell {
+    color: #ffffff;
+    padding: 8px 10px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid currentColor; /* border inherits from dynamic color via JS override below */
+}
+
+/* First label row — slightly more padding, prominent */
+.zh_agnostic_cit_table tr:first-child .zh_agnostic_cit_label_cell {
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* ── Content cells (rows 2, 4, 6) ── */
+.zh_agnostic_cit_content_cell {
+    padding: 8px 10px;
+    color: #d0d8e0;
+    border: 1px solid #253649;
+}
+
+.zh_agnostic_cit_content_cell a {
+    color: #d0d8e0;
+    text-decoration: none;
+}
+
+.zh_agnostic_cit_content_cell a:hover {
+    color: #ffffff;
+}

@@ -88,6 +88,24 @@ function staircase_enqueue_assets() {
         );
     }
 
+    // Enqueue company info table component (footer-agnostic, reusable)
+    $cit_css_path = get_template_directory() . '/special-elements/zh_agnostic_company_info_table.css';
+    if (file_exists($cit_css_path)) {
+        wp_enqueue_style(
+            'zh-agnostic-company-info-table',
+            get_template_directory_uri() . '/special-elements/zh_agnostic_company_info_table.css',
+            array(),
+            filemtime($cit_css_path)
+        );
+        // Inject dynamic label cell bg-color from WP option (default #101722)
+        $cit_label_color = get_option('zh_agnostic_cit_label_bg_color', '#101722');
+        $cit_label_color = sanitize_hex_color($cit_label_color) ?: '#101722';
+        wp_add_inline_style(
+            'zh-agnostic-company-info-table',
+            '.zh_agnostic_cit_label_cell { background-color: ' . $cit_label_color . '; border-color: ' . $cit_label_color . '; }'
+        );
+    }
+
     // Enqueue navigation script for mobile menu
     wp_enqueue_script(
         'staircase-navigation',
@@ -4144,6 +4162,14 @@ function zaramax_footer_management_page() {
 
         // Save footer2 custom styles toggle
         update_option('zh_ft2_custom_styles_enabled', isset($_POST['zh_ft2_custom_styles_enabled']) ? '1' : '0');
+
+        // Save company info table label cell bg color
+        if (isset($_POST['zh_agnostic_cit_label_bg_color'])) {
+            $submitted_color = sanitize_hex_color(wp_unslash($_POST['zh_agnostic_cit_label_bg_color']));
+            if ($submitted_color) {
+                update_option('zh_agnostic_cit_label_bg_color', $submitted_color);
+            }
+        }
         
         // TEMPORARY: Save footer blurb to WordPress options for testing
         // TODO: Remove this when proper database column is created
@@ -4197,6 +4223,7 @@ function zaramax_footer_management_page() {
     // Get current legacy settings (WordPress Options)
     $use_custom_footer = get_option('zaramax_use_custom_footer', false);
     $zh_ft2_custom_styles_enabled = get_option('zh_ft2_custom_styles_enabled', '0');
+    $zh_agnostic_cit_label_bg_color = sanitize_hex_color(get_option('zh_agnostic_cit_label_bg_color', '#101722')) ?: '#101722';
     $footer_box2_content = get_option('zaramax_footer_box2_content', '');
     $footer_box3_content = get_option('zaramax_footer_box3_content', '');
     $footer_map_heading = get_option('zaramax_footer_map_heading', '');
@@ -4302,6 +4329,42 @@ function zaramax_footer_management_page() {
             })();
             </script>
             <!-- ── /Footer 2: Custom Styles Toggle ── -->
+
+            <!-- ── Company Info Table: Label Cell Color ── -->
+            <div class="zh_ft2_admin_toggle_block" style="background: #1b2a3d; border: 2px solid #4a5568; border-radius: 8px; padding: 18px 24px; margin-bottom: 28px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 0 0 auto;">
+                    <span style="font-size: 18px;">🎨</span>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <strong style="color: #ffffff; font-size: 14px; display: block; margin-bottom: 4px;">(footer2 only) modify company info table label cells bg color</strong>
+                    <span style="color: #d0d8e0; font-size: 13px;">Sets background of rows 1, 3, 5 in the Box 3 company info table — <code style="background: rgba(255,255,255,0.1); color: #fde9e3; padding: 1px 6px; border-radius: 3px;">zh_agnostic_cit_label_cell</code></span>
+                    <div style="color: #7a8a98; font-size: 11px; margin-top: 4px;">Default: <code style="color: #7a8a98;">#101722</code> — injected via <code style="color: #7a8a98;">wp_add_inline_style()</code>, no extra HTTP request.</div>
+                </div>
+                <div style="flex: 0 0 auto; display: flex; align-items: center; gap: 12px;">
+                    <label for="zh_agnostic_cit_color_picker" style="color: #d0d8e0; font-size: 13px; font-weight: 600;">Color:</label>
+                    <input
+                        type="color"
+                        id="zh_agnostic_cit_color_picker"
+                        name="zh_agnostic_cit_label_bg_color"
+                        value="<?php echo esc_attr($zh_agnostic_cit_label_bg_color); ?>"
+                        style="width: 48px; height: 36px; padding: 2px; border: 2px solid #4a5568; border-radius: 6px; background: transparent; cursor: pointer;"
+                        title="Pick label cell background color"
+                    >
+                    <code id="zh_agnostic_cit_color_hex" style="color: #e0d8d2; font-size: 12px; min-width: 60px;"><?php echo esc_html($zh_agnostic_cit_label_bg_color); ?></code>
+                    <button type="button" onclick="document.getElementById('zh_agnostic_cit_color_picker').value='#101722'; document.getElementById('zh_agnostic_cit_color_hex').textContent='#101722';" style="background: #4a5568; color: #d0d8e0; border: none; border-radius: 4px; padding: 6px 10px; font-size: 11px; cursor: pointer;" title="Reset to default">Reset</button>
+                </div>
+            </div>
+            <script>
+            (function() {
+                var picker = document.getElementById('zh_agnostic_cit_color_picker');
+                var hex    = document.getElementById('zh_agnostic_cit_color_hex');
+                if (!picker || !hex) return;
+                picker.addEventListener('input', function() {
+                    hex.textContent = picker.value;
+                });
+            })();
+            </script>
+            <!-- ── /Company Info Table: Label Cell Color ── -->
 
             <div class="footer-system-choice" style="background: #fff; border: 1px solid #ddd; padding: 20px; margin-bottom: 30px; border-radius: 8px;">
                 <h2>Footer System Selection</h2>
