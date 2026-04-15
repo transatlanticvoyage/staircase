@@ -373,13 +373,16 @@ body.zx_hd2_active {
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
 
+/* Admin bar offset — CSS fallback only.
+   JS overrides this with actual measured admin bar height (getAdminBarHeight())
+   so tablet / orientation-change gaps are eliminated. */
 .admin-bar .zx_hd2_header.zx_hd2_sticky_active {
-    top: 32px !important;
+    top: 32px; /* no !important — JS inline style wins */
 }
 
 @media screen and (max-width: 782px) {
     .admin-bar .zx_hd2_header.zx_hd2_sticky_active {
-        top: 46px !important;
+        top: 46px; /* no !important — JS inline style wins */
     }
 }
 
