@@ -61,14 +61,39 @@
     font-size: 14px;
 }
 
-/* ── 6. Box 2 "Quick Links" heading consistency ── */
+/* ── 6. Box 2: Quick Links ── */
 .zh_ft2_box_2 strong:first-of-type {
     display: block;
     font-size: 16px !important;
     font-weight: 600;
     color: #ffffff;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     letter-spacing: 0.3px;
+}
+
+.zh_ft2_box2_divider {
+    border: none;
+    border-top: 1px solid #8898a7;
+    margin: 0 0 14px 0;
+}
+
+.zh_ft2_box_2 a {
+    display: block;
+    color: #8898a7 !important;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 8px;
+    transition: color 0.2s ease, padding-left 0.15s ease;
+}
+
+.zh_ft2_box_2 a:visited {
+    color: #8898a7 !important;
+}
+
+.zh_ft2_box_2 a:hover,
+.zh_ft2_box_2 a:focus {
+    color: #e84b2a !important;
+    padding-left: 4px;
 }
 
 /* ── 7. Slightly taller logo ── */
