@@ -102,7 +102,7 @@ function staircase_enqueue_assets() {
         $cit_label_text_color = sanitize_hex_color(get_option('zh_agnostic_cit_label_text_color', '#ffffff')) ?: '#ffffff';
         wp_add_inline_style(
             'zh-agnostic-company-info-table',
-            '.zh_agnostic_cit_label_cell { background-color: ' . $cit_label_color . '; border-color: ' . $cit_label_color . '; color: ' . $cit_label_text_color . '; }'
+            '.zh_agnostic_cit_label_cell { background-color: ' . $cit_label_color . ' !important; border-color: ' . $cit_label_color . ' !important; color: ' . $cit_label_text_color . ' !important; }'
         );
     }
 

@@ -34,6 +34,16 @@
     font-size: 14px;
 }
 
+/* Ensure any <p> or <strong> injected by wpautop inside label cells
+   inherits the dynamic text color rather than being overridden by
+   footer theme rules like .zh_ft2_box p { color: #b0bcc8 } */
+.zh_agnostic_cit_label_cell p,
+.zh_agnostic_cit_label_cell strong,
+.zh_agnostic_cit_label_cell span {
+    color: inherit !important;
+    margin: 0;
+}
+
 /* ── Content cells (rows 2, 4, 6) ── */
 .zh_agnostic_cit_content_cell {
     padding: 8px 10px;

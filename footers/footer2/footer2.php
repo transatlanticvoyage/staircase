@@ -23,7 +23,7 @@ function render_footer2() {
 
     // Conditionally enqueue custom enhancement stylesheet (toggle via zaramax admin)
     if (get_option('zh_ft2_custom_styles_enabled', '0') === '1') {
-        wp_enqueue_style('footer2-custom-7423', $assets_url . 'css/zh_ft2_custom_7423.css', array('footer2-styles'), '1.0.0');
+        wp_enqueue_style('footer2-custom-7423', $assets_url . 'css/zh_ft2_custom_7423.css', array('footer2-styles'), '1.0.1');
     }
 
     // Get all legacy footer settings (WordPress Options)
