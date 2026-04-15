@@ -89,43 +89,25 @@ jQuery(document).ready(function($) {
             return header.offset().top - getAdminBarHeight();
         }
 
-        function applySticky() {
-            if (!placeholder) {
-                placeholder = $('<div class="zx_hd2_sticky_placeholder"></div>');
-            }
-            placeholder.css('height', header.outerHeight() + 'px');
-            header.before(placeholder);
-            header.addClass('zx_hd2_sticky_active');
-            // Dynamically set top based on actual admin bar height —
-            // avoids gap on tablet where hardcoded CSS values may not match
-            header.css('top', getAdminBarHeight() + 'px');
-            isSticky = true;
-        }
-
-        function removeSticky() {
-            header.removeClass('zx_hd2_sticky_active');
-            header.css('top', ''); // clear inline style, return to CSS
-            if (placeholder) {
-                placeholder.detach();
-            }
-            isSticky = false;
-        }
-
         $(window).on('scroll', function() {
             var scrollTop = $(window).scrollTop();
             var offset = getHeaderOffset();
 
             if (scrollTop > offset && !isSticky) {
-                applySticky();
+                // Insert a placeholder to prevent content jump
+                if (!placeholder) {
+                    placeholder = $('<div class="zx_hd2_sticky_placeholder"></div>');
+                }
+                placeholder.css('height', header.outerHeight() + 'px');
+                header.before(placeholder);
+                header.addClass('zx_hd2_sticky_active');
+                isSticky = true;
             } else if (scrollTop <= offset && isSticky) {
-                removeSticky();
-            }
-        });
-
-        // On orientation change / resize, recalculate top if already sticky
-        $(window).on('resize orientationchange', function() {
-            if (isSticky) {
-                header.css('top', getAdminBarHeight() + 'px');
+                header.removeClass('zx_hd2_sticky_active');
+                if (placeholder) {
+                    placeholder.detach();
+                }
+                isSticky = false;
             }
         });
     }
