@@ -1,0 +1,100 @@
+/**
+ * zh_ft2_custom_7423.css
+ * Footer 2 — Custom Style Enhancements
+ * All selectors prefixed with zh_ft2_ for complete style isolation.
+ * Toggle this file on/off via:
+ *   WP Admin → Zaramax Footer Management → "Enable custom styles (footer2 only)"
+ * Option key: zh_ft2_custom_styles_enabled
+ */
+
+/* ── 1. Column proportions: give logo & map more breathing room ── */
+.zh_ft2_grid {
+    grid-template-columns: 2fr 1.5fr 1.5fr 2fr;
+}
+
+/* ── 2. Bottom bar: row layout on desktop ── */
+.zh_ft2_bottom_grid {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.zh_ft2_legal_links {
+    text-align: right;
+}
+
+/* ── 3. Taller map iframe ── */
+.zh_ft2_map iframe {
+    height: 240px;
+}
+
+/* ── 4. Brand-red link hover instead of plain white ── */
+.zh_ft2_box a:hover {
+    color: #e84b2a;
+}
+
+/* ── 5. Tame Box 3 legacy inline-styled table ── */
+.zh_ft2_box_3 table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.zh_ft2_box_3 table td {
+    padding: 8px 10px;
+    border-color: #253649 !important;
+    color: #d0d8e0;
+}
+
+/* Alternating header rows (dark bg) */
+.zh_ft2_box_3 table td[style*="background-color:#101722"],
+.zh_ft2_box_3 table td[style*="background-color: #101722"] {
+    background-color: #253649 !important;
+    color: #ffffff;
+}
+
+.zh_ft2_box_3 table tr:first-child td {
+    background-color: #253649 !important;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+/* ── 6. Box 2 "Quick Links" heading consistency ── */
+.zh_ft2_box_2 strong:first-of-type {
+    display: block;
+    font-size: 16px !important;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 12px;
+    letter-spacing: 0.3px;
+}
+
+/* ── 7. Slightly taller logo ── */
+.zh_ft2_logo_img {
+    max-height: 62px;
+}
+
+/* ── 8. Mobile: revert bottom bar to stacked ── */
+@media (max-width: 768px) {
+    .zh_ft2_grid {
+        grid-template-columns: 1fr;
+    }
+
+    .zh_ft2_bottom_grid {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .zh_ft2_legal_links {
+        text-align: left;
+    }
+}
+
+/* ── 9. Tablet: 2-col grid ── */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .zh_ft2_grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

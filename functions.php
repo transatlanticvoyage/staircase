@@ -4141,6 +4141,9 @@ function zaramax_footer_management_page() {
     if (isset($_POST['submit']) && check_admin_referer('zaramax_footer', 'zaramax_footer_nonce')) {
         // Save footer system choice
         update_option('zaramax_use_custom_footer', isset($_POST['use_custom_footer']));
+
+        // Save footer2 custom styles toggle
+        update_option('zh_ft2_custom_styles_enabled', isset($_POST['zh_ft2_custom_styles_enabled']) ? '1' : '0');
         
         // TEMPORARY: Save footer blurb to WordPress options for testing
         // TODO: Remove this when proper database column is created
@@ -4193,6 +4196,7 @@ function zaramax_footer_management_page() {
     
     // Get current legacy settings (WordPress Options)
     $use_custom_footer = get_option('zaramax_use_custom_footer', false);
+    $zh_ft2_custom_styles_enabled = get_option('zh_ft2_custom_styles_enabled', '0');
     $footer_box2_content = get_option('zaramax_footer_box2_content', '');
     $footer_box3_content = get_option('zaramax_footer_box3_content', '');
     $footer_map_heading = get_option('zaramax_footer_map_heading', '');
@@ -4238,7 +4242,67 @@ function zaramax_footer_management_page() {
             <div style="margin-bottom: 20px;">
                 <?php submit_button(); ?>
             </div>
-            
+
+            <!-- ── Footer 2: Custom Styles Toggle ── -->
+            <div class="zh_ft2_admin_toggle_block" style="background: #1b2a3d; border: 2px solid #b1250d; border-radius: 8px; padding: 18px 24px; margin-bottom: 28px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 0 0 auto;">
+                    <span style="font-size: 18px;">🎨</span>
+                </div>
+                <div style="flex: 1; min-width: 200px;">
+                    <strong style="color: #ffffff; font-size: 14px; display: block; margin-bottom: 4px;">(if using footer2 system only)</strong>
+                    <span style="color: #d0d8e0; font-size: 13px;">Enable custom styles — <code style="background: rgba(255,255,255,0.1); color: #fde9e3; padding: 1px 6px; border-radius: 3px;">zh_ft2_custom_7423.css</code></span>
+                    <div style="color: #7a8a98; font-size: 11px; margin-top: 4px;">When disabled, the stylesheet is not loaded at all — zero impact on the page.</div>
+                </div>
+                <div style="flex: 0 0 auto;">
+                    <label class="zh_ft2_toggle_switch" style="position: relative; display: inline-block; width: 52px; height: 28px; cursor: pointer;" title="Toggle footer2 custom styles">
+                        <input type="checkbox" name="zh_ft2_custom_styles_enabled" value="1" <?php checked($zh_ft2_custom_styles_enabled, '1'); ?>
+                            style="opacity: 0; width: 0; height: 0; position: absolute;"
+                            onchange="document.getElementById('zh_ft2_toggle_label').textContent = this.checked ? 'ON' : 'OFF';">
+                        <span class="zh_ft2_toggle_slider" style="
+                            position: absolute; cursor: pointer; inset: 0;
+                            background-color: <?php echo $zh_ft2_custom_styles_enabled === '1' ? '#b1250d' : '#4a5568'; ?>;
+                            transition: background-color 0.25s;
+                            border-radius: 28px;
+                        "></span>
+                        <span style="
+                            position: absolute; top: 4px; left: <?php echo $zh_ft2_custom_styles_enabled === '1' ? '28px' : '4px'; ?>;
+                            width: 20px; height: 20px;
+                            background: #fff; border-radius: 50%;
+                            transition: left 0.25s;
+                            pointer-events: none;
+                        " class="zh_ft2_toggle_knob"></span>
+                    </label>
+                </div>
+                <div style="flex: 0 0 auto; min-width: 36px;">
+                    <strong id="zh_ft2_toggle_label" style="color: <?php echo $zh_ft2_custom_styles_enabled === '1' ? '#e84b2a' : '#7a8a98'; ?>; font-size: 13px;">
+                        <?php echo $zh_ft2_custom_styles_enabled === '1' ? 'ON' : 'OFF'; ?>
+                    </strong>
+                </div>
+            </div>
+            <script>
+            (function() {
+                var cb = document.querySelector('input[name="zh_ft2_custom_styles_enabled"]');
+                if (!cb) return;
+                cb.addEventListener('change', function() {
+                    var slider = cb.parentElement.querySelector('.zh_ft2_toggle_slider');
+                    var knob   = cb.parentElement.querySelector('.zh_ft2_toggle_knob');
+                    var label  = document.getElementById('zh_ft2_toggle_label');
+                    if (cb.checked) {
+                        slider.style.backgroundColor = '#b1250d';
+                        knob.style.left = '28px';
+                        label.style.color = '#e84b2a';
+                        label.textContent = 'ON';
+                    } else {
+                        slider.style.backgroundColor = '#4a5568';
+                        knob.style.left = '4px';
+                        label.style.color = '#7a8a98';
+                        label.textContent = 'OFF';
+                    }
+                });
+            })();
+            </script>
+            <!-- ── /Footer 2: Custom Styles Toggle ── -->
+
             <div class="footer-system-choice" style="background: #fff; border: 1px solid #ddd; padding: 20px; margin-bottom: 30px; border-radius: 8px;">
                 <h2>Footer System Selection</h2>
                 <fieldset>
