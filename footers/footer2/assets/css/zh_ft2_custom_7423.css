@@ -77,12 +77,16 @@
     margin: 0 0 14px 0;
 }
 
+.zh_ft2_box_2 br {
+    display: none;
+}
+
 .zh_ft2_box_2 a {
     display: block;
     color: #8898a7 !important;
     text-decoration: none;
     font-size: 14px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     transition: color 0.2s ease, padding-left 0.15s ease;
 }
 
@@ -94,6 +98,21 @@
 .zh_ft2_box_2 a:focus {
     color: #e84b2a !important;
     padding-left: 4px;
+}
+
+/* ── Box 2: accent border — left on desktop, top on mobile ── */
+.zh_ft2_box_2 {
+    border-left: 3px solid #b1250d;
+    padding-left: 18px;
+}
+
+@media (max-width: 768px) {
+    .zh_ft2_box_2 {
+        border-left: none;
+        border-top: 3px solid #b1250d;
+        padding-left: 0;
+        padding-top: 16px;
+    }
 }
 
 /* ── 7. Slightly taller logo ── */
