@@ -1,4 +1,5 @@
 // TEST COMMENT — modified by chat session 2026-04-15
+// TEST COMMENT — modified by chat session 2026-04-15 (revert of dynamic sticky JS)
 /**
  * Header 2 - Header-Specific JavaScript (Refactored)
  * Minimal scripts for header2-specific functionality only
