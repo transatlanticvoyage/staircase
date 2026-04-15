@@ -378,7 +378,8 @@ body.zx_hd2_active {
     top: 32px !important;
 }
 
-@media screen and (max-width: 782px) {
+/* Tablet range: WP admin bar is 46px tall up to 1024px, not just ≤782px */
+@media screen and (max-width: 1024px) {
     .admin-bar .zx_hd2_header.zx_hd2_sticky_active {
         top: 46px !important;
     }
