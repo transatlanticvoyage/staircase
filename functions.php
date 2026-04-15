@@ -4351,10 +4351,32 @@ function zaramax_footer_management_page() {
                         title="Pick label cell background color"
                     >
                     <code id="zh_agnostic_cit_color_hex" style="color: #e0d8d2; font-size: 12px; min-width: 60px;"><?php echo esc_html($zh_agnostic_cit_label_bg_color); ?></code>
-                    <button type="button" onclick="document.getElementById('zh_agnostic_cit_color_picker').value='#101722'; document.getElementById('zh_agnostic_cit_color_hex').textContent='#101722';" style="background: #4a5568; color: #d0d8e0; border: none; border-radius: 4px; padding: 6px 10px; font-size: 11px; cursor: pointer;" title="Reset to default">Reset</button>
+                    <!-- Preset pill: dark default -->
+                    <button type="button"
+                        onclick="zh_cit_set_color('#101722')"
+                        style="display:inline-flex; align-items:center; gap:6px; background:#101722; color:#ffffff; border:2px solid #4a5568; border-radius:20px; padding:5px 12px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;"
+                        title="Apply dark default #101722">
+                        <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#101722;border:1px solid #4a5568;flex-shrink:0;"></span>
+                        #101722 (dark)
+                    </button>
+                    <!-- Preset pill: lighter -->
+                    <button type="button"
+                        onclick="zh_cit_set_color('#253649')"
+                        style="display:inline-flex; align-items:center; gap:6px; background:#253649; color:#ffffff; border:2px solid #4a5568; border-radius:20px; padding:5px 12px; font-size:11px; font-weight:600; cursor:pointer; white-space:nowrap;"
+                        title="Apply lighter blue #253649">
+                        <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#253649;border:1px solid #4a5568;flex-shrink:0;"></span>
+                        #253649 (lighter)
+                    </button>
                 </div>
             </div>
             <script>
+            function zh_cit_set_color(val) {
+                var picker = document.getElementById('zh_agnostic_cit_color_picker');
+                var hex    = document.getElementById('zh_agnostic_cit_color_hex');
+                if (!picker || !hex) return;
+                picker.value    = val;
+                hex.textContent = val;
+            }
             (function() {
                 var picker = document.getElementById('zh_agnostic_cit_color_picker');
                 var hex    = document.getElementById('zh_agnostic_cit_color_hex');
