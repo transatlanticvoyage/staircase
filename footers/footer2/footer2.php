@@ -20,7 +20,7 @@ function render_footer2() {
 
     // Enqueue footer-specific assets
     $assets_url = get_template_directory_uri() . '/footers/footer2/assets/';
-    wp_enqueue_style('footer2-styles', $assets_url . 'css/footer-styles.css', array(), '1.0.1');
+    wp_enqueue_style('footer2-styles', $assets_url . 'css/footer-styles.css', array(), '1.0.3');
 
     // Conditionally enqueue custom enhancement stylesheet (toggle via zaramax admin)
     if (get_option('zh_ft2_custom_styles_enabled', '0') === '1') {
@@ -32,6 +32,7 @@ function render_footer2() {
     $footer_box3_content = get_option('zaramax_footer_box3_content', '');
     $footer_map_heading = get_option('zaramax_footer_map_heading', '');
     $footer_map_location = get_option('zaramax_footer_map_location', '');
+    $hide_box4_map = get_option('zaramax_footer_hide_box4_map', '0') === '1';
     $legacy_hide_disclaimer = get_option('zaramax_footer_hide_disclaimer', '0');
     $legacy_footer_disclaimer = get_option('zaramax_footer_disclaimer', '');
     $legacy_footer_legal_links = get_option('zaramax_footer_legal_links', '');
@@ -82,7 +83,7 @@ function render_footer2() {
         <!-- Main Footer Boxes -->
         <div class="zh_ft2_main">
             <div class="zh_ft2_container">
-                <div class="zh_ft2_grid">
+                <div class="zh_ft2_grid<?php echo $hide_box4_map ? ' zh_ft2_grid_no_box4' : ''; ?>">
 
                     <!-- Box 1: Logo & Contact -->
                     <div class="zh_ft2_box zh_ft2_box_1">
@@ -126,6 +127,7 @@ function render_footer2() {
                         <?php echo wpautop(do_shortcode($footer_box3_content)); ?>
                     </div>
 
+                    <?php if (!$hide_box4_map): ?>
                     <!-- Box 4: Google Maps -->
                     <div class="zh_ft2_box zh_ft2_box_4">
                         <?php if (!empty($footer_map_heading)): ?>
@@ -147,6 +149,7 @@ function render_footer2() {
                             <p style="color: #999; font-style: italic;">Map location not set</p>
                         <?php endif; ?>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

@@ -233,3 +233,14 @@
         font-size: 12px;
     }
 }
+
+/* When box 4 (map widget) is hidden via the zaramax admin toggle,
+   reflow boxes 1-3 across the desktop grid (3 equal columns).
+   Wrapped in a min-width media query so the existing tablet (≤1024px → 2-col)
+   and mobile (≤768px → 1-col) rules keep working — without this scope the
+   higher-specificity selector below was overriding the responsive breakpoints. */
+@media (min-width: 1025px) {
+    .zh_ft2_grid.zh_ft2_grid_no_box4 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

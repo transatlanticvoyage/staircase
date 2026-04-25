@@ -13,8 +13,8 @@ get_header();
 <?php
 $current_template = staircase_get_current_template();
 
-// Cherry and vibrantcashew templates need full width rendering, others use container
-if ($current_template === 'cherry' || $current_template === 'homepage-cherry' || $current_template === 'vibrantcashew') {
+// Cherry, vibrantcashew, and galleryberry templates need full width rendering, others use container
+if ($current_template === 'cherry' || $current_template === 'homepage-cherry' || $current_template === 'vibrantcashew' || $current_template === 'galleryberry') {
     // These templates render without container constraint for full width sections
     while (have_posts()): the_post();
         staircase_render_template();

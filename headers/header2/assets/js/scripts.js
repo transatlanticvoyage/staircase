@@ -152,16 +152,16 @@ jQuery(document).ready(function($) {
     });
 
     // Silkweaver mobile accordion (header2-specific, only active on mobile widths)
-    // Standard dropdowns use slideToggle; robust items use class-based toggle
-    // to avoid conflicts with the plugin's :hover CSS rules on touch devices.
+    // Standard dropdowns use slideToggle; robust/elegant mega-panels use class-based
+    // toggle to avoid conflicts with the plugin's :hover CSS rules on touch devices.
     $('.zx_hd2_header .silkweaver-parent-button').on('click', function(e) {
         if ($(window).width() <= 1024) {
             e.preventDefault();
             e.stopPropagation();
             var parentLi = $(this).closest('.silkweaver-dropdown');
-            var isRobust = parentLi.hasClass('silkweaver-robust-dropdown');
+            var isMegaPanel = parentLi.hasClass('silkweaver-robust-dropdown') || parentLi.hasClass('silkweaver-elegant-dropdown');
 
-            if (isRobust) {
+            if (isMegaPanel) {
                 // Pure class toggle — no inline styles to fight CSS
                 parentLi.toggleClass('active');
             } else {

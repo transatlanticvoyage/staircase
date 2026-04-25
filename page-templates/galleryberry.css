@@ -1,0 +1,541 @@
+/**
+ * Galleryberry page template styles
+ * All selectors prefixed with `galleryberry_` for style isolation.
+ */
+
+/* ============================================
+   ACCESSIBILITY UTILITIES
+   ============================================ */
+
+/* Visually hidden but available to assistive tech (screen readers) */
+.galleryberry_sr_only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* ============================================
+   MAIN / CONTAINER
+   ============================================ */
+
+.galleryberry_main {
+    background: #0a0a0a;
+    color: #fafafa;
+    min-height: 70vh;
+    padding: 48px 20px 96px;
+    box-sizing: border-box;
+    font-family: inherit;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.galleryberry_inner {
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   PAGE TITLE
+   ============================================ */
+
+.galleryberry_page_title {
+    color: #ffffff;
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin: 0 0 32px 0;
+    padding: 0;
+}
+
+@media (max-width: 640px) {
+    .galleryberry_page_title {
+        font-size: 26px;
+        margin: 0 0 20px 0;
+    }
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+
+.galleryberry_empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: #9a9a9a;
+}
+
+.galleryberry_empty_title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #fafafa;
+    margin: 0 0 12px 0;
+}
+
+.galleryberry_empty_sub {
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ============================================
+   GRID
+   ============================================ */
+
+.galleryberry_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* ============================================
+   CARD
+   ============================================ */
+
+.galleryberry_card {
+    position: relative;
+    background: #141414;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.galleryberry_card:hover,
+.galleryberry_card:focus {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.galleryberry_card:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 2px;
+}
+
+.galleryberry_card_cover {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #222;
+}
+
+/* fallback for browsers without aspect-ratio */
+@supports not (aspect-ratio: 4 / 3) {
+    .galleryberry_card_cover {
+        padding-top: 75%;
+        height: 0;
+    }
+    .galleryberry_card_cover_img {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+}
+
+.galleryberry_card_cover_img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 400ms ease;
+}
+
+.galleryberry_card:hover .galleryberry_card_cover_img,
+.galleryberry_card:focus .galleryberry_card_cover_img {
+    transform: scale(1.04);
+}
+
+.galleryberry_card_badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 999px;
+    line-height: 1;
+    backdrop-filter: blur(4px);
+}
+
+.galleryberry_card_body {
+    padding: 16px 18px 18px;
+}
+
+.galleryberry_card_title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fafafa;
+    margin: 0 0 6px 0;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
+
+.galleryberry_card_meta {
+    font-size: 13px;
+    color: #9a9a9a;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.galleryberry_card_year {
+    font-variant-numeric: tabular-nums;
+}
+
+.galleryberry_card_year + .galleryberry_card_count::before {
+    content: "·";
+    margin-right: 10px;
+    color: #555;
+}
+
+/* ============================================
+   LIGHTBOX
+   ============================================ */
+
+.galleryberry_lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.96);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 60px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: opacity 200ms ease;
+}
+
+/* On desktop, cap the image width so it stays centered on the viewport
+   AND doesn't extend into the right-side info-panel area.
+   Info panel = 320px wide + 40px right offset = 360px reserved on the right.
+   Mirroring 360px on the left keeps the image visually centered.
+   Plus ~40px breathing room on each side = 800px total subtracted. */
+@media (min-width: 1025px) {
+    .galleryberry_lightbox_img {
+        max-width: calc(100vw - 800px);
+    }
+}
+
+.galleryberry_lightbox[hidden] {
+    display: none;
+}
+
+.galleryberry_lightbox.is-visible {
+    opacity: 1;
+}
+
+.galleryberry_lightbox_figure {
+    margin: 0;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.galleryberry_lightbox_img {
+    max-width: 100%;
+    max-height: calc(100vh - 160px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    border-radius: 2px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Info panel — to the right of the image on desktop */
+.galleryberry_lightbox_info {
+    position: absolute;
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%);
+    width: 320px;
+    max-width: 30vw;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    color: #ffffff;
+    padding: 24px;
+    box-sizing: border-box;
+    pointer-events: auto;
+}
+
+.galleryberry_lightbox_info_title {
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px 0;
+    padding: 0;
+}
+
+.galleryberry_lightbox_info_desc {
+    color: #ffffff;
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    white-space: pre-line;
+}
+
+.galleryberry_lightbox_info_title:empty,
+.galleryberry_lightbox_info_desc:empty {
+    display: none;
+}
+
+.galleryberry_lightbox_counter {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #c5c5c5;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 6px 14px;
+    border-radius: 999px;
+}
+
+.galleryberry_lightbox_close,
+.galleryberry_lightbox_prev,
+.galleryberry_lightbox_next {
+    position: absolute;
+    background: rgba(20, 20, 20, 0.7);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    line-height: 1;
+    padding: 0;
+    transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+    z-index: 1;
+    font-family: inherit;
+}
+
+/* Visible keyboard focus indicator on lightbox controls */
+.galleryberry_lightbox_close:focus-visible,
+.galleryberry_lightbox_prev:focus-visible,
+.galleryberry_lightbox_next:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 3px;
+    background: rgba(40, 40, 40, 0.95);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.galleryberry_lightbox_close:hover,
+.galleryberry_lightbox_prev:hover,
+.galleryberry_lightbox_next:hover {
+    background: rgba(40, 40, 40, 0.95);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+.galleryberry_lightbox_close:active,
+.galleryberry_lightbox_prev:active,
+.galleryberry_lightbox_next:active {
+    transform: scale(0.95);
+}
+
+.galleryberry_lightbox_close {
+    top: 16px;
+    right: 16px;
+    font-size: 26px;
+}
+
+.galleryberry_lightbox_prev {
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.galleryberry_lightbox_prev:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.galleryberry_lightbox_next {
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.galleryberry_lightbox_next:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* ============================================
+   MOBILE (≤ 640px)
+   ============================================ */
+
+@media (max-width: 640px) {
+    .galleryberry_main {
+        padding: 24px 14px 64px;
+    }
+
+    .galleryberry_grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .galleryberry_card_body {
+        padding: 14px 14px 16px;
+    }
+
+    .galleryberry_card_title {
+        font-size: 16px;
+    }
+
+    .galleryberry_card_meta {
+        font-size: 12px;
+    }
+
+    .galleryberry_lightbox {
+        padding: 56px 10px 72px;
+    }
+
+    .galleryberry_lightbox_close {
+        top: 10px;
+        right: 10px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .galleryberry_lightbox_prev,
+    .galleryberry_lightbox_next {
+        top: auto;
+        bottom: 14px;
+        transform: none;
+        width: 44px;
+        height: 44px;
+    }
+
+    .galleryberry_lightbox_prev {
+        left: 24%;
+    }
+
+    .galleryberry_lightbox_next {
+        right: 24%;
+    }
+
+    .galleryberry_lightbox_prev:active,
+    .galleryberry_lightbox_next:active {
+        transform: scale(0.92);
+    }
+
+    .galleryberry_lightbox_counter {
+        top: 14px;
+        font-size: 12px;
+    }
+
+    .galleryberry_lightbox_caption {
+        font-size: 13px;
+    }
+
+    .galleryberry_lightbox_img {
+        max-height: calc(100vh - 200px);
+    }
+}
+
+/* ============================================
+   TABLET (641px – 1024px)
+   ============================================ */
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    .galleryberry_grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+    }
+}
+
+/* ============================================
+   LIGHTBOX INFO PANEL — non-desktop layout
+   On tablet/mobile the info panel stacks below the image (full width)
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .galleryberry_lightbox_info {
+        position: static;
+        transform: none;
+        width: 100%;
+        max-width: 720px;
+        max-height: none;
+        margin: 16px auto 0 auto;
+        padding: 16px 20px 0 20px;
+        text-align: center;
+    }
+
+    .galleryberry_lightbox_info_title {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .galleryberry_lightbox_info_desc {
+        font-size: 14px;
+    }
+
+    .galleryberry_lightbox {
+        flex-direction: column;
+    }
+
+    .galleryberry_lightbox_img {
+        max-height: calc(100vh - 280px);
+    }
+}
+
+/* ============================================
+   REDUCED MOTION — respect user preference
+   Disables transitions, animations, and transform-based hover effects
+   for users who request reduced motion (vestibular disorders, etc.)
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .galleryberry_card,
+    .galleryberry_card_cover_img,
+    .galleryberry_lightbox,
+    .galleryberry_lightbox_close,
+    .galleryberry_lightbox_prev,
+    .galleryberry_lightbox_next {
+        transition: none !important;
+        animation: none !important;
+    }
+    .galleryberry_card:hover,
+    .galleryberry_card:focus,
+    .galleryberry_card:focus-visible {
+        transform: none !important;
+    }
+    .galleryberry_card:hover .galleryberry_card_cover_img,
+    .galleryberry_card:focus .galleryberry_card_cover_img {
+        transform: none !important;
+    }
+    .galleryberry_lightbox.is-visible {
+        opacity: 1 !important;
+    }
+    .galleryberry_lightbox_close:active,
+    .galleryberry_lightbox_prev:active,
+    .galleryberry_lightbox_next:active {
+        transform: none !important;
+    }
+}

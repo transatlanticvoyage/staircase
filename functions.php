@@ -57,6 +57,38 @@ function staircase_enqueue_assets() {
     // Enqueue Dashicons for frontend use (for service icons)
     wp_enqueue_style('dashicons');
     
+    // Enqueue Galleryberry assets only on pages using the galleryberry template
+    if (is_page() || is_single()) {
+        global $wpdb, $post;
+        if (!empty($post) && !empty($post->ID)) {
+            $gby_template = $wpdb->get_var($wpdb->prepare(
+                "SELECT staircase_page_template_desired FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d LIMIT 1",
+                $post->ID
+            ));
+            if ($gby_template === 'galleryberry') {
+                $gby_css = get_template_directory() . '/page-templates/galleryberry.css';
+                $gby_js  = get_template_directory() . '/page-templates/galleryberry.js';
+                if (file_exists($gby_css)) {
+                    wp_enqueue_style(
+                        'staircase-galleryberry',
+                        get_template_directory_uri() . '/page-templates/galleryberry.css',
+                        array('staircase-style'),
+                        filemtime($gby_css)
+                    );
+                }
+                if (file_exists($gby_js)) {
+                    wp_enqueue_script(
+                        'staircase-galleryberry',
+                        get_template_directory_uri() . '/page-templates/galleryberry.js',
+                        array(),
+                        filemtime($gby_js),
+                        true
+                    );
+                }
+            }
+        }
+    }
+
     // Enqueue Silkweaver menu styles if system is enabled
     if (function_exists('silkweaver_render_menu') && get_option('silkweaver_use_system', true)) {
         wp_enqueue_style(
@@ -64,6 +96,12 @@ function staircase_enqueue_assets() {
             get_template_directory_uri() . '/css/silkweaver-core.css',
             array('staircase-style'),
             filemtime(get_template_directory() . '/css/silkweaver-core.css')
+        );
+        wp_enqueue_style(
+            'staircase-silkweaver-elegant',
+            get_template_directory_uri() . '/css/silkweaver-elegant.css',
+            array('staircase-silkweaver'),
+            filemtime(get_template_directory() . '/css/silkweaver-elegant.css')
         );
     }
     
@@ -1709,7 +1747,11 @@ function staircase_render_template() {
         case 'vibrantcashew':
             get_template_part('page-templates/vibrantcashew');
             break;
-            
+
+        case 'galleryberry':
+            get_template_part('page-templates/galleryberry');
+            break;
+
         case 'content-only':
         default:
             staircase_render_default_template();
@@ -2545,7 +2587,8 @@ function staircase_get_page_templates() {
         'sarsaparilla' => 'sarsaparilla',
         'gooseberry' => 'gooseberry',
         'vibrantberry' => 'Vibrantberry (Custom HTML)',
-        'vibrantcashew' => 'Vibrantcashew (Full HTML Expanse)'
+        'vibrantcashew' => 'Vibrantcashew (Full HTML Expanse)',
+        'galleryberry' => 'Galleryberry (Dark Project Gallery)'
     );
 }
 
@@ -4195,6 +4238,8 @@ function zaramax_footer_management_page() {
         update_option('zaramax_footer_map_heading', sanitize_text_field($_POST['footer_map_heading']));
         // Use wp_unslash to preserve shortcodes without adding backslashes
         update_option('zaramax_footer_map_location', wp_unslash($_POST['footer_map_location']));
+        // Toggle to hide box 4 (map widget) and reflow boxes 1-3 across the grid
+        update_option('zaramax_footer_hide_box4_map', isset($_POST['zaramax_footer_hide_box4_map']) ? '1' : '0');
         update_option('zaramax_footer_hide_disclaimer', isset($_POST['footer_hide_disclaimer']) ? '1' : '0');
         update_option('zaramax_footer_disclaimer', wp_unslash($_POST['footer_disclaimer']));
         update_option('zaramax_footer_legal_links', wp_unslash($_POST['footer_legal_links']));
@@ -4237,6 +4282,7 @@ function zaramax_footer_management_page() {
     $footer_box3_content = get_option('zaramax_footer_box3_content', '');
     $footer_map_heading = get_option('zaramax_footer_map_heading', '');
     $footer_map_location = get_option('zaramax_footer_map_location', '');
+    $zaramax_footer_hide_box4_map = get_option('zaramax_footer_hide_box4_map', '0');
     $footer_hide_disclaimer = get_option('zaramax_footer_hide_disclaimer', '0');
     $footer_disclaimer = get_option('zaramax_footer_disclaimer', '');
     $footer_legal_links = get_option('zaramax_footer_legal_links', '');
@@ -4506,10 +4552,67 @@ function zaramax_footer_management_page() {
                         <!-- Box 4 -->
                         <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 2px solid #dc3545;">
                             <h3 style="margin-top: 0; color: #dc3545;">Box 4 - Google Maps</h3>
-                            
+
+                            <!-- Hide Box 4 toggle: removes the map widget and reflows boxes 1-3 across the grid -->
+                            <div class="zh_ft2_hide_box4_toggle_block" style="background: #1b2a3d; border: 2px solid #b1250d; border-radius: 8px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                                <div style="flex: 0 0 auto;">
+                                    <span style="font-size: 18px;">🗺️</span>
+                                </div>
+                                <div style="flex: 1; min-width: 180px;">
+                                    <strong style="color: #ffffff; font-size: 13px; display: block; margin-bottom: 2px;">Hide map widget</strong>
+                                    <span style="color: #d0d8e0; font-size: 12px;">When ON, Box 4 (the map) is removed and Boxes 1-3 spread across the row.</span>
+                                </div>
+                                <div style="flex: 0 0 auto;">
+                                    <label class="zh_ft2_hide_box4_toggle_switch" style="position: relative; display: inline-block; width: 52px; height: 28px; cursor: pointer;" title="Toggle hiding the map widget (Box 4)">
+                                        <input type="checkbox" name="zaramax_footer_hide_box4_map" value="1" <?php checked($zaramax_footer_hide_box4_map, '1'); ?>
+                                            style="opacity: 0; width: 0; height: 0; position: absolute;">
+                                        <span class="zh_ft2_hide_box4_toggle_slider" style="
+                                            position: absolute; cursor: pointer; inset: 0;
+                                            background-color: <?php echo $zaramax_footer_hide_box4_map === '1' ? '#b1250d' : '#4a5568'; ?>;
+                                            transition: background-color 0.25s;
+                                            border-radius: 28px;
+                                        "></span>
+                                        <span style="
+                                            position: absolute; top: 4px; left: <?php echo $zaramax_footer_hide_box4_map === '1' ? '28px' : '4px'; ?>;
+                                            width: 20px; height: 20px;
+                                            background: #fff; border-radius: 50%;
+                                            transition: left 0.25s;
+                                            pointer-events: none;
+                                        " class="zh_ft2_hide_box4_toggle_knob"></span>
+                                    </label>
+                                </div>
+                                <div style="flex: 0 0 auto; min-width: 36px;">
+                                    <strong id="zh_ft2_hide_box4_toggle_label" style="color: <?php echo $zaramax_footer_hide_box4_map === '1' ? '#e84b2a' : '#7a8a98'; ?>; font-size: 13px;">
+                                        <?php echo $zaramax_footer_hide_box4_map === '1' ? 'ON' : 'OFF'; ?>
+                                    </strong>
+                                </div>
+                            </div>
+                            <script>
+                            (function() {
+                                var cb = document.querySelector('input[name="zaramax_footer_hide_box4_map"]');
+                                if (!cb) return;
+                                cb.addEventListener('change', function() {
+                                    var slider = cb.parentElement.querySelector('.zh_ft2_hide_box4_toggle_slider');
+                                    var knob   = cb.parentElement.querySelector('.zh_ft2_hide_box4_toggle_knob');
+                                    var label  = document.getElementById('zh_ft2_hide_box4_toggle_label');
+                                    if (cb.checked) {
+                                        slider.style.backgroundColor = '#b1250d';
+                                        knob.style.left = '28px';
+                                        label.style.color = '#e84b2a';
+                                        label.textContent = 'ON';
+                                    } else {
+                                        slider.style.backgroundColor = '#4a5568';
+                                        knob.style.left = '4px';
+                                        label.style.color = '#7a8a98';
+                                        label.textContent = 'OFF';
+                                    }
+                                });
+                            })();
+                            </script>
+
                             <label for="footer_map_heading"><strong>Heading:</strong></label>
                             <input type="text" id="footer_map_heading" name="footer_map_heading" value="<?php echo esc_attr($footer_map_heading); ?>" style="width: 100%; margin-bottom: 10px;" placeholder="e.g., Visit Our Office">
-                            
+
                             <label for="footer_map_location"><strong>Location/Address:</strong></label>
                             <input type="text" id="footer_map_location" name="footer_map_location" value="<?php echo esc_attr($footer_map_location); ?>" style="width: 100%;" placeholder="e.g., 123 Main St, City, State">
                         </div>
