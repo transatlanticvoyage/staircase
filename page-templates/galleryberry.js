@@ -19,6 +19,9 @@
     var galleryberry_img       = document.getElementById('galleryberry_lightbox_img');
     var galleryberry_infoTitle = document.getElementById('galleryberry_lightbox_info_title');
     var galleryberry_infoDesc  = document.getElementById('galleryberry_lightbox_info_desc');
+    var galleryberry_clientWrap = document.getElementById('galleryberry_lightbox_info_client');
+    var galleryberry_clientName = document.getElementById('galleryberry_lightbox_info_client_name');
+    var galleryberry_clientLoc  = document.getElementById('galleryberry_lightbox_info_client_location');
     var galleryberry_counter   = document.getElementById('galleryberry_lightbox_counter');
     var galleryberry_announce  = document.getElementById('galleryberry_lightbox_announce');
     var galleryberry_closeBtn  = document.getElementById('galleryberry_lightbox_close');
@@ -55,6 +58,45 @@
         return buttons;
     }
 
+    /**
+     * Update the per-image client info line in the lightbox.
+     * Pulls client_name + client_location from the CURRENT photo (per-image,
+     * not per-project) and applies the rule: the word "from" only appears
+     * when BOTH name and location have non-empty values.
+     */
+    function galleryberry_updateClientInfo(photo) {
+        if (!galleryberry_clientWrap) return;
+        var cliName = photo && photo.client_name ? String(photo.client_name).trim() : '';
+        var cliLoc  = photo && photo.client_location ? String(photo.client_location).trim() : '';
+        var fromSpan = galleryberry_clientWrap.querySelector('.galleryberry_lightbox_info_client_from');
+
+        if (cliName && cliLoc) {
+            // Both present → "Name from Location"
+            galleryberry_clientName.textContent = cliName;
+            galleryberry_clientLoc.textContent  = cliLoc;
+            galleryberry_clientWrap.hidden = false;
+            if (fromSpan) fromSpan.style.display = '';
+        } else if (cliName) {
+            // Only name → just "Name" (no "from", no location)
+            galleryberry_clientName.textContent = cliName;
+            galleryberry_clientLoc.textContent  = '';
+            galleryberry_clientWrap.hidden = false;
+            if (fromSpan) fromSpan.style.display = 'none';
+        } else if (cliLoc) {
+            // Only location → just "Location" (no "from", no name)
+            galleryberry_clientName.textContent = '';
+            galleryberry_clientLoc.textContent  = cliLoc;
+            galleryberry_clientWrap.hidden = false;
+            if (fromSpan) fromSpan.style.display = 'none';
+        } else {
+            // Neither → hide entire line
+            galleryberry_clientName.textContent = '';
+            galleryberry_clientLoc.textContent  = '';
+            galleryberry_clientWrap.hidden = true;
+            if (fromSpan) fromSpan.style.display = '';
+        }
+    }
+
     function galleryberry_render() {
         var photo = galleryberry_state.photos[galleryberry_state.index];
         if (!photo) return;
@@ -79,6 +121,9 @@
             galleryberry_announce.textContent = 'Photo ' + (idx + 1) + ' of ' + total;
         }
 
+        // Per-image client info: updates on every photo change (prev/next/swipe)
+        galleryberry_updateClientInfo(photo);
+
         var multiple = total > 1;
         galleryberry_prevBtn.style.display = multiple ? '' : 'none';
         galleryberry_nextBtn.style.display = multiple ? '' : 'none';
@@ -90,6 +135,8 @@
         galleryberry_state.projectName = name;
         if (galleryberry_infoTitle) galleryberry_infoTitle.textContent = name;
         if (galleryberry_infoDesc)  galleryberry_infoDesc.textContent  = desc;
+        // Note: client_name + client_location are now per-photo (not per-project).
+        // They get populated by galleryberry_updateClientInfo() inside render().
     }
 
     function galleryberry_open(card) {

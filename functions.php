@@ -103,6 +103,13 @@ function staircase_enqueue_assets() {
             array('staircase-silkweaver'),
             filemtime(get_template_directory() . '/css/silkweaver-elegant.css')
         );
+        wp_enqueue_script(
+            'staircase-silkweaver-elegant-mobile',
+            get_template_directory_uri() . '/js/silkweaver-elegant-mobile.js',
+            array(),
+            filemtime(get_template_directory() . '/js/silkweaver-elegant-mobile.js'),
+            true
+        );
     }
     
     // Conditionally enqueue TPCom nav styles

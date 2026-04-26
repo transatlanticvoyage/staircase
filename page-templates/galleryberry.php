@@ -24,7 +24,7 @@ $gby_table_exists = $wpdb->get_var($wpdb->prepare(
 $gby_projects = array();
 if ($gby_table_exists) {
     $gby_projects = $wpdb->get_results(
-        "SELECT id, project_name, client_name, project_date, status, description, technologies, project_url, featured, display_order
+        "SELECT id, project_name, client_name, client_location, project_date, status, description, technologies, project_url, featured, display_order
          FROM {$gby_projects_table}
          ORDER BY display_order ASC, id DESC",
         ARRAY_A
@@ -36,7 +36,7 @@ $gby_cards = array();
 foreach ($gby_projects as $gby_project) {
     $gby_project_id = intval($gby_project['id']);
     $gby_relations = $wpdb->get_results($wpdb->prepare(
-        "SELECT r.image_id, p.post_title
+        "SELECT r.image_id, r.client_name, r.client_location, p.post_title
          FROM {$gby_relations_table} r
          LEFT JOIN {$wpdb->posts} p ON p.ID = r.image_id
          WHERE r.project_id = %d
@@ -53,10 +53,12 @@ foreach ($gby_projects as $gby_project) {
         $gby_thumb = wp_get_attachment_image_url($gby_image_id, 'medium');
         if (!$gby_full && !$gby_large && !$gby_thumb) continue;
         $gby_photos[] = array(
-            'id'    => $gby_image_id,
-            'thumb' => $gby_thumb ?: ($gby_large ?: $gby_full),
-            'full'  => $gby_full ?: ($gby_large ?: $gby_thumb),
-            'alt'   => $gby_rel['post_title'] ?: '',
+            'id'              => $gby_image_id,
+            'thumb'           => $gby_thumb ?: ($gby_large ?: $gby_full),
+            'full'            => $gby_full ?: ($gby_large ?: $gby_thumb),
+            'alt'             => $gby_rel['post_title'] ?: '',
+            'client_name'     => $gby_rel['client_name'] ?: '',
+            'client_location' => $gby_rel['client_location'] ?: '',
         );
     }
 
@@ -74,13 +76,13 @@ foreach ($gby_projects as $gby_project) {
     }
 
     $gby_cards[] = array(
-        'id'          => $gby_project_id,
-        'title'       => $gby_project['project_name'] ?: ('Project #' . $gby_project_id),
-        'description' => $gby_project['description'] ?: '',
-        'year'        => $gby_year,
-        'photo_count' => count($gby_photos),
-        'cover'       => $gby_cover,
-        'photos'      => $gby_photos,
+        'id'              => $gby_project_id,
+        'title'           => $gby_project['project_name'] ?: ('Project #' . $gby_project_id),
+        'description'     => $gby_project['description'] ?: '',
+        'year'            => $gby_year,
+        'photo_count'     => count($gby_photos),
+        'cover'           => $gby_cover,
+        'photos'          => $gby_photos,
     );
 }
 
@@ -162,6 +164,11 @@ foreach ($gby_projects as $gby_project) {
     <aside class="galleryberry_lightbox_info" id="galleryberry_lightbox_info">
         <h2 class="galleryberry_lightbox_info_title" id="galleryberry_lightbox_info_title"></h2>
         <p class="galleryberry_lightbox_info_desc" id="galleryberry_lightbox_info_desc"></p>
+        <p class="galleryberry_lightbox_info_client" id="galleryberry_lightbox_info_client" hidden>
+            <strong class="galleryberry_lightbox_info_client_name" id="galleryberry_lightbox_info_client_name"></strong>
+            <span class="galleryberry_lightbox_info_client_from"> from </span>
+            <strong class="galleryberry_lightbox_info_client_location" id="galleryberry_lightbox_info_client_location"></strong>
+        </p>
     </aside>
 
     <!-- Visual counter ("3 / 5"). aria-hidden so screen readers don't read "3 slash 5". -->

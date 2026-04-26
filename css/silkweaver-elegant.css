@@ -21,14 +21,18 @@
     top: 100%;
     left: 0; /* JS will override to viewport-center the panel on desktop */
     width: max-content;
-    min-width: 640px;
+    min-width: 980px;
     max-width: calc(100vw - 40px);
     max-height: calc(100vh - 120px);
     overflow-y: auto;
-    background: #fff;
+    background: #fcfcfc;
     border: 1px solid #ececec;
-    border-radius: 2px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+    border-radius: 5px;
+    /* Outer lift + inner top-edge highlight for the "lifted card" feel. */
+    box-shadow:
+        0 10px 32px rgba(0, 0, 0, 0.06),
+        0 2px 6px rgba(0, 0, 0, 0.035),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
     z-index: 9999;
     padding: 40px 48px;
     box-sizing: border-box;
@@ -73,10 +77,78 @@
 
 .silkweaver-elegant-inner {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    column-gap: 48px;
-    row-gap: 36px;
-    align-items: start;
+    grid-template-columns: minmax(220px, 280px) minmax(560px, 1fr);
+    column-gap: 0;
+    align-items: stretch;
+}
+
+/* Feature (largest) category column gets a faint tone shift so it reads as
+   the deliberate "anchor" section, not just the longest list. */
+.silkweaver-elegant-feature {
+    display: flex;
+    align-items: stretch;
+    background: #fafafa;
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-right: 24px;
+}
+
+.silkweaver-elegant-feature > .silkweaver-elegant-column {
+    width: 100%;
+}
+
+.silkweaver-elegant-rest {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    /* grid-template-columns set inline based on max(top_count, bottom_count) */
+    column-gap: 36px;
+    row-gap: 28px;
+    min-width: 0;
+    padding-left: 24px;
+    position: relative;
+}
+
+/* Vertical divider between feature column and the right-side bands. */
+.silkweaver-elegant-rest::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: #ececec;
+    pointer-events: none;
+}
+
+/* Horizontal divider between top and bottom bands. Sits in the row-gap so
+   neither band's content overlaps it. left:24px starts the line just past
+   the vertical divider; right:0 stretches it to the panel edge. */
+.silkweaver-elegant-rest::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 24px;
+    right: 0;
+    height: 1px;
+    background: #ececec;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Row wrappers disappear from the layout tree so their children become direct
+   grid items of .silkweaver-elegant-rest. This way both rows share the same
+   column tracks and a category in row 1 column N has the same width as a
+   category in row 2 column N (the wider of the two sets the track width). */
+.silkweaver-elegant-row {
+    display: contents;
+}
+
+.silkweaver-elegant-row-top > .silkweaver-elegant-column {
+    grid-row: 1;
+}
+
+.silkweaver-elegant-row-bottom > .silkweaver-elegant-column {
+    grid-row: 2;
 }
 
 .silkweaver-elegant-column {
@@ -98,7 +170,7 @@
 .silkweaver-elegant-category-desc {
     font-size: 12px;
     line-height: 1.5;
-    color: #777;
+    color: #666; /* AA contrast vs #fff (5.74:1) and #fafafa (5.49:1) — was #777 (4.48:1, borderline) */
     margin: 0 0 14px 0;
     padding: 0;
 }
@@ -125,13 +197,15 @@
 
 .silkweaver-elegant-child-pages a {
     display: block !important;
-    padding: 6px 0 !important;
+    padding: 6px 10px !important;
+    margin: 0 -10px !important;
     font-size: 15px !important;
     line-height: 1.45 !important;
     color: #222 !important;
     text-decoration: none !important;
     border: none !important;
-    transition: color 120ms ease, transform 120ms ease;
+    border-radius: 4px;
+    transition: color 120ms ease, background-color 120ms ease, transform 120ms ease;
 }
 
 .silkweaver-elegant-child-pages a:hover,
@@ -140,8 +214,21 @@
     text-decoration: underline !important;
     text-underline-offset: 3px !important;
     transform: translateX(2px);
-    background: none !important;
+    background-color: #e6f1fb !important;
     opacity: 1 !important;
+}
+
+/* Keyboard-only focus ring (mouse hover gets the bg highlight, keyboard users
+   get a clear high-contrast outline so the focused link is unmistakable). */
+.silkweaver-elegant-child-pages a:focus-visible {
+    outline: 2px solid #cf660f !important;
+    outline-offset: 2px !important;
+}
+
+/* Match the toggle button so keyboard nav into the menu has a visible ring too. */
+.silkweaver-elegant-dropdown > .silkweaver-dropdown-toggle:focus-visible {
+    outline: 2px solid #cf660f;
+    outline-offset: 3px;
 }
 
 /* ============================================
@@ -189,13 +276,153 @@
         row-gap: 24px;
     }
 
+    /* Drop the desktop-only feature bg/divider treatment when the layout
+       collapses to a single stacked column. */
+    .silkweaver-elegant-feature {
+        background: none;
+        padding: 0;
+        margin-right: 0;
+        border-radius: 0;
+    }
+
+    .silkweaver-elegant-rest {
+        grid-template-rows: auto;
+        grid-template-columns: 1fr !important;
+        row-gap: 20px;
+        padding-left: 0;
+    }
+
+    .silkweaver-elegant-rest::before,
+    .silkweaver-elegant-rest::after {
+        display: none;
+    }
+
+    .silkweaver-elegant-row-top > .silkweaver-elegant-column,
+    .silkweaver-elegant-row-bottom > .silkweaver-elegant-column {
+        grid-row: auto;
+    }
+
+    /* Each category becomes its own accordion row on mobile.
+       Every column gets the SAME borders top + bottom so the visual rhythm
+       is consistent regardless of which container the column lives in
+       (.silkweaver-elegant-feature wraps the largest, while the others
+       sit in .silkweaver-elegant-row-top / .silkweaver-elegant-row-bottom).
+       Adjacent columns will have the lines collapse visually because of
+       the row-margin between them — but each individual column still
+       carries its own top + bottom rule so none ever look "naked". */
+    .silkweaver-elegant-column {
+        margin: 0;
+        padding: 0;
+        border-top: 1px solid #ececec;
+        border-bottom: 1px solid #ececec;
+    }
+
+    /* Keep the parent menu item's bottom edge visible when the panel opens
+       — without this, the expanded area would sit flush against the
+       parent button and its bottom border would visually disappear. */
+    .silkweaver-elegant-child-area {
+        border-top: 1px solid #ececec;
+    }
+
+    /* Category title is the accordion handle on mobile — large tap target,
+       chevron on the right that rotates when expanded. JS adds role=button +
+       aria-expanded so it announces correctly to assistive tech. */
+    .silkweaver-elegant-category-title,
+    .silkweaver-elegant-section-title {
+        font-size: 15px;
+        letter-spacing: 0.04em;
+        margin: 0;
+        padding: 16px 38px 16px 12px;
+        line-height: 1.3;
+        border-bottom: none;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .silkweaver-elegant-category-title:focus-visible {
+        outline: 2px solid #cf660f;
+        outline-offset: -2px;
+    }
+
+    /* Chevron indicator (right side). Rotates 180deg when category is open. */
+    .silkweaver-elegant-category-title::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        width: 8px;
+        height: 8px;
+        border-right: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+        transform: translateY(-70%) rotate(45deg);
+        transition: transform 200ms ease;
+        opacity: 0.7;
+    }
+
+    .silkweaver-elegant-column.is-cat-expanded > .silkweaver-elegant-category-title::after {
+        transform: translateY(-30%) rotate(-135deg);
+    }
+
+    /* Description and child-pages are collapsed by default on mobile.
+       Only revealed when the category column has the .is-cat-expanded class
+       toggled on by silkweaver-elegant-mobile.js. */
+    .silkweaver-elegant-category-desc,
+    .silkweaver-elegant-child-pages {
+        display: none;
+    }
+
+    .silkweaver-elegant-column.is-cat-expanded > .silkweaver-elegant-category-desc,
+    .silkweaver-elegant-column.is-cat-expanded > .silkweaver-elegant-child-pages {
+        display: block;
+    }
+
+    .silkweaver-elegant-category-desc {
+        font-size: 13px;
+        line-height: 1.55;
+        margin: 0;
+        padding: 0 12px 8px 12px;
+    }
+
+    /* Child page links — flush to the column edges (no negative margin bleed),
+       comfortable tap height, indent slightly so they read as nested under the
+       category heading. */
+    .silkweaver-elegant-child-pages {
+        padding: 4px 0 12px 0;
+    }
+
+    .silkweaver-elegant-child-pages a {
+        font-size: 15px !important;
+        padding: 11px 12px 11px 24px !important;
+        margin: 0 !important;
+        line-height: 1.4 !important;
+        border-radius: 0;
+    }
+
+    .silkweaver-elegant-child-pages a:hover,
+    .silkweaver-elegant-child-pages a:focus {
+        transform: none;
+    }
+
     .silkweaver-elegant-locations-list {
         column-width: 140px;
         column-gap: 20px;
     }
+}
 
-    .silkweaver-elegant-category-title,
-    .silkweaver-elegant-section-title {
-        font-size: 10px;
+/* Respect users who request reduced motion — disable panel slide-in and
+   per-link translate/transition. Standard WCAG 2.1 / 2.3.3 guidance. */
+@media (prefers-reduced-motion: reduce) {
+    .silkweaver-elegant-child-area {
+        transition: none !important;
+        transform: none !important;
+    }
+    .silkweaver-elegant-child-pages a {
+        transition: none !important;
+    }
+    .silkweaver-elegant-child-pages a:hover,
+    .silkweaver-elegant-child-pages a:focus {
+        transform: none !important;
     }
 }

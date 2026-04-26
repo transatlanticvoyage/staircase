@@ -19,6 +19,19 @@ get_header();
             
             // For blog listing page, use card layout
             if (is_home() && !is_front_page()):
+                // Render the designated Posts page title ABOVE (and outside) the
+                // blog-posts-grid wrapper so it sits in its own row, not as a grid item.
+                // Class name kept neutral (no theme namespace) to minimize the public
+                // footprint of the theme's name in rendered HTML.
+                $staircase_posts_page_id = (int) get_option('page_for_posts');
+                if ($staircase_posts_page_id > 0):
+                    $staircase_posts_page_title = get_the_title($staircase_posts_page_id);
+                    if ($staircase_posts_page_title):
+                        ?>
+                        <h1 class="blog-page-title" style="margin-bottom: 50px;"><?php echo esc_html($staircase_posts_page_title); ?></h1>
+                        <?php
+                    endif;
+                endif;
                 ?>
                 <div class="blog-posts-grid">
                     <?php

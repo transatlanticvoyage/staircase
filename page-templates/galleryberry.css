@@ -301,6 +301,30 @@
     display: none;
 }
 
+/* "[Client Name] from [Client Location]" line — below project description */
+.galleryberry_lightbox_info_client {
+    color: #ffffff;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 14px 0 0 0;
+    padding: 0;
+}
+
+.galleryberry_lightbox_info_client_name {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.galleryberry_lightbox_info_client_from {
+    color: #ffffff;
+    font-weight: 400;
+}
+
+.galleryberry_lightbox_info_client_location {
+    color: #009bff;
+    font-weight: 700;
+}
+
 .galleryberry_lightbox_counter {
     position: absolute;
     top: 16px;
