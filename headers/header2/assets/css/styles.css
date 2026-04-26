@@ -810,9 +810,18 @@ body.zx_hd2_active {
         display: block !important;
     }
 
-    /* Chevron rotation for elegant items (left-side ::before chevron) */
-    .zx_hd2_header .silkweaver-elegant-dropdown.active .silkweaver-parent-button::before {
-        transform: rotate(90deg);
+    /* Hide the left-side ::before chevron on elegant dropdowns. The right-side
+       ::after chevron from silkweaver-core.css mobile rules is the only
+       expand/collapse indicator we want for elegant items. */
+    .zx_hd2_header .silkweaver-elegant-dropdown .silkweaver-parent-button::before {
+        display: none;
+    }
+
+    /* The 48px-wide ::before chevron used to provide implicit left spacing.
+       With it hidden, restore the 16px left padding so "Services" lines up
+       with the other top-level nav items (which use padding: 15px 16px). */
+    .zx_hd2_header .silkweaver-elegant-dropdown .silkweaver-parent-button {
+        padding-left: 16px;
     }
 
     /* Elegant inner: stack columns on mobile so child links flow vertically */
@@ -823,10 +832,18 @@ body.zx_hd2_active {
     }
 
     .zx_hd2_header .silkweaver-elegant-column {
-        margin-bottom: 4px;
+        /* No margin-bottom — spacing between categories comes solely from
+           the Grid row-gap on .silkweaver-elegant-inner / .silkweaver-elegant-rest
+           (24px each). Margin here would add an inconsistent extra gap to
+           rest-internal transitions only, making the feature→rest gap look
+           tighter than the rest-internal ones. */
         /* Soften the agnostic #ececec column borders against header2's dark bg. */
         border-top-color: #555;
         border-bottom-color: #555;
+        /* Dark-gray category bg (distinct from the surrounding black panel and
+           the black page-link rows inside). Top-level Services button stays
+           black; child-page links stay black via their own !important rule. */
+        background: #2a2a2a;
     }
 
     .zx_hd2_header .silkweaver-elegant-category-title,

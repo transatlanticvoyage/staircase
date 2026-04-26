@@ -276,20 +276,16 @@
         row-gap: 24px;
     }
 
-    /* Drop the desktop-only feature bg/divider treatment when the layout
-       collapses to a single stacked column. */
-    .silkweaver-elegant-feature {
-        background: none;
-        padding: 0;
-        margin-right: 0;
-        border-radius: 0;
-    }
-
+    /* On mobile, flatten the desktop's two-tier layout (.feature + .rest with
+       its own internal grid) into a single grid governed by .silkweaver-elegant-inner.
+       Both wrappers become display: contents so their boxes vanish and ALL six
+       category columns become direct grid children of .silkweaver-elegant-inner.
+       That way there is exactly ONE row-gap value controlling every gap between
+       categories, and the first→second transition has the same stacking as
+       every other transition.  */
+    .silkweaver-elegant-feature,
     .silkweaver-elegant-rest {
-        grid-template-rows: auto;
-        grid-template-columns: 1fr !important;
-        row-gap: 20px;
-        padding-left: 0;
+        display: contents;
     }
 
     .silkweaver-elegant-rest::before,
@@ -363,6 +359,31 @@
 
     .silkweaver-elegant-column.is-cat-expanded > .silkweaver-elegant-category-title::after {
         transform: translateY(-30%) rotate(-135deg);
+    }
+
+    /* Use the same border-based chevron on the elegant dropdown's parent
+       button (e.g. "Services") as the category-level chevron above, so the
+       two visually match. Overrides the unicode '▾' from silkweaver-core.css.
+       Both .active (header2) and .is-open / .open (other headers) trigger
+       the rotated/expanded state. */
+    .silkweaver-elegant-dropdown .silkweaver-dropdown-toggle::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        right: 16px !important;
+        width: 8px !important;
+        height: 8px !important;
+        border-right: 2px solid currentColor !important;
+        border-bottom: 2px solid currentColor !important;
+        transform: translateY(-70%) rotate(45deg) !important;
+        transition: transform 200ms ease !important;
+        opacity: 0.7;
+    }
+
+    .silkweaver-elegant-dropdown.active .silkweaver-dropdown-toggle::after,
+    .silkweaver-elegant-dropdown.is-open .silkweaver-dropdown-toggle::after,
+    .silkweaver-elegant-dropdown.open .silkweaver-dropdown-toggle::after {
+        transform: translateY(-30%) rotate(-135deg) !important;
     }
 
     /* Description and child-pages are collapsed by default on mobile.
