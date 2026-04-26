@@ -831,25 +831,33 @@ body.zx_hd2_active {
         column-gap: 0;
     }
 
+    /* Force transparent on column and child-pages so absolutely no gray bg
+       leaks through behind the child page items. The only place gray lives
+       is the category title row itself — see rule below. */
     .zx_hd2_header .silkweaver-elegant-column {
-        /* No margin-bottom — spacing between categories comes solely from
-           the Grid row-gap on .silkweaver-elegant-inner / .silkweaver-elegant-rest
-           (24px each). Margin here would add an inconsistent extra gap to
-           rest-internal transitions only, making the feature→rest gap look
-           tighter than the rest-internal ones. */
-        /* Soften the agnostic #ececec column borders against header2's dark bg. */
+        background: transparent !important;
         border-top-color: #555;
         border-bottom-color: #555;
-        /* Dark-gray category bg (distinct from the surrounding black panel and
-           the black page-link rows inside). Top-level Services button stays
-           black; child-page links stay black via their own !important rule. */
-        background: #2a2a2a;
     }
 
+    .zx_hd2_header .silkweaver-elegant-child-pages {
+        background: transparent !important;
+    }
+
+    /* Dark-gray bg lives ONLY on the category title row. */
     .zx_hd2_header .silkweaver-elegant-category-title,
     .zx_hd2_header .silkweaver-elegant-section-title {
         color: #fff;
+        background: #2a2a2a !important;
         border-bottom-color: #555;
+    }
+
+    /* When expanded, the title row shows a clearly visible 2px bottom border
+       in a bright off-white that reads against both the gray title bg above
+       and the black panel bg below. Then the child-pages list adds 12px of
+       transparent space (padding-top) before the first page link begins. */
+    .zx_hd2_header .silkweaver-elegant-column.is-cat-expanded > .silkweaver-elegant-category-title {
+        border-bottom: 2px solid #cccccc !important;
     }
 
     .zx_hd2_header .silkweaver-elegant-category-desc {
