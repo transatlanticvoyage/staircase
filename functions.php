@@ -135,6 +135,32 @@ function staircase_enqueue_assets() {
         );
     }
 
+    // Enqueue header1 styles early (only when header1 is the selected header) so the
+    // <link> lands in <head> (no FOUC) and loads AFTER staircase-style — letting
+    // header1's scoped rules override the global inline header CSS. header1 had no
+    // dedicated CSS and inherited the global blue phone button + wrapping mobile
+    // layout; these styles port the StaircaseDefaultHeader look onto header1 only.
+    if (function_exists('staircase_get_header_template') && staircase_get_header_template() === 'header1') {
+        $header1_css_path = get_template_directory() . '/headers/header1/assets/css/styles.css';
+        if (file_exists($header1_css_path)) {
+            wp_enqueue_style(
+                'header1-styles',
+                get_template_directory_uri() . '/headers/header1/assets/css/styles.css',
+                array('staircase-style'),
+                filemtime($header1_css_path)
+            );
+            // Dynamic CTA button color — full parity with StaircaseDefaultHeader's
+            // add_dynamic_styles(): pull from the same options the default header uses.
+            $h1_cta_color = sanitize_hex_color(get_option('staircase_cta_button_color', '#23bb73')) ?: '#23bb73';
+            $h1_cta_hover = sanitize_hex_color(get_option('staircase_cta_button_hover_color', '#fd9f1f')) ?: '#fd9f1f';
+            wp_add_inline_style(
+                'header1-styles',
+                '.site-header.header1 .header-phone-button { background-color: ' . $h1_cta_color . '; }' .
+                '.site-header.header1 .header-phone-button:hover { background-color: ' . $h1_cta_hover . '; }'
+            );
+        }
+    }
+
     // Enqueue company info table component (footer-agnostic, reusable)
     $cit_css_path = get_template_directory() . '/special-elements/zh_agnostic_company_info_table.css';
     if (file_exists($cit_css_path)) {

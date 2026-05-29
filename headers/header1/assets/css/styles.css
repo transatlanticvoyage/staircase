@@ -1,0 +1,324 @@
+/**
+ * Header 1 — dedicated styles
+ *
+ * Ports the look + responsive behavior of StaircaseDefaultHeader (the header the
+ * older roaches site renders) onto header1, which previously had no dedicated CSS
+ * and inherited the global inline header styles in functions.php (blue phone
+ * button + a mobile layout that wraps the phone onto its own full-width line).
+ *
+ * EVERYTHING here is scoped to `.site-header.header1` so header2, header3, and any
+ * other page styling are completely unaffected. Loaded after `staircase-style`
+ * (see the enqueue in functions.php) so these rules override the global inline
+ * header CSS. The mobile menu toggle, scroll/`.scrolled` state, hamburger
+ * animation, and dynamic body padding are already handled by the global
+ * js/navigation.js — this file is presentation only (no JS needed).
+ *
+ * Phone-button color is the StaircaseDefaultHeader default (#23bb73 / hover
+ * #fd9f1f) and is overridden per-site by the dynamic inline style injected in
+ * functions.php from the staircase_cta_button_color / _hover_color options.
+ */
+
+/* ── Header bar (fixed, like StaircaseDefaultHeader) ─────────────────────────── */
+.site-header.header1 {
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    transition: top 0.3s ease, box-shadow 0.3s ease;
+}
+
+.site-header.header1.scrolled {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.site-header.header1 .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+.site-header.header1 .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;          /* override global .header-inner{flex-wrap:wrap} */
+    min-height: 70px;
+    padding-top: 0;
+    padding-bottom: 0;
+    position: relative;
+}
+
+/* ── Logo ────────────────────────────────────────────────────────────────────── */
+.site-header.header1 .header-logo-area {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    min-height: 60px;   /* lock to the scrolled-state height (overrides global 86px) */
+}
+
+.site-header.header1 .site-branding {
+    display: flex;
+    align-items: center;
+    min-height: 60px;   /* lock to the scrolled-state height (overrides global 86px) */
+}
+
+.site-header.header1 .staircase-logo-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+}
+
+.site-header.header1 .staircase-logo-link:hover {
+    opacity: 0.8;
+}
+
+.site-header.header1 .staircase-logo {
+    max-height: 60px !important;   /* lock to the scrolled-state logo size at all times */
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+/* WordPress custom-logo fallback — same locked height */
+.site-header.header1 .custom-logo {
+    height: 60px !important;
+    min-height: 60px !important;
+    width: auto !important;
+}
+
+.site-header.header1 .site-title {
+    font-size: 1.6rem;
+    font-weight: bold;
+    line-height: 1.2;
+    margin: 0;
+}
+
+/* ── Nav area (toggle + nav + phone) ─────────────────────────────────────────── */
+.site-header.header1 .header-nav-area {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+    min-width: 0;
+    padding-top: 0.5rem;     /* lock to the scrolled-state nav padding (overrides global 1rem) */
+    padding-bottom: 0.5rem;
+}
+
+/* Center the nav menu in the gap between the logo (left) and the phone button
+   (right). main-navigation grows to fill the space and centers its items, so the
+   menu no longer sits jammed against the phone on the right. (On mobile the nav is
+   an absolutely-positioned dropdown, so these flex rules have no effect there.) */
+.site-header.header1 .main-navigation {
+    flex: 1 1 auto;
+    justify-content: center;
+}
+
+/* Mobile menu toggle hidden on desktop (global js/navigation.js shows it on mobile
+   and animates it via .menu-toggle.is-active) */
+.site-header.header1 .menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.site-header.header1 .menu-toggle span {
+    display: block;
+    width: 25px;
+    height: 2px;
+    background-color: #333333;
+    margin: 3px 0;
+    transition: all 0.3s ease;
+}
+
+/* ── Phone button — the desirable green pill ─────────────────────────────────── */
+.site-header.header1 .header-phone {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    margin-left: 0;
+}
+
+.site-header.header1 .header-phone-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background-color: #23bb73;
+    color: #ffffff;
+    text-decoration: none;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(35, 187, 115, 0.2);
+}
+
+.site-header.header1 .header-phone-button:hover {
+    background-color: #fd9f1f;
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(253, 159, 31, 0.3);
+}
+
+.site-header.header1 .phone-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.site-header.header1 .phone-number {
+    line-height: 1;
+}
+
+/* Sit below the WP admin bar when present */
+.admin-bar .site-header.header1 {
+    top: 32px;
+}
+
+/* ── Tablet + mobile (≤768px): keep logo + hamburger + phone on ONE tight row ── */
+@media (max-width: 768px) {
+    .site-header.header1 .container {
+        padding: 0 15px;
+    }
+
+    .site-header.header1 .header-inner {
+        flex-wrap: nowrap;      /* override global wrap */
+        min-height: 55px;
+        padding-top: 0;
+        padding-bottom: 0;
+        gap: 8px;
+    }
+
+    /* Logo shrinks instead of pushing other items to a new line */
+    .site-header.header1 .header-logo-area {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        max-width: 50%;
+        min-height: 0;   /* keep the mobile bar compact; don't inherit the 60px desktop lock */
+    }
+
+    .site-header.header1 .site-branding {
+        min-height: 0;
+    }
+
+    .site-header.header1 .staircase-logo {
+        max-height: 40px !important;   /* effective over the global !important; constant (no scroll shrink) */
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .site-header.header1 .site-title {
+        font-size: 1.2rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Toggle + phone stay inline, fixed size */
+    .site-header.header1 .header-nav-area {
+        flex: 0 0 auto;
+        gap: 8px;
+    }
+
+    .site-header.header1 .menu-toggle {
+        display: flex;
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        padding: 4px;
+    }
+
+    .site-header.header1 .menu-toggle span {
+        width: 20px;
+        margin: 2px 0;
+    }
+
+    /* Phone button stays inline (override global order:3 / width:100% / margin-top) */
+    .site-header.header1 .header-phone {
+        order: 0;
+        width: auto;
+        margin: 0;
+        text-align: left;
+        flex: 0 0 auto;
+    }
+
+    .site-header.header1 .header-phone-button {
+        padding: 9px 15px;
+        gap: 9px;
+        box-shadow: none;
+    }
+
+    .site-header.header1 .header-phone-button:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .site-header.header1 .phone-icon {
+        width: 21px;
+        height: 21px;
+    }
+
+    .site-header.header1 .phone-number {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* Admin bar is taller on small screens */
+    .admin-bar .site-header.header1 {
+        top: 46px;
+    }
+}
+
+/* ── Very small screens: collapse phone button to icon-only ──────────────────── */
+@media (max-width: 360px) {
+    .site-header.header1 .phone-number {
+        display: none;
+    }
+
+    .site-header.header1 .header-phone-button {
+        padding: 9px;
+        min-width: 48px;
+        justify-content: center;
+    }
+}
+
+/* ── Top-level nav items (header1 only) ──────────────────────────────────────
+   Bigger (1.3x the 16px default = 20.8px), bold, and tighter horizontal spacing.
+   The child combinator (> li > a / > li > .silkweaver-parent-button) limits this
+   to TOP-LEVEL items only — dropdown / sub-child links keep their existing look. */
+.site-header.header1 .silkweaver-menu > li > a,
+.site-header.header1 .silkweaver-menu > li > .silkweaver-parent-button {
+    font-size: 18.72px !important;    /* 0.9 × 20.8px (downsized slightly) — !important beats TPComExtractedNavStyles' 15px !important on .main-navigation a */
+    font-weight: 700 !important;      /* bold — beats TPCom's 500 !important */
+    letter-spacing: normal !important;/* match buttons (TPCom adds 0.3px to <a> only) */
+    text-transform: none !important;  /* match buttons (TPCom capitalizes <a> only) */
+    line-height: 1.5 !important;
+    padding: 8px 0 !important;        /* uniform; overrides TPCom's 0.5rem 1rem padding on the <a> links */
+}
+
+.site-header.header1 .silkweaver-menu > li {
+    margin-right: 14px;  /* reduced from the 30px default */
+}
+
+.site-header.header1 .silkweaver-menu > li:last-child {
+    margin-right: 0;
+}
