@@ -1,5 +1,6 @@
 <?php
 // TEST COMMENT — modified by chat session 2026-04-15
+// Test comment: VSCode source control sync test - 2026-05-28
 /**
  * Staircase Theme Functions
  * 
