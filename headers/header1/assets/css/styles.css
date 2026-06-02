@@ -322,3 +322,20 @@
 .site-header.header1 .silkweaver-menu > li:last-child {
     margin-right: 0;
 }
+
+/* ── Mobile: tap-to-open for the silkweaver dynamic dropdowns ─────────────────
+   The dropdown is hover-only by default (style.css), so on touch devices it never
+   opens. headers/header1/assets/js/scripts.js adds .is-open on tap; these rules
+   reveal the child area when open (mirrors the :hover reveal, including the mobile
+   horizontal centering). */
+.site-header.header1 .silkweaver-dropdown.is-open .silkweaver-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .site-header.header1 .silkweaver-dropdown.is-open .silkweaver-dropdown-menu {
+        transform: translateX(-50%) translateY(0);
+    }
+}

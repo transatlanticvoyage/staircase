@@ -159,6 +159,22 @@ function staircase_enqueue_assets() {
                 '.site-header.header1 .header-phone-button:hover { background-color: ' . $h1_cta_hover . '; }'
             );
         }
+
+        // Mobile tap-toggle for the silkweaver dynamic dropdowns. They are hover-only
+        // by default, so on touch devices the Services / Areas We Serve child areas
+        // never open. The global js/navigation.js has no handler for
+        // .silkweaver-dropdown-toggle; this header1-scoped script adds one (companion
+        // .is-open CSS lives in header1's styles.css).
+        $header1_js_path = get_template_directory() . '/headers/header1/assets/js/scripts.js';
+        if (file_exists($header1_js_path)) {
+            wp_enqueue_script(
+                'header1-scripts',
+                get_template_directory_uri() . '/headers/header1/assets/js/scripts.js',
+                array(),
+                filemtime($header1_js_path),
+                true
+            );
+        }
     }
 
     // Enqueue company info table component (footer-agnostic, reusable)
