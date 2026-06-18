@@ -3129,6 +3129,48 @@ function staircase_add_admin_menu() {
         'staircase-contact-forms',
         'staircase_contact_form_options_page'
     );
+
+    // Reorder the Staircase submenu items.
+    // WordPress auto-inserts a duplicate "Staircase" parent link as the first
+    // submenu item; reordering the add_submenu_page() calls above cannot move it,
+    // so we rearrange the global $submenu array directly after registration.
+    //
+    // Desired top order: Settings / Logo, then Footer, then the auto-generated
+    // "Staircase" parent link. Remaining items keep their original relative order.
+    global $submenu;
+    if (isset($submenu['staircase-theme'])) {
+        $desired_top = array(
+            'staircase-settings', // Settings / Logo
+            'zaramax_footer_mar', // Footer
+            'staircase-theme',    // auto-generated "Staircase" parent link
+        );
+
+        $items   = $submenu['staircase-theme'];
+        $by_slug = array();
+        foreach ($items as $item) {
+            // $item[2] is the menu slug.
+            $by_slug[$item[2]] = $item;
+        }
+
+        $reordered = array();
+        // 1) Pinned items, in the desired order (only those that exist).
+        foreach ($desired_top as $slug) {
+            if (isset($by_slug[$slug])) {
+                $reordered[] = $by_slug[$slug];
+                unset($by_slug[$slug]);
+            }
+        }
+        // 2) Everything else, preserving original relative order.
+        foreach ($items as $item) {
+            if (isset($by_slug[$item[2]])) {
+                $reordered[] = $item;
+                unset($by_slug[$item[2]]);
+            }
+        }
+
+        // Re-key from 0 so WordPress renders them in this exact order.
+        $submenu['staircase-theme'] = array_values($reordered);
+    }
 }
 add_action('admin_menu', 'staircase_add_admin_menu');
 
@@ -3669,7 +3711,29 @@ function staircase_settings_page() {
         } else {
             delete_option('staircase_header_logo');
         }
-        
+
+        // Save sitewide default header/footer/sidebar/anteheader into the single
+        // zen_sitespren row (wppma_id = 1 — the same row the template selector reads).
+        if (isset($_POST['site_default_header'])
+            || isset($_POST['site_default_footer'])
+            || isset($_POST['site_default_sidebar'])
+            || isset($_POST['site_default_anteheader'])) {
+            global $wpdb;
+            $sitespren_table = $wpdb->prefix . 'zen_sitespren';
+            $wpdb->update(
+                $sitespren_table,
+                array(
+                    'site_default_header'     => isset($_POST['site_default_header']) ? sanitize_text_field(wp_unslash($_POST['site_default_header'])) : '',
+                    'site_default_footer'     => isset($_POST['site_default_footer']) ? sanitize_text_field(wp_unslash($_POST['site_default_footer'])) : '',
+                    'site_default_sidebar'    => isset($_POST['site_default_sidebar']) ? sanitize_text_field(wp_unslash($_POST['site_default_sidebar'])) : '',
+                    'site_default_anteheader' => isset($_POST['site_default_anteheader']) ? sanitize_text_field(wp_unslash($_POST['site_default_anteheader'])) : '',
+                ),
+                array('wppma_id' => 1),
+                array('%s', '%s', '%s', '%s'),
+                array('%d')
+            );
+        }
+
         echo '<div class="notice notice-success"><p>Settings saved successfully!</p></div>';
     }
     
@@ -3685,6 +3749,21 @@ function staircase_settings_page() {
     $footer_link_color = get_option('staircase_footer_default_link_color', '#fdfdfd'); // Default light color
     $footer_logo_bg_color = get_option('staircase_footer_logo_bg_color', '#fdfdfd'); // Default light gray background
     $footer_logo_border_radius = get_option('staircase_footer_logo_border_radius', '8'); // Default 8px border radius
+
+    // Current sitewide default templates from the single zen_sitespren row (wppma_id = 1).
+    global $wpdb;
+    $sitespren_table = $wpdb->prefix . 'zen_sitespren';
+    $sitespren_row = $wpdb->get_row(
+        "SELECT site_default_header, site_default_footer, site_default_sidebar, site_default_anteheader FROM `{$sitespren_table}` WHERE wppma_id = 1 LIMIT 1",
+        ARRAY_A
+    );
+    if (!is_array($sitespren_row)) {
+        $sitespren_row = array();
+    }
+    $sd_header     = $sitespren_row['site_default_header']     ?? '';
+    $sd_footer     = $sitespren_row['site_default_footer']     ?? '';
+    $sd_sidebar    = $sitespren_row['site_default_sidebar']    ?? '';
+    $sd_anteheader = $sitespren_row['site_default_anteheader'] ?? '';
     ?>
     <div class="wrap">
         <h1>Staircase Theme Settings</h1>
@@ -3717,9 +3796,165 @@ function staircase_settings_page() {
                             </td>
                         </tr>
                     </table>
-                    
+
                 </div>
-                
+
+                <div class="settings-section">
+                    <h2>Set Default Sitewide Header, Footer, Sidebar, Anteheader</h2>
+
+                    <style>
+                        .swd-defaults-table {
+                            border-collapse: collapse;
+                            margin-top: 12px;
+                            background: #fff;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                            display: inline-table;
+                        }
+                        .swd-defaults-table th {
+                            padding: 12px 16px;
+                            text-align: left;
+                            font-size: 11px;
+                            font-weight: 500;
+                            color: #6b7280;
+                            text-transform: uppercase;
+                            letter-spacing: 0.05em;
+                            border: 1px solid #e5e7eb;
+                            background: #f9fafb;
+                            white-space: nowrap;
+                        }
+                        .swd-defaults-table td {
+                            padding: 12px 16px;
+                            border: 1px solid #e5e7eb;
+                            vertical-align: top;
+                            white-space: nowrap;
+                        }
+                        .swd-field-label {
+                            font-weight: 700;
+                            text-transform: lowercase;
+                            color: #374151;
+                            min-width: 220px;
+                        }
+                        .swd-field-input {
+                            width: 300px;
+                            padding: 8px 12px;
+                            border: 1px solid #d1d5db;
+                            border-radius: 4px;
+                            font-size: 14px;
+                            font-family: monospace;
+                        }
+                        .swd-pill-buttons {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 4px;
+                        }
+                        .swd-pill-btn {
+                            background: #f3f4f6;
+                            border: 1px solid #d1d5db;
+                            border-radius: 12px;
+                            padding: 4px 8px;
+                            font-size: 11px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            color: #374151;
+                            font-weight: 500;
+                        }
+                        .swd-pill-btn:hover {
+                            background: #e5e7eb;
+                            border-color: #9ca3af;
+                            transform: translateY(-1px);
+                        }
+                        .swd-pill-btn:active {
+                            background: #d1d5db;
+                            transform: translateY(0);
+                        }
+                    </style>
+
+                    <table class="swd-defaults-table">
+                        <thead>
+                            <tr>
+                                <th>Field Name</th>
+                                <th>Datum House</th>
+                                <th>adjunct 1</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="swd-field-label">site_default_header</td>
+                                <td>
+                                    <input type="text" name="site_default_header" class="swd-field-input" value="<?php echo esc_attr($sd_header); ?>">
+                                </td>
+                                <td>
+                                    <div class="swd-pill-buttons">
+                                        <button type="button" class="swd-pill-btn" data-target="site_default_header" data-value="header1">header1</button>
+                                        <button type="button" class="swd-pill-btn" data-target="site_default_header" data-value="header2">header2</button>
+                                        <button type="button" class="swd-pill-btn" data-target="site_default_header" data-value="header3">header3</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="swd-field-label">site_default_footer</td>
+                                <td>
+                                    <input type="text" name="site_default_footer" class="swd-field-input" value="<?php echo esc_attr($sd_footer); ?>">
+                                </td>
+                                <td>
+                                    <div class="swd-pill-buttons">
+                                        <button type="button" class="swd-pill-btn" data-target="site_default_footer" data-value="footer1">footer1</button>
+                                        <button type="button" class="swd-pill-btn" data-target="site_default_footer" data-value="footer2">footer2</button>
+                                        <button type="button" class="swd-pill-btn" data-target="site_default_footer" data-value="footer3">footer3</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="swd-field-label">site_default_sidebar</td>
+                                <td>
+                                    <input type="text" name="site_default_sidebar" class="swd-field-input" value="<?php echo esc_attr($sd_sidebar); ?>">
+                                </td>
+                                <td>
+                                    <div class="swd-pill-buttons">
+                                        <button type="button" class="swd-pill-btn" data-target="site_default_sidebar" data-value="sidebar1">sidebar1</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="swd-field-label">site_default_anteheader</td>
+                                <td>
+                                    <input type="text" name="site_default_anteheader" class="swd-field-input" value="<?php echo esc_attr($sd_anteheader); ?>">
+                                </td>
+                                <td>
+                                    <div class="swd-pill-buttons">
+                                        <button type="button" class="swd-pill-btn" data-target="site_default_anteheader" data-value="anteheader1">anteheader1</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <script>
+                    (function() {
+                        var pills = document.querySelectorAll('.swd-pill-btn');
+                        pills.forEach(function(btn) {
+                            btn.addEventListener('click', function() {
+                                var target = this.getAttribute('data-target');
+                                var value = this.getAttribute('data-value');
+                                var input = document.querySelector('input[name="' + target + '"]');
+                                if (!input) return;
+                                input.value = value;
+                                // brief visual feedback
+                                var self = this;
+                                self.style.background = '#10b981';
+                                self.style.color = '#ffffff';
+                                self.style.borderColor = '#10b981';
+                                setTimeout(function() {
+                                    self.style.background = '';
+                                    self.style.color = '';
+                                    self.style.borderColor = '';
+                                }, 300);
+                            });
+                        });
+                    })();
+                    </script>
+                </div>
+
                 <div class="settings-section">
                     <h2>Template Settings</h2>
                     <table class="form-table">
