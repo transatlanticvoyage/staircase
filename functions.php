@@ -3785,6 +3785,23 @@ function staircase_settings_page() {
             }
         }
 
+        // Save the Victoria "Go To Blog" button-text override (guarded separately,
+        // since its column may have been migrated independently of the others).
+        if (isset($_POST['boilerplatich_victoria_go_to_blog_button_text'])) {
+            global $wpdb;
+            $bp_btn_table = $wpdb->prefix . 'zen_sitespren';
+            $bp_btn_col_exists = $wpdb->get_var("SHOW COLUMNS FROM `{$bp_btn_table}` LIKE 'boilerplatich_victoria_go_to_blog_button_text'");
+            if ($bp_btn_col_exists) {
+                $wpdb->update(
+                    $bp_btn_table,
+                    array('boilerplatich_victoria_go_to_blog_button_text' => sanitize_text_field(wp_unslash($_POST['boilerplatich_victoria_go_to_blog_button_text']))),
+                    array('wppma_id' => 1),
+                    array('%s'),
+                    array('%d')
+                );
+            }
+        }
+
         echo '<div class="notice notice-success"><p>Settings saved successfully!</p></div>';
     }
 
@@ -3832,14 +3849,16 @@ function staircase_settings_page() {
     $vbb_hide        = $home_pylon ? ($home_pylon['victoria_blog_box_hide'] ?? '') : '';
 
     // Boilerplatich text-diversity: current raw values + option JSON files.
-    $bp_raw            = staircase_get_boilerplatich_victoria_raw();
-    $bp_heading_val    = $bp_raw['heading'];
-    $bp_subheading_val = $bp_raw['subheading'];
+    $bp_raw             = staircase_get_boilerplatich_victoria_raw();
+    $bp_heading_val     = $bp_raw['heading'];
+    $bp_subheading_val  = $bp_raw['subheading'];
+    $bp_button_text_val = $bp_raw['go_to_blog_button_text'];
 
     $bp_dir   = get_template_directory() . '/admin-screens/boilerplatich-text-diversity/';
     $bp_files = array(
-        'boilerplatich_victoria_blog_box_heading'    => 'options_for_boilerplatich_victoria_blog_box_heading.json',
-        'boilerplatich_victoria_blog_box_subheading' => 'options_for_boilerplatich_victoria_blog_box_subheading.json',
+        'boilerplatich_victoria_blog_box_heading'       => 'options_for_boilerplatich_victoria_blog_box_heading.json',
+        'boilerplatich_victoria_blog_box_subheading'    => 'options_for_boilerplatich_victoria_blog_box_subheading.json',
+        'boilerplatich_victoria_go_to_blog_button_text' => 'options_for_boilerplatich_victoria_go_to_blog_button_text.json',
     );
     $bp_options = array(); // field => array('raw' => <string>, 'items' => <array>)
     foreach ($bp_files as $bp_field => $bp_fname) {
@@ -4158,6 +4177,16 @@ function staircase_settings_page() {
                                 <td>
                                     <button type="button" class="bptd-choose-random" data-field="boilerplatich_victoria_blog_box_subheading" data-options="<?php echo esc_attr(wp_json_encode($bp_options['boilerplatich_victoria_blog_box_subheading']['items'])); ?>"><span class="bptd-wheel">&#9881;</span> choose random</button>
                                     <button type="button" class="button bptd-view-options" data-field="boilerplatich_victoria_blog_box_subheading">view options</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="swd-field-label">boilerplatich_victoria_go_to_blog_button_text</td>
+                                <td>
+                                    <input type="text" name="boilerplatich_victoria_go_to_blog_button_text" class="swd-field-input" value="<?php echo esc_attr($bp_button_text_val); ?>">
+                                </td>
+                                <td>
+                                    <button type="button" class="bptd-choose-random" data-field="boilerplatich_victoria_go_to_blog_button_text" data-options="<?php echo esc_attr(wp_json_encode($bp_options['boilerplatich_victoria_go_to_blog_button_text']['items'])); ?>"><span class="bptd-wheel">&#9881;</span> choose random</button>
+                                    <button type="button" class="button bptd-view-options" data-field="boilerplatich_victoria_go_to_blog_button_text">view options</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -7493,28 +7522,42 @@ function staircase_render_kristina_cta_box() {
 function staircase_get_boilerplatich_victoria_raw() {
     global $wpdb;
     $table = $wpdb->prefix . 'zen_sitespren';
-    $out = array('heading' => '', 'subheading' => '');
+    $out = array('heading' => '', 'subheading' => '', 'go_to_blog_button_text' => '');
 
-    // Column-existence guard (cached per request).
+    // Column-existence guards (cached per request). The heading/subheading and
+    // the go-to-blog button-text columns are guarded separately so a site that
+    // has run one migration but not the other never triggers a DB error.
     static $has_cols = null;
     if ($has_cols === null) {
         $has_cols = (bool) $wpdb->get_var(
             "SHOW COLUMNS FROM `{$table}` LIKE 'boilerplatich_victoria_blog_box_heading'"
         );
     }
-    if (!$has_cols) {
-        return $out;
+    if ($has_cols) {
+        $row = $wpdb->get_row(
+            "SELECT boilerplatich_victoria_blog_box_heading, boilerplatich_victoria_blog_box_subheading
+             FROM `{$table}` WHERE wppma_id = 1 LIMIT 1",
+            ARRAY_A
+        );
+        if (is_array($row)) {
+            $out['heading']    = $row['boilerplatich_victoria_blog_box_heading']    ?? '';
+            $out['subheading'] = $row['boilerplatich_victoria_blog_box_subheading'] ?? '';
+        }
     }
 
-    $row = $wpdb->get_row(
-        "SELECT boilerplatich_victoria_blog_box_heading, boilerplatich_victoria_blog_box_subheading
-         FROM `{$table}` WHERE wppma_id = 1 LIMIT 1",
-        ARRAY_A
-    );
-    if (is_array($row)) {
-        $out['heading']    = $row['boilerplatich_victoria_blog_box_heading']    ?? '';
-        $out['subheading'] = $row['boilerplatich_victoria_blog_box_subheading'] ?? '';
+    static $has_btn_col = null;
+    if ($has_btn_col === null) {
+        $has_btn_col = (bool) $wpdb->get_var(
+            "SHOW COLUMNS FROM `{$table}` LIKE 'boilerplatich_victoria_go_to_blog_button_text'"
+        );
     }
+    if ($has_btn_col) {
+        $btn = $wpdb->get_var(
+            "SELECT boilerplatich_victoria_go_to_blog_button_text FROM `{$table}` WHERE wppma_id = 1 LIMIT 1"
+        );
+        $out['go_to_blog_button_text'] = ($btn !== null) ? $btn : '';
+    }
+
     return $out;
 }
 
@@ -7536,8 +7579,9 @@ function staircase_render_victoria_blog_box() {
     // Boilerplatich text-diversity overrides: if a value is set on the
     // zen_sitespren row, use it; otherwise fall back to the original defaults.
     $boiler = staircase_get_boilerplatich_victoria_raw();
-    $vbb_heading    = ($boiler['heading'] !== '' && $boiler['heading'] !== null) ? $boiler['heading'] : 'Recent Posts';
-    $vbb_subheading = ($boiler['subheading'] !== '' && $boiler['subheading'] !== null) ? $boiler['subheading'] : 'Key insights from our team';
+    $vbb_heading     = ($boiler['heading'] !== '' && $boiler['heading'] !== null) ? $boiler['heading'] : 'Recent Posts';
+    $vbb_subheading  = ($boiler['subheading'] !== '' && $boiler['subheading'] !== null) ? $boiler['subheading'] : 'Key insights from our team';
+    $vbb_button_text = ($boiler['go_to_blog_button_text'] !== '' && $boiler['go_to_blog_button_text'] !== null) ? $boiler['go_to_blog_button_text'] : 'Go To Blog';
 
     ?>
     <!-- Victoria Blog Box Section -->
@@ -7598,7 +7642,7 @@ function staircase_render_victoria_blog_box() {
                 $blog_page_url = get_permalink($blog_page_id);
             ?>
                 <div class="blog-button-container">
-                    <a href="<?php echo esc_url($blog_page_url); ?>" class="go-to-blog-btn">Go To Blog</a>
+                    <a href="<?php echo esc_url($blog_page_url); ?>" class="go-to-blog-btn"><?php echo esc_html($vbb_button_text); ?></a>
                 </div>
             <?php endif; ?>
         </div>
