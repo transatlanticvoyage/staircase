@@ -2309,8 +2309,14 @@ function staircase_get_current_template() {
         return $normalized;
     }
     
-    // If pylons entry exists but no template specified, return bilberry as default (minimal)
-    return 'bilberry';
+    // If pylons entry exists but no template specified, the default depends on
+    // the post type:
+    //   - posts default to bilberry (minimal)
+    //   - pages (and everything else) default to cherry (full layout)
+    if (get_post_type($post_id) === 'post') {
+        return 'bilberry';
+    }
+    return 'cherry';
 }
 
 // Custom function to check if hero should be displayed based on template
