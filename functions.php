@@ -2309,8 +2309,8 @@ function staircase_get_current_template() {
         return $normalized;
     }
     
-    // If pylons entry exists but no template specified, return cherry as default (full-featured)
-    return 'cherry';
+    // If pylons entry exists but no template specified, return bilberry as default (minimal)
+    return 'bilberry';
 }
 
 // Custom function to check if hero should be displayed based on template
@@ -3734,9 +3734,54 @@ function staircase_settings_page() {
             );
         }
 
+        // Save Victoria Blog Box hide flag onto the homepage's pylons row.
+        if (isset($_POST['victoria_blog_box_hide'])) {
+            $home_pid = (int) get_option('page_on_front');
+            if ($home_pid > 0) {
+                global $wpdb;
+                $pylons_table = $wpdb->prefix . 'pylons';
+                $row_exists = $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(*) FROM {$pylons_table} WHERE rel_wp_post_id = %d",
+                    $home_pid
+                ));
+                if ($row_exists) {
+                    $vhide = (intval($_POST['victoria_blog_box_hide']) === 1) ? 1 : 0;
+                    $wpdb->update(
+                        $pylons_table,
+                        array('victoria_blog_box_hide' => $vhide),
+                        array('rel_wp_post_id' => $home_pid),
+                        array('%d'),
+                        array('%d')
+                    );
+                }
+            }
+        }
+
+        // Save Boilerplatich text-diversity overrides into the single zen_sitespren
+        // row (wppma_id = 1). Separate, column-guarded update so it can't break the
+        // site_default_* save on sites that haven't run the column migration yet.
+        if (isset($_POST['boilerplatich_victoria_blog_box_heading'])
+            || isset($_POST['boilerplatich_victoria_blog_box_subheading'])) {
+            global $wpdb;
+            $bp_table = $wpdb->prefix . 'zen_sitespren';
+            $bp_cols_exist = $wpdb->get_var("SHOW COLUMNS FROM `{$bp_table}` LIKE 'boilerplatich_victoria_blog_box_heading'");
+            if ($bp_cols_exist) {
+                $wpdb->update(
+                    $bp_table,
+                    array(
+                        'boilerplatich_victoria_blog_box_heading'    => isset($_POST['boilerplatich_victoria_blog_box_heading']) ? sanitize_text_field(wp_unslash($_POST['boilerplatich_victoria_blog_box_heading'])) : '',
+                        'boilerplatich_victoria_blog_box_subheading' => isset($_POST['boilerplatich_victoria_blog_box_subheading']) ? sanitize_text_field(wp_unslash($_POST['boilerplatich_victoria_blog_box_subheading'])) : '',
+                    ),
+                    array('wppma_id' => 1),
+                    array('%s', '%s'),
+                    array('%d')
+                );
+            }
+        }
+
         echo '<div class="notice notice-success"><p>Settings saved successfully!</p></div>';
     }
-    
+
     // Get current settings
     $default_template = get_option('staircase_default_template', 'hero-full');
     $enable_breadcrumbs = get_option('staircase_enable_breadcrumbs', false);
@@ -3764,6 +3809,42 @@ function staircase_settings_page() {
     $sd_footer     = $sitespren_row['site_default_footer']     ?? '';
     $sd_sidebar    = $sitespren_row['site_default_sidebar']    ?? '';
     $sd_anteheader = $sitespren_row['site_default_anteheader'] ?? '';
+
+    // Victoria Blog Box quick-update — look up the homepage's pylons row.
+    // "Homepage" = the static front page (page_on_front); 0 if the front page
+    // is the posts index instead of a page.
+    $home_post_id = (int) get_option('page_on_front');
+    $home_pylon = null;
+    if ($home_post_id > 0) {
+        $home_pylon = $wpdb->get_row($wpdb->prepare(
+            "SELECT pylon_id, rel_wp_post_id, victoria_blog_box_hide FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d LIMIT 1",
+            $home_post_id
+        ), ARRAY_A);
+    }
+    $vbb_rel_post_id = $home_pylon['rel_wp_post_id']      ?? '';
+    $vbb_pylon_id    = $home_pylon['pylon_id']            ?? '';
+    $vbb_hide        = $home_pylon ? ($home_pylon['victoria_blog_box_hide'] ?? '') : '';
+
+    // Boilerplatich text-diversity: current raw values + option JSON files.
+    $bp_raw            = staircase_get_boilerplatich_victoria_raw();
+    $bp_heading_val    = $bp_raw['heading'];
+    $bp_subheading_val = $bp_raw['subheading'];
+
+    $bp_dir   = get_template_directory() . '/admin-screens/boilerplatich-text-diversity/';
+    $bp_files = array(
+        'boilerplatich_victoria_blog_box_heading'    => 'options_for_boilerplatich_victoria_blog_box_heading.json',
+        'boilerplatich_victoria_blog_box_subheading' => 'options_for_boilerplatich_victoria_blog_box_subheading.json',
+    );
+    $bp_options = array(); // field => array('raw' => <string>, 'items' => <array>)
+    foreach ($bp_files as $bp_field => $bp_fname) {
+        $bp_path  = $bp_dir . $bp_fname;
+        $bp_rawjs = file_exists($bp_path) ? file_get_contents($bp_path) : '[]';
+        $bp_items = json_decode($bp_rawjs, true);
+        if (!is_array($bp_items)) {
+            $bp_items = array();
+        }
+        $bp_options[$bp_field] = array('raw' => $bp_rawjs, 'items' => $bp_items);
+    }
     ?>
     <div class="wrap">
         <h1>Staircase Theme Settings</h1>
@@ -3949,6 +4030,251 @@ function staircase_settings_page() {
                                     self.style.color = '';
                                     self.style.borderColor = '';
                                 }, 300);
+                            });
+                        });
+                    })();
+                    </script>
+                </div>
+
+                <div class="settings-section">
+                    <h2>Victoria Blog Box (Quick Update For Homepage)</h2>
+
+                    <div id="vbb-quick-update">
+                    <table class="swd-defaults-table">
+                        <thead>
+                            <tr>
+                                <th>field name</th>
+                                <th>datum house</th>
+                                <th>adjunct 1</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="swd-field-label">homepage wp_posts.post_id</td>
+                                <td>
+                                    <input type="text" class="swd-field-input" value="<?php echo esc_attr($home_post_id); ?>" style="background:#f3f4f6;color:#6b7280;" readonly>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="swd-field-label">wp_pylons.rel_wp_post_id</td>
+                                <td>
+                                    <input type="text" class="swd-field-input" value="<?php echo esc_attr($vbb_rel_post_id); ?>" style="background:#f3f4f6;color:#6b7280;" readonly>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="swd-field-label">wp_pylons.pylon_id</td>
+                                <td>
+                                    <input type="text" class="swd-field-input" value="<?php echo esc_attr($vbb_pylon_id); ?>" style="background:#f3f4f6;color:#6b7280;" readonly>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td class="swd-field-label">victoria_blog_box_hide</td>
+                                <td>
+                                    <input type="text" name="victoria_blog_box_hide" class="swd-field-input" value="<?php echo esc_attr($vbb_hide); ?>">
+                                </td>
+                                <td>
+                                    <div class="swd-pill-buttons">
+                                        <button type="button" class="swd-pill-btn" data-target="victoria_blog_box_hide" data-value="0">0 (show)</button>
+                                        <button type="button" class="swd-pill-btn" data-target="victoria_blog_box_hide" data-value="1">1 (hide)</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="description" style="margin-top:10px;">
+                        Updates <code>victoria_blog_box_hide</code> on the homepage's <code>wp_pylons</code> row
+                        (matched by <code>rel_wp_post_id</code> = the front page ID). <strong>1</strong> = hide the Recent Posts box, <strong>0</strong> = show it.
+                        The first three fields are read-only. Saving requires an existing pylons row for the homepage.
+                    </p>
+                    </div>
+
+                    <script>
+                    (function() {
+                        var box = document.getElementById('vbb-quick-update');
+                        if (!box) return;
+                        box.querySelectorAll('.swd-pill-btn').forEach(function(btn) {
+                            btn.addEventListener('click', function() {
+                                var target = this.getAttribute('data-target');
+                                var value = this.getAttribute('data-value');
+                                var input = box.querySelector('input[name="' + target + '"]');
+                                if (!input) return;
+                                input.value = value;
+                                var self = this;
+                                self.style.background = '#10b981';
+                                self.style.color = '#ffffff';
+                                self.style.borderColor = '#10b981';
+                                setTimeout(function() {
+                                    self.style.background = '';
+                                    self.style.color = '';
+                                    self.style.borderColor = '';
+                                }, 300);
+                            });
+                        });
+                    })();
+                    </script>
+                </div>
+
+                <div class="settings-section">
+                    <h2>Boilerplatich Text Piece Diversity Manager</h2>
+                    <p class="description" style="margin-bottom:10px;">
+                        SEO text-diversity controls for the Victoria Blog Box. A value set here overrides the
+                        theme default sitewide; left blank, the theme uses its built-in default text.
+                    </p>
+
+                    <div id="bptd-manager">
+                    <table class="swd-defaults-table">
+                        <thead>
+                            <tr>
+                                <th>field name</th>
+                                <th>datum house</th>
+                                <th>adjunct 1</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="swd-field-label">boilerplatich_victoria_blog_box_heading</td>
+                                <td>
+                                    <input type="text" name="boilerplatich_victoria_blog_box_heading" class="swd-field-input" value="<?php echo esc_attr($bp_heading_val); ?>">
+                                </td>
+                                <td>
+                                    <button type="button" class="bptd-choose-random" data-field="boilerplatich_victoria_blog_box_heading" data-options="<?php echo esc_attr(wp_json_encode($bp_options['boilerplatich_victoria_blog_box_heading']['items'])); ?>"><span class="bptd-wheel">&#9881;</span> choose random</button>
+                                    <button type="button" class="button bptd-view-options" data-field="boilerplatich_victoria_blog_box_heading">view options</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="swd-field-label">boilerplatich_victoria_blog_box_subheading</td>
+                                <td>
+                                    <input type="text" name="boilerplatich_victoria_blog_box_subheading" class="swd-field-input" value="<?php echo esc_attr($bp_subheading_val); ?>">
+                                </td>
+                                <td>
+                                    <button type="button" class="bptd-choose-random" data-field="boilerplatich_victoria_blog_box_subheading" data-options="<?php echo esc_attr(wp_json_encode($bp_options['boilerplatich_victoria_blog_box_subheading']['items'])); ?>"><span class="bptd-wheel">&#9881;</span> choose random</button>
+                                    <button type="button" class="button bptd-view-options" data-field="boilerplatich_victoria_blog_box_subheading">view options</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+
+                    <?php foreach ($bp_options as $bp_field => $bp_opt): ?>
+                    <div class="bptd-modal-overlay" id="bptd-modal-<?php echo esc_attr($bp_field); ?>" style="display:none;">
+                        <div class="bptd-modal">
+                            <div class="bptd-modal-header">
+                                <span class="bptd-modal-title"><?php echo esc_html($bp_field); ?></span>
+                                <button type="button" class="bptd-modal-close" aria-label="Close">&times;</button>
+                            </div>
+                            <div class="bptd-tabs">
+                                <button type="button" class="bptd-tab bptd-tab-active" data-tab="raw">raw json</button>
+                                <button type="button" class="bptd-tab" data-tab="items">items separated</button>
+                            </div>
+                            <div class="bptd-tab-panel bptd-panel-raw">
+                                <textarea class="bptd-raw-json" readonly><?php echo esc_textarea($bp_opt['raw']); ?></textarea>
+                            </div>
+                            <div class="bptd-tab-panel bptd-panel-items" style="display:none;">
+                                <?php if (empty($bp_opt['items'])): ?>
+                                    <p>No items found in the JSON file.</p>
+                                <?php else: foreach ($bp_opt['items'] as $bp_item): ?>
+                                <div class="bptd-item">
+                                    <button type="button" class="button bptd-insert" data-field="<?php echo esc_attr($bp_field); ?>" data-value="<?php echo esc_attr($bp_item); ?>">insert</button>
+                                    <span class="bptd-item-text"><?php echo esc_html($bp_item); ?></span>
+                                </div>
+                                <?php endforeach; endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+
+                    <style>
+                        .bptd-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100000; }
+                        .bptd-modal {
+                            position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+                            width: 600px; max-width: 100%; height: 100vh; background: #fff;
+                            box-shadow: 0 0 30px rgba(0,0,0,0.4); display: flex; flex-direction: column;
+                        }
+                        .bptd-modal-header {
+                            display: flex; justify-content: space-between; align-items: center;
+                            padding: 14px 16px; border-bottom: 1px solid #e5e7eb;
+                        }
+                        .bptd-modal-title { font-weight: 700; font-family: monospace; font-size: 13px; }
+                        .bptd-modal-close { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: #6b7280; }
+                        .bptd-tabs { display: flex; border-bottom: 1px solid #e5e7eb; }
+                        .bptd-tab {
+                            flex: 1; padding: 10px; background: #f9fafb; border: none;
+                            border-bottom: 2px solid transparent; cursor: pointer; font-size: 12px;
+                            text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280;
+                        }
+                        .bptd-tab-active { background: #fff; border-bottom-color: #2271b1; color: #1d2327; font-weight: 600; }
+                        .bptd-tab-panel { flex: 1; overflow-y: auto; padding: 16px; }
+                        .bptd-raw-json {
+                            width: 100%; height: 100%; min-height: 420px; box-sizing: border-box;
+                            font-family: monospace; font-size: 13px; border: 1px solid #d1d5db;
+                            border-radius: 4px; padding: 12px; resize: none;
+                        }
+                        .bptd-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+                        .bptd-item-text { font-size: 14px; }
+                        .bptd-choose-random {
+                            background: #46b450; color: #fff; border: 1px solid #3da046;
+                            border-radius: 4px; padding: 5px 10px; font-size: 13px; cursor: pointer;
+                            margin-right: 6px; vertical-align: middle;
+                        }
+                        .bptd-choose-random:hover { background: #3da046; }
+                        .bptd-choose-random .bptd-wheel { color: #fff; }
+                    </style>
+
+                    <script>
+                    (function() {
+                        // Open a field's modal
+                        document.querySelectorAll('.bptd-view-options').forEach(function(btn) {
+                            btn.addEventListener('click', function() {
+                                var modal = document.getElementById('bptd-modal-' + this.getAttribute('data-field'));
+                                if (modal) modal.style.display = 'block';
+                            });
+                        });
+
+                        document.querySelectorAll('.bptd-modal-overlay').forEach(function(overlay) {
+                            // Close on overlay backdrop click
+                            overlay.addEventListener('click', function(e) {
+                                if (e.target === overlay) overlay.style.display = 'none';
+                            });
+                            // Close button
+                            var closeBtn = overlay.querySelector('.bptd-modal-close');
+                            if (closeBtn) closeBtn.addEventListener('click', function() { overlay.style.display = 'none'; });
+                            // Tab switching
+                            overlay.querySelectorAll('.bptd-tab').forEach(function(tab) {
+                                tab.addEventListener('click', function() {
+                                    var which = this.getAttribute('data-tab');
+                                    overlay.querySelectorAll('.bptd-tab').forEach(function(t) { t.classList.remove('bptd-tab-active'); });
+                                    this.classList.add('bptd-tab-active');
+                                    overlay.querySelector('.bptd-panel-raw').style.display   = (which === 'raw')   ? 'block' : 'none';
+                                    overlay.querySelector('.bptd-panel-items').style.display = (which === 'items') ? 'block' : 'none';
+                                });
+                            });
+                        });
+
+                        // Insert an item's text into the associated field, then close
+                        document.querySelectorAll('.bptd-insert').forEach(function(btn) {
+                            btn.addEventListener('click', function() {
+                                var field = this.getAttribute('data-field');
+                                var value = this.getAttribute('data-value');
+                                var input = document.querySelector('input[name="' + field + '"]');
+                                if (input) input.value = value;
+                                var modal = document.getElementById('bptd-modal-' + field);
+                                if (modal) modal.style.display = 'none';
+                            });
+                        });
+
+                        // Choose random: pick a random option and overwrite the field — no popup needed
+                        document.querySelectorAll('.bptd-choose-random').forEach(function(btn) {
+                            btn.addEventListener('click', function() {
+                                var field = this.getAttribute('data-field');
+                                var opts = [];
+                                try { opts = JSON.parse(this.getAttribute('data-options') || '[]'); } catch (e) { opts = []; }
+                                if (!opts.length) return;
+                                var pick = opts[Math.floor(Math.random() * opts.length)];
+                                var input = document.querySelector('input[name="' + field + '"]');
+                                if (input) input.value = pick;
                             });
                         });
                     })();
@@ -7149,27 +7475,70 @@ function staircase_render_kristina_cta_box() {
 /**
  * Render Victoria Blog Box Section
  */
+/**
+ * Get the raw "boilerplatich" Victoria Blog Box override values from the single
+ * zen_sitespren row (wppma_id = 1). Returns raw stored values ('' when unset).
+ *
+ * Guards against the columns not existing yet (sites that have not run the
+ * migration), so it never triggers a DB error.
+ *
+ * @return array array('heading' => string, 'subheading' => string)
+ */
+function staircase_get_boilerplatich_victoria_raw() {
+    global $wpdb;
+    $table = $wpdb->prefix . 'zen_sitespren';
+    $out = array('heading' => '', 'subheading' => '');
+
+    // Column-existence guard (cached per request).
+    static $has_cols = null;
+    if ($has_cols === null) {
+        $has_cols = (bool) $wpdb->get_var(
+            "SHOW COLUMNS FROM `{$table}` LIKE 'boilerplatich_victoria_blog_box_heading'"
+        );
+    }
+    if (!$has_cols) {
+        return $out;
+    }
+
+    $row = $wpdb->get_row(
+        "SELECT boilerplatich_victoria_blog_box_heading, boilerplatich_victoria_blog_box_subheading
+         FROM `{$table}` WHERE wppma_id = 1 LIMIT 1",
+        ARRAY_A
+    );
+    if (is_array($row)) {
+        $out['heading']    = $row['boilerplatich_victoria_blog_box_heading']    ?? '';
+        $out['subheading'] = $row['boilerplatich_victoria_blog_box_subheading'] ?? '';
+    }
+    return $out;
+}
+
 function staircase_render_victoria_blog_box() {
     global $wpdb;
     $post_id = get_the_ID();
-    
+
     // Check if blog box should be hidden
     $hide_blog_box = $wpdb->get_var($wpdb->prepare(
         "SELECT victoria_blog_box_hide FROM {$wpdb->prefix}pylons WHERE rel_wp_post_id = %d",
         $post_id
     ));
-    
+
     // If hide is TRUE (1), don't render the blog box
     if ($hide_blog_box == 1 || $hide_blog_box === true || $hide_blog_box === 'true') {
         return;
     }
-    
+
+    // Boilerplatich text-diversity overrides: if a value is set on the
+    // zen_sitespren row, use it; otherwise fall back to the original defaults.
+    $boiler = staircase_get_boilerplatich_victoria_raw();
+    $vbb_heading    = ($boiler['heading'] !== '' && $boiler['heading'] !== null) ? $boiler['heading'] : 'Recent Posts';
+    $vbb_subheading = ($boiler['subheading'] !== '' && $boiler['subheading'] !== null) ? $boiler['subheading'] : 'Key insights from our team';
+
     ?>
     <!-- Victoria Blog Box Section -->
     <section class="victoria-blog-box">
         <div class="blog-box-container">
-            <h2>Recent Posts</h2>
-            <p class="blog-box-subtitle">Key insights from our team</p>
+            <h2><?php echo esc_html($vbb_heading); ?></h2>
+            <p class="blog-box-subtitle"><?php echo esc_html($vbb_subheading); ?></p>
             
             <div class="blog-posts-grid">
                 <?php
