@@ -3718,6 +3718,18 @@ function staircase_settings_page() {
             delete_option('staircase_header_logo');
         }
 
+        // Handle WordPress core native favicon (site_icon). Stored as an
+        // attachment ID in the core 'site_icon' option — same value the WP
+        // Customizer / Settings use, rendered by core's wp_site_icon().
+        if (isset($_POST['staircase_site_icon'])) {
+            $icon_id = absint($_POST['staircase_site_icon']);
+            if ($icon_id > 0 && wp_attachment_is_image($icon_id)) {
+                update_option('site_icon', $icon_id);
+            } else {
+                delete_option('site_icon');
+            }
+        }
+
         // Save sitewide default header/footer/sidebar/anteheader into the single
         // zen_sitespren row (wppma_id = 1 — the same row the template selector reads).
         if (isset($_POST['site_default_header'])
@@ -3818,6 +3830,10 @@ function staircase_settings_page() {
     $footer_logo_bg_color = get_option('staircase_footer_logo_bg_color', '#fdfdfd'); // Default light gray background
     $footer_logo_border_radius = get_option('staircase_footer_logo_border_radius', '8'); // Default 8px border radius
 
+    // WordPress core native favicon (site_icon) — attachment ID + preview URL.
+    $site_icon_id  = (int) get_option('site_icon');
+    $site_icon_url = $site_icon_id ? wp_get_attachment_image_url($site_icon_id, 'thumbnail') : '';
+
     // Current sitewide default templates from the single zen_sitespren row (wppma_id = 1).
     global $wpdb;
     $sitespren_table = $wpdb->prefix . 'zen_sitespren';
@@ -3899,6 +3915,25 @@ function staircase_settings_page() {
                                     </div>
                                 <?php endif; ?>
                                 <p class="description">Upload or specify a URL for your site logo. This will appear in the header to the left of the navigation menu.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">
+                                Favicon
+                                <p class="description" style="font-weight:400;margin-top:4px;">Uses WordPress core native favicon functionality (the <code>site_icon</code> option).</p>
+                            </th>
+                            <td>
+                                <div class="favicon-upload-container" style="display:flex;align-items:center;gap:10px;">
+                                    <span id="staircase_favicon_preview">
+                                        <?php if ($site_icon_url): ?>
+                                            <img src="<?php echo esc_url($site_icon_url); ?>" alt="Current Favicon" style="width:48px;height:48px;border:1px solid #ddd;padding:3px;border-radius:4px;vertical-align:middle;">
+                                        <?php endif; ?>
+                                    </span>
+                                    <button type="button" class="button" id="staircase_favicon_select"><?php echo $site_icon_id ? 'Change Favicon' : 'Set Favicon'; ?></button>
+                                    <button type="button" class="button" id="staircase_favicon_remove" style="<?php echo $site_icon_id ? '' : 'display:none;'; ?>">Remove Favicon</button>
+                                    <input type="hidden" name="staircase_site_icon" id="staircase_site_icon" value="<?php echo esc_attr($site_icon_id ?: ''); ?>">
+                                </div>
+                                <p class="description">Set, change, or empty the site favicon. This is the standard WordPress Site Icon — the same value used by Appearance &rarr; Customize &rarr; Site Identity and rendered by WordPress core.</p>
                             </td>
                         </tr>
                     </table>
@@ -4059,6 +4094,14 @@ function staircase_settings_page() {
                         });
                     })();
                     </script>
+                </div>
+
+                <div class="settings-section">
+                    <h2>Silkweaver Nav Menu System</h2>
+                    <a href="<?php echo esc_url(admin_url('admin.php?page=silkweaver_mar')); ?>" target="_blank" rel="noopener"
+                       style="display:inline-flex;align-items:center;gap:8px;background:#001f3f;color:#fff;text-decoration:none;font-weight:600;padding:10px 16px;border-radius:4px;">
+                        <span aria-hidden="true">&#8599;</span> open silkweaver_mar (ruplin admin page)
+                    </a>
                 </div>
 
                 <div class="settings-section">
@@ -4544,6 +4587,42 @@ function staircase_settings_page() {
             e.preventDefault();
             if (confirm('Are you sure you want to remove the logo?')) {
                 $('#header_logo_url').val('');
+            }
+        });
+
+        // --- WordPress core favicon (site_icon) media picker ---
+        var faviconUploader;
+        $('#staircase_favicon_select').click(function(e) {
+            e.preventDefault();
+            if (typeof wp === 'undefined' || typeof wp.media === 'undefined') {
+                alert('Media uploader not available. Please refresh the page.');
+                return;
+            }
+            if (faviconUploader) { faviconUploader.open(); return; }
+            faviconUploader = wp.media({
+                title: 'Select Favicon (Site Icon)',
+                button: { text: 'Use as favicon' },
+                multiple: false,
+                library: { type: 'image' }
+            });
+            faviconUploader.on('select', function() {
+                var attachment = faviconUploader.state().get('selection').first().toJSON();
+                $('#staircase_site_icon').val(attachment.id);
+                var url = (attachment.sizes && attachment.sizes.thumbnail) ? attachment.sizes.thumbnail.url : attachment.url;
+                $('#staircase_favicon_preview').html('<img src="' + url + '" alt="Current Favicon" style="width:48px;height:48px;border:1px solid #ddd;padding:3px;border-radius:4px;vertical-align:middle;">');
+                $('#staircase_favicon_select').text('Change Favicon');
+                $('#staircase_favicon_remove').show();
+            });
+            faviconUploader.open();
+        });
+
+        $('#staircase_favicon_remove').click(function(e) {
+            e.preventDefault();
+            if (confirm('Remove the favicon? Click Save Changes to apply.')) {
+                $('#staircase_site_icon').val('');
+                $('#staircase_favicon_preview').empty();
+                $('#staircase_favicon_select').text('Set Favicon');
+                $(this).hide();
             }
         });
         
