@@ -222,7 +222,7 @@
 
     .site-header.header1 .staircase-logo {
         max-height: 40px !important;   /* effective over the global !important; constant (no scroll shrink) */
-        max-width: 100%;
+        max-width: 100% !important;    /* must be !important too — otherwise loses to the global .staircase-logo{max-width:351px!important} and the logo overflows the (overflow:hidden) logo area, getting clipped on the right */
         object-fit: contain;
     }
 
